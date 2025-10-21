@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Services\Socialite\VatsimProvider;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Socialite\Contracts\Factory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        /*Socialite::extend('vatsim', function($app) {
+            $config = $app['config']['services.vatsim'];
+            return Socialite::buildProvider(VatsimProvider::class, $config);
+        });*/
+
+        $socialite = $this->app->make('Laravel\Socialite\Contracts\Factory');
+
+        $socialite->extend('vatsim', function($app) use ($socialite) {
+            $config = $app['config']['services.vatsim'];
+            return $socialite->buildProvider(VatsimProvider::class, $config);
+        });
     }
 }
