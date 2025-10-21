@@ -10,7 +10,7 @@ use Laravel\Socialite\Facades\Socialite;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('home');
 })->name('home');
 
 
@@ -33,5 +33,5 @@ Route::get('/auth/callback', function() {
  
     Auth::login($user);
  
-    return redirect('/dashboard');
+    return redirect('home');
 })->middleware('web');
