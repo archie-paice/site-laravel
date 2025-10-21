@@ -7,7 +7,9 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
-@plugin "daisyui";
+@plugin "daisyui" {
+    themes: light --default;
+}
 
 
 @plugin "daisyui/theme" {
@@ -43,4 +45,8 @@
   --border: 1px;
   --depth: 0;
   --noise: 0;
+}
+
+:root {
+    background-color: var(--color-base-100);
 }
