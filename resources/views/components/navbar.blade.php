@@ -4,6 +4,10 @@
     </div>
 
     <div>
-        <h1>{{  auth()->user()->first_name }} {{  auth()->user()->last_name }} - {{  auth()->user()->id }}</h1>
+        @if(auth()->user())
+            <h1>{{  auth()->user()->first_name }} {{  auth()->user()->last_name }} - {{  auth()->user()->id }}</h1>
+        @else
+            <h1>Not logged in</h1>
+        @endif
     </div>
 </div>
