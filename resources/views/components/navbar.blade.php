@@ -1,13 +1,13 @@
-<div class="navbar bg-primary text-primary-content">
+<div class="navbar bg-primary text-primary-content z-10">
     <div class="flex-1">
-        <h1>ZJX ARTCC</h1>
+        <a href='{{ route('home') }}' class='font-bold text-2xl'>ZJX ARTCC</a>
     </div>
 
     <div>
         @if(auth()->user())
-            <h1>{{  auth()->user()->first_name }} {{  auth()->user()->last_name }} - {{  auth()->user()->id }}</h1>
+            <h2>{{  auth()->user()->first_name }} {{  auth()->user()->last_name }} - {{  auth()->user()->id }}</h2>
         @else
-            <h1>Not logged in</h1>
+            <x-login-button />
         @endif
     </div>
 </div>

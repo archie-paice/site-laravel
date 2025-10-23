@@ -19,8 +19,10 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
     </head>
-    <body data-theme='light'>
+    <body class='min-h-dvh' data-theme='light'>
         <x-navbar/>
+
+        @yield('body-nopad')
 
         <div class="p-5">
             @yield('body')
