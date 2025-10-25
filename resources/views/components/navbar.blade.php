@@ -1,4 +1,4 @@
-<div class="navbar bg-primary text-primary-content z-10">
+<div class="navbar sticky bg-primary text-primary-content z-10">
     <div class="flex-1">
         <a href='{{ route('home') }}' class='font-bold text-2xl'>ZJX ARTCC</a>
     </div>
