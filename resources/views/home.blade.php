@@ -21,6 +21,19 @@
             <h1 class='text-accent text-7xl'>Virtual Jacksonville ARTCC</h1>
             <h2 class='text-5xl'>Pride of VATUSA South</h2>
         </div>
+@endsection
+
+@section('body')
+    <div class="grid grid-cols-3">
+        <x-card-component title="Online Controllers">
+            <x-online-controller userId='10000010' callsign="MCO_TWR" :onlineSince="new DateTime('2025-10-24 12:00:00')"/>
+        </x-card-component>
+    </div>
+</div>
+
+    <div class='p-5'>
+        <h1>THIS IS A WEBSITE</h1>
+        <h1>IT RENDERS HTML AND CSS AND RUNS JAVASCRIPT. NO OTHER BS!</h1>
     </div>
 </div>
 
