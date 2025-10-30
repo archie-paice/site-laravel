@@ -6,34 +6,30 @@
 @extends('layouts.main')
 
 @section('body-nopad')
-<div class="h-full overflow-hidden">
-    <div class='top-0 w-svw h-max flex justify-center items-center p-0'>
-        <video autoplay class='left-0 top-0 w-full h-full absolute object-cover'
-        muted
-        loop
-        playbackRSate='2'
-        controls='false'
-        disablePictureInPicture
-        src={{ asset('images/ZJX_home.mp4') }}>
-        </video>
+        <div class='relative w-lvw h-lvh flex flex-col -top-20 justify-center items-center'>
+            <video autoplay class='w-full h-full absolute  object-cover'
+            muted
+            loop
+            playbackRSate='2'
+            controls='false'
+            disablePictureInPicture
+            src={{ asset('images/ZJX_home.mp4') }}>
+            </video>
 
-        <div class='mt-10 font-bold text-accent-content text-center z-10'>
-            <h1 class='text-accent text-7xl'>Virtual Jacksonville ARTCC</h1>
-            <h2 class='text-5xl'>Pride of VATUSA South</h2>
+            <div class='font-bold text-accent-content text-center z-10 w-max h-max relative p-10 flex justify-center flex-col items-center'>
+                <div class="absolute glass opacity-25 rounded-2xl bg-info h-full w-full">
+
+                </div>
+                <h1 class='text-accent text-7xl z-20'>Virtual Jacksonville ARTCC</h1>
+                <h2 class='text-5xl z-20'>Pride of VATUSA South</h2>
+            </div>
         </div>
 @endsection
 
 @section('body')
-<div>
     <div class="grid grid-cols-3">
         <x-card-component title="Online Controllers">
             <x-online-controller userId='10000010' callsign="MCO_TWR" :onlineSince="new DateTime('2025-10-24 12:00:00')"/>
         </x-card-component>
     </div>
-
-    <div class='p-5'>
-        <h1>THIS IS A WEBSITE</h1>
-        <h1>IT RENDERS HTML AND CSS AND RUNS JAVASCRIPT. NO OTHER BS!</h1>
-    </div>
-</div>
 @endsection

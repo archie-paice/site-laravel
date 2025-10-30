@@ -8,6 +8,7 @@ use Nette\NotImplementedException;
 
 class UserController extends Controller
 {
+    
     public function show(int $id) {
         $user = User::findOrFail($id);
 

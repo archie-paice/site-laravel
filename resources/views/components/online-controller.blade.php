@@ -3,6 +3,7 @@
 
     $user = User::find($userId);
 ?>
+
 <div class='card bg-sky-100'>
     <div class='p-2 flex flex-col relative'>
         <strong class='text-xl'>{{ $callsign }}</strong>

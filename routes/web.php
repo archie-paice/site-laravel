@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\RosterController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\UserController;
+use App\Jobs\SyncRoster;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -14,3 +16,8 @@ Route::get('/auth/callback', VatsimOauthController::class . '@callback')->name('
 Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth.logout');
 
 Route::resource('users', UserController::class);
+Route::get('/roster', RosterController::class.'@index')->name('roster');
+Route::get('/sync', function() {
+    SyncRoster::dispatch();
+    return 'scheduled';
+});
