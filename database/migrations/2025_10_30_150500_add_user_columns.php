@@ -16,8 +16,9 @@ return new class extends Migration
             $table->integer('rating', false, false)->default(1);
             $table->string('division', 3)->nullable();
             $table->string('facility', 3)->nullable();
-            $table->dateTime('joined_at');
+            $table->dateTime('joined_at')->nullable();
             $table->string('discord_id')->nullable();
+            $table->string('operating_initials')->nullable()->unique();
         });
     }
 

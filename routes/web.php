@@ -19,7 +19,7 @@ Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth
 Route::resource('users', UserController::class);
 Route::get('/roster', RosterController::class . '@index')->name('roster');
 
-if (App::environment('development')) {
+if (App::environment('development', 'local')) {
     Route::get('/sync', function() {
         SyncRoster::dispatch();
         return 'scheduled';

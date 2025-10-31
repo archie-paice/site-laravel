@@ -18,7 +18,10 @@ class VatsimOauthController extends Controller {
         ], [
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
-            'email' => $user->email
+            'email' => $user->email,
+            'division' => $user->division,
+            'facility' => $user->facility,
+            'rating' => $user->rating
         ]);
     
         Auth::login($user);
