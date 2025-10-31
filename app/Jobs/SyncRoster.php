@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\DTOs\VatusaRosterUser;
+use App\Models\User;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -28,17 +29,17 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        echo $this->ROSTER_API_ENDPOINT;
-        echo env('VATUSA_API_KEY');
+        $users = [];
         $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
             'apikey' => env('VATUSA_API_KEY')
         ]);
-        echo $rosterData;
+
         $roster = json_decode($rosterData, true);
         for ($i = 0; $i < count($roster['data']); $i++) {
-            echo print_r($roster['data'][$i]);
-            $user = new VatusaRosterUser($roster['data'][$i]);
-            echo $user->lastName;
+            $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
+            print_r($vatusaUser);
+            
+            User::updateFromVatusa($vatusaUser);
         }  
     }
 }

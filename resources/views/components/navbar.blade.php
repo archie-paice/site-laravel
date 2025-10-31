@@ -7,7 +7,7 @@
         <li>
             <details>
             <summary>Controllers</summary>
-            <ul class="bg-base-100 rounded-t-none p-2">
+            <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                 <li><a href={{ route('roster') }}>Roster</a></li>
                 <li><a>Link 2</a></li>
             </ul>

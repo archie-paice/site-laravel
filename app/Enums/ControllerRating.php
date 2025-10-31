@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Enums;
 
 enum ControllerRating: int
 {
@@ -22,6 +22,7 @@ enum ControllerRating: int
     public function mapToString(): string {
         return match($this) {
             self::INA => "INA",
+            self::SUS => "SUS",
             self::OBS => "OBS",
             self::S1 => "S1",
             self::S2 => "S2",
@@ -53,4 +54,4 @@ ID	Short Text	Long Text
 9	I2	Senior Instructor
 10	I3	Senior Instructor
 11	SUP	Supervisor
-12	ADM	Administrator
+12	ADM	Administrator*/

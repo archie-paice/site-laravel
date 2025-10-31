@@ -2,6 +2,7 @@
 
 namespace App\DTOs;
 
+use App\Enums\ControllerRating;
 use DateTime;
 use Exception;
 
@@ -13,11 +14,11 @@ readonly class VatusaRosterUser {
     public string $facility;
     public DateTime $joinedFacility;
     public DateTime $lastActivity;
-    public int $rating;
+    public ControllerRating $rating;
     public DateTime $createdAt;
     public DateTime $updatedAt;
     public DateTime $lastCompetencyDate;
-    public string $discordId;
+    public string|null $discordId;
     public bool $needsBasic;
     public bool $hasTransferOverride;
     public bool $isHomeController;
@@ -38,26 +39,27 @@ readonly class VatusaRosterUser {
             $this->cid = $data['cid'];
             $this->firstName = $data['fname'];
             $this->lastName = $data['lname'];
+            $this->rating = ControllerRating::from($data['rating']);
             $this->email = $data['email'];
             $this->facility = $data['facility'];
-            $this->createdAt = $data['created_at'];
-            $this->updatedAt = $data['updated_at'];
-            $this->needsBasic = $data['flag_needbasic'];
-            $this->hasTransferOverride = $data['flag_xferOverride'];
-            $this->joinedFacility = $data['facility_join'];
-            $this->isHomeController = $data['flag_homecontroller'];
-            $this->lastActivity = $data['lastactivity'];
-            $this->broadcastOptIn = $data['flag_broadcastOptedIn'];
-            $this->preventStaffAssingnment = $data['flag_preventStaffAssign'];
+            $this->createdAt = new DateTime($data['created_at']);
+            $this->updatedAt = new DateTime($data['updated_at']);
+            $this->needsBasic = $data['flag_needbasic'] || false;
+            $this->hasTransferOverride = $data['flag_xferOverride'] || false;
+            $this->joinedFacility = new DateTime($data['facility_join']);
+            $this->isHomeController = $data['flag_homecontroller'] || false;
+            $this->lastActivity = new DateTime($data['lastactivity']);
+            $this->broadcastOptIn = $data['flag_broadcastOptedIn'] || false;
+            $this->preventStaffAssingnment = $data['flag_preventStaffAssign'] || false;
             $this->discordId = $data['discord_id'];
-            $this->namePrivacy = $data['flag_nameprivacy'];
-            $this->lastCompetencyDate = $data['last_competency_date'];
-            $this->isPromotionEligible = $data['promotion_eligible'];
-            $this->isTransferEligible = $data['transfer_eligible'];
+            $this->namePrivacy = $data['flag_nameprivacy'] || false;
+            $this->lastCompetencyDate = new DateTime($data['last_competency_date']);
+            $this->isPromotionEligible = $data['promotion_eligible'] || false;
+            $this->isTransferEligible = $data['transfer_eligible'] || false;
             $this->roles = $data['roles'];
-            $this->isMentor = $data['isMentor'];
-            $this->isSupOrIns = $data['isSupIns'];
-            $this->lastPromotion = $data['last_promotion'];
+            $this->isMentor = $data['isMentor'] || false;
+            $this->isSupOrIns = $data['isSupIns'] || false;
+            $this->lastPromotion = new DateTime($data['last_promotion']);
         }
         catch(Exception $e) {
             echo $e->getMessage();

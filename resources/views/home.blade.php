@@ -29,7 +29,6 @@
 @section('body')
     <div class="grid grid-cols-3">
         <x-card-component title="Online Controllers">
-            <x-online-controller userId='10000010' callsign="MCO_TWR" :onlineSince="new DateTime('2025-10-24 12:00:00')"/>
         </x-card-component>
     </div>
 @endsection
