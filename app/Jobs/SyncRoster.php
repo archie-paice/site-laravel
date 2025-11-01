@@ -29,11 +29,13 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
+
         $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
             'apikey' => env('VATUSA_API_KEY')
         ]);
 
         $roster = json_decode($rosterData, true);
+        User::where(['rostered' => true])->update(['rostered' => false]);
         
         for ($i = 0; $i < count($roster['data']); $i++) {
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
