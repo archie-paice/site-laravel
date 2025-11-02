@@ -13,7 +13,7 @@
                 </tr>
                 <tr>
                     <th class="cursor-pointer px-4 py-2 text-left">CID</th>
-                    <th>Name</th>
+                    <th>Name (OIs)</th>
                     <th>Rating</th>
                     @haspermission('manage roster')
                         <th>Email</th>
@@ -30,7 +30,11 @@
                         </td>
                         <td class='border-r-1 border-base-300'>
                             <a href={{ route('users.show', ['user' => $user->id]) }} class='text-base-content no-underline'>
-                                {{ $user->last_name }}, {{ $user->first_name }}
+                                {{ $user->last_name }}, {{ $user->first_name }} 
+                                
+                                @unless(is_null($user->operating_initials) || strlen($user->operating_initials) == 0)
+                                    ({{ $user->operating_initials }})
+                                @endunless
                             </a>
 
                             @unless(strcasecmp($user->facility, env('VATUSA_FACILITY')) == 0)

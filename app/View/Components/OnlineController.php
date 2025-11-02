@@ -10,17 +10,16 @@ use Illuminate\View\Component;
 
 class OnlineController extends Component
 {
-    public string $userId;
-    protected User $user;
+    public User $user;
     public string $callsign;
     public DateTime $onlineSince;
 
     /**
      * Create a new component instance.
      */
-    public function __construct(string $userId, string $callsign, DateTime $onlineSince)
+    public function __construct(User $user, string $callsign, DateTime $onlineSince)
     {
-        $this->userId = $userId;
+        $this->user = $user;
         $this->callsign = $callsign;
         $this->onlineSince = $onlineSince;
     }

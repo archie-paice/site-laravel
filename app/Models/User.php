@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\DTOs\VatusaRosterUser;
 use App\Enums\ControllerRating;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -86,5 +87,12 @@ class User extends Authenticatable
             'discord_id' => $vatusaUser->discordId
         ],
         ['id']);
+    }
+
+    protected function operatingInitials(): Attribute {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+            set: fn($value) => strtoupper($value)
+        );
     }
 }

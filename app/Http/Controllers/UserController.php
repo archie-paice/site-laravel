@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Log;
 
 class UserController extends Controller implements HasMiddleware
 {
@@ -48,6 +49,10 @@ class UserController extends Controller implements HasMiddleware
             'operating_initials' => $validated['operatingInitials']
         ]);
 
-        return redirect()->route('users.edit', ['user' => $user->id])->with('success');
+        Log::info('User {id} updated by user {id2}', [
+            'id' => $user->id,
+            'id2' => auth()->user()->id
+        ]);
+        return redirect()->route('users.edit', ['user' => $user->id])->with('success', 'User updated successfully');
     }
 }

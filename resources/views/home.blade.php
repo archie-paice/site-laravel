@@ -3,6 +3,9 @@
         display: none !important;
     }
 </style>
+
+@section('title', 'Home')
+
 @extends('layouts.main')
 
 @section('body-nopad')
@@ -29,6 +32,12 @@
 @section('body')
     <div class="grid grid-cols-3">
         <x-card-component title="Online Controllers">
+            @foreach ($onlineSessions as $session)
+                <x-online-controller
+                :callsign='$session->callsign'
+                :user='$session->user'
+                :onlineSince='new DateTime($session->start)'/>
+            @endforeach
         </x-card-component>
     </div>
 @endsection

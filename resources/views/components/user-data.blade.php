@@ -8,8 +8,15 @@
 </div>
 
 <div class="grid grid-cols-2 gap-x-20">
+    <a href={{ route('users.edit', $user) }} class='link absolute top-5 right-5'>Edit User</a>
     <x-label label='CID' :value="$user->id"/>
     <x-label label='Rating' :value="$user->rating->mapToString()"/>
+
+    @unless(is_null($user->operating_initials) || strlen($user->operating_initials) == 0)
+        <x-label label='Operating Initials' :value="$user->operating_initials"/>
+    @else
+        <x-label label='Operating Initials' value="Unassigned"/>
+    @endunless
     
     @if($user->rostered && $user->joined_at != null)
         <x-label label='Member Since' :value='new DateTime($user->joined_at)->format("M d Y")'/>

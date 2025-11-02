@@ -27,12 +27,20 @@
         <x-navbar/>
 
         @if ($errors->any())
-            <div class="alert alert-danger">
+            <div class="alert alert-danger" x-data="{open: true}" x-show='open' >
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
+                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
+            </div>
+        @endif
+
+        @if(session('success'))
+            <div x-data="{open: true}" x-show='open' class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
             </div>
         @endif
 
