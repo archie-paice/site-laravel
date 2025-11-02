@@ -24,7 +24,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     Route::get('users', UserController::class.'@index')->name('users.index');
 
     Route::middleware('permission:manage statistics prefixes')->group(function() {
-        Route::resource('statistics', StatisticsPrefixesController::class);
+        Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
     });
 });
 

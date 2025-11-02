@@ -30,7 +30,7 @@
                 <details>
                     <summary>Data Management</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('admin.index') }}>Admin Dashboard</a></li>
+                        <li><a href={{ route('statistics-prefixes.index') }}>Statistics Prefixes</a></li>
                     </ul>
                 </details>
             </li>

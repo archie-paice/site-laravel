@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('statistics_prefixes', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->timestamps();
+            $table->id();
+            $table->string('name')->unique();
         });
     }
 
