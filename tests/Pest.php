@@ -1,5 +1,11 @@
 <?php
 
+use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\PermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+use function Pest\Laravel\artisan;
+
 /*
 |--------------------------------------------------------------------------
 | Test Case
@@ -12,9 +18,9 @@
 */
 
 pest()->extend(Tests\TestCase::class)
-    ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->use(RefreshDatabase::class)
     ->in('Feature');
-
+    
 /*
 |--------------------------------------------------------------------------
 | Expectations
@@ -28,6 +34,20 @@ pest()->extend(Tests\TestCase::class)
 
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
+});
+
+expect()->extend('toRunInLessThan', function (int $milliseconds) {
+    $start = microtime(true);
+
+    // Execute the callable
+    ($this->value)();
+
+    $elapsedMs = (microtime(true) - $start) * 1000;
+
+    expect($elapsedMs)
+        ->toBeLessThan($milliseconds, "Execution took {$elapsedMs}ms, expected under {$milliseconds}ms");
+
+    return $this;
 });
 
 /*
