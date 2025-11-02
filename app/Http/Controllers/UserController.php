@@ -3,9 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 
-class UserController extends Controller
+class UserController extends Controller implements HasMiddleware
 {
+    public static function middleware() {
+        return [
+            new Middleware('permission:manage users', only: ['edit', 'update'])
+        ];
+    }
+
     public function index() {
         $users = User::all();
 
@@ -20,7 +28,9 @@ class UserController extends Controller
     }
 
     public function edit(int $id) {
-
+        $user = User::findOrFail($id);
+        
+        return view('users.edit', ['user'=> $user]);
     }
 
     public function update(int $id, User $user) {

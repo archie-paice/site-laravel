@@ -3,5 +3,5 @@
 @section('title', 'User Management')
 
 @section('body')
-    @livewire('user-table', ['users' => $users])
+    @livewire('user-table')
 @endsection

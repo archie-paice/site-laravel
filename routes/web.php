@@ -1,8 +1,8 @@
 <?php
 
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Jobs\SyncRoster;
 use Illuminate\Support\Facades\App;
@@ -17,8 +17,13 @@ Route::get('/auth/redirect', VatsimOauthController::class . '@redirect')->name('
 Route::get('/auth/callback', VatsimOauthController::class . '@callback')->name('auth.callback');
 Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth.logout');
 
-Route::resource('users', UserController::class);
-Route::resource('admin', AdminController::class)->middleware('permission:view dashboard');
+Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
+
+Route::prefix('admin')->middleware('permission:view dashboard')->group(function() {
+    Route::get('/', DashboardController::class.'@index')->name('admin.index');
+    Route::get('users', UserController::class.'@index')->name('users.index');
+});
+
 
 
 Route::get('/roster', RosterController::class . '@index')->name('roster');
