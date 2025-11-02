@@ -26,6 +26,16 @@
     <body class='min-h-dvh' data-theme='light'>
         <x-navbar/>
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @yield('body-nopad')
 
         <h1 class='font-bold text-2xl ml-5 mt-5'>@yield('title')</h1>

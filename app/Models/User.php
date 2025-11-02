@@ -32,7 +32,8 @@ class User extends Authenticatable
         'division',
         'facility',
         'rostered',
-        'discord_id'
+        'discord_id',
+        'operating_initials'
     ];
 
     /**
