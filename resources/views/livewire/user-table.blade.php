@@ -1,19 +1,25 @@
-<div>
+<div x-data="{ search: @entangle('search').live }">
+    <input 
+    type='text' 
+    x-model.debounce.300ms="search" 
+    class='input input-md mb-5' 
+    placeholder='Search (Name, CID)'/>
+
     @unless(sizeof($users) == 0)
-        <table x-data='$users' class='table table-zebra table-md w-max border-2 border-base-300'>
+        <table class='table table-zebra table-md w-max border-2 border-base-300'>
             <thead>
                 <tr class='text-xl font-bold'>
-                    <th colspan='4'>ZJX Roster</th>
-                    <th rowspan='1'>Certifications</th>
+                    <th>ZJX Roster</th>
                 </tr>
-                <tr colspan='4'>
-                    <th>CID</th>
+                <tr>
+                    <th class="cursor-pointer px-4 py-2 text-left">CID</th>
                     <th>Name</th>
                     <th>Rating</th>
-                    <th>Facility</th>
-                    <th>Cert 1</th>
-                    <th>Cert 2</th>
-                    <th>Cert 3</th>
+                    @haspermission('manage roster')
+                        <th>Email</th>
+                        <th>Joined</th>
+                        <th>Last Activity</th>
+                    @endhaspermission
                 </tr>
             </thead>
             <tbody>
@@ -32,8 +38,23 @@
                             @endunless
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $user->rating->mapToString() }}</td>
-                        <td class='border-r-1 border-base-300'>{{ $user->facility }}</td>
-                        <td class='border-r-1 border-base-300'>TBD</td>
+                        @haspermission('manage roster')
+                            <td>{{ $user->email }}</td>
+                            <td>{{ $user->joined_at }}</td>
+                            <td>{{ $user->updated_at }}</td>
+                            <td>
+                                <ul class='text-accent menu menu-horizontal h-10 items-center gap-x-5 justify-center'>
+                                    <li>
+                                        <details>
+                                            <summary>Actions</summary>
+                                            <ul class="bg-base-100 text-base-content rounded-t-none p-2 z-10">
+                                                <li><a href={{ route('users.edit', ['user' => $user->id]) }}>Edit</a></li>
+                                            </ul>
+                                        </details>
+                                    </li>
+                                </ul>
+                            </td>
+                        @endhaspermission
                     </tr>
                 @endforeach
             </tbody>
@@ -41,4 +62,8 @@
     @else
         <h1>There are no rostered users.</h1>
     @endunless
+
+    <div class="w-150 mt-5">
+        {{ $users->links() }}
+    </div>
 </div>
