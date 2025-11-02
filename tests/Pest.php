@@ -1,6 +1,10 @@
 <?php
 
+use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\PermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+
+use function Pest\Laravel\artisan;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,7 +20,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 pest()->extend(Tests\TestCase::class)
     ->use(RefreshDatabase::class)
     ->in('Feature');
-
+    
 /*
 |--------------------------------------------------------------------------
 | Expectations
