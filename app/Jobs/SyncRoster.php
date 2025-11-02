@@ -2,8 +2,10 @@
 
 namespace App\Jobs;
 
+use App;
 use App\DTOs\VatusaRosterUser;
 use App\Models\User;
+use DateTime;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -42,5 +44,23 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             
             User::updateFromVatusa($vatusaUser);
         }  
+
+        if (App::environment('local', 'development')) {
+            $user = User::createOrFirst([
+                'id' => 10000010,
+            ], [
+                'id' => 10000010,
+                'first_name' => 'Web',
+                'last_name' => 'Ten',
+                'email' => 'web10@vatusa.net',
+                'rating' => 11,
+                'joined_at' => new DateTime(),
+                'division' => 'USA',
+                'facility' => 'ZJX',
+                'rostered' => true,]);
+
+            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+
+        };
     }
 }

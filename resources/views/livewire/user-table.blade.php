@@ -1,9 +1,6 @@
-@extends('layouts.main')
-
-@section('title', 'Roster')
-@section('body')
+<div>
     @unless(sizeof($users) == 0)
-        <table class='table table-zebra table-md w-max border-2 border-base-300'>
+        <table x-data='$users' class='table table-zebra table-md w-max border-2 border-base-300'>
             <thead>
                 <tr class='text-xl font-bold'>
                     <th colspan='4'>ZJX Roster</th>
@@ -44,4 +41,4 @@
     @else
         <h1>There are no rostered users.</h1>
     @endunless
-@endsection
+</div>

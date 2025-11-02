@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\UserController;
@@ -17,6 +18,9 @@ Route::get('/auth/callback', VatsimOauthController::class . '@callback')->name('
 Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth.logout');
 
 Route::resource('users', UserController::class);
+Route::resource('admin', AdminController::class)->middleware('permission:view dashboard');
+
+
 Route::get('/roster', RosterController::class . '@index')->name('roster');
 
 if (App::environment('development', 'local')) {

@@ -2,7 +2,6 @@
 namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Nette\NotImplementedException;
 
 class RosterController extends Controller {
     public function index() {

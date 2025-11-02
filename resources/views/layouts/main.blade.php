@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>ZJX ARTCC</title>
+        <title>@yield('title') - ZJX ARTCC</title>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -26,6 +26,8 @@
         <x-navbar/>
 
         @yield('body-nopad')
+
+        <h1 class='font-bold text-2xl ml-5 mt-5'>@yield('title')</h1>
 
         <div class="p-5">
             @yield('body')

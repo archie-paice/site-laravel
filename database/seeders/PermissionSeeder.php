@@ -3,46 +3,34 @@
 namespace Database\Seeders;
 
 use DB;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class PermissionSeeder extends Seeder
 {
+    private array $permissions = [
+        'core' => ['edit own profile'],
+        'staff' => ['view dashboard'],
+        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs'],
+        'events' => ['create events', 'edit events', 'delete events', 'assign event positions', 'publish events'],
+        'facilities' => ['manage roster', 'edit certifications', 'assign positions', 'manage visiting controllers'],
+        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs' ],
+        'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students']
+    ];
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-        Role::create([
-            'name' => 'staff',
-            'guard_name' => 'staff'
-        ]);
+        foreach ($this->permissions as $group => $groupPermissions) {
+            $role = Role::firstOrCreate(['name' => $group]);
 
-        Role::table('roles')->insert([
-            'name' => 'web_staff',
-            'guard_name' => 'web_staff'
-        ]);
-
-        Role::table('roles')->insert([
-            'name' => 'event_staff',
-            'guard_name' => 'event_staff'
-        ]);
-
-        Role::table('roles')->insert([
-            'name' => 'training_staff',
-            'guard_name' => 'training_staff'
-        ]);
-
-        Role::table('roles')->insert([
-            'name' => 'senior_staff',
-            'guard_name' => 'senior_staff'
-        ]);
-
-        Role::table('roles')->insert([
-            'name' => 'instructors',
-            'guard_name' => 'instructors'
-        ]);
+            foreach ($groupPermissions as $permission) {
+                Permission::firstOrCreate(['name' => $permission]);
+                $role->givePermissionTo($permission);
+            }
+        }
     }
 }
