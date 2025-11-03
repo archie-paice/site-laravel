@@ -4,8 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\StatisticsPrefixes;
+use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Log;
+use Str;
 
 class StatisticsPrefixesController extends Controller
 {
@@ -14,7 +17,7 @@ class StatisticsPrefixesController extends Controller
      */
     public function index()
     {
-        return view('admin.statistics-prefixes.index', ['prefixes' => StatisticsPrefixes::all()]);
+        return view('statistics-prefixes.index', ['prefixes' => StatisticsPrefixes::all()->sortBy('name')]);
     }
 
     /**
@@ -22,17 +25,15 @@ class StatisticsPrefixesController extends Controller
      */
     public function store(Request $request)
     {
+       
         $validated = $request->validate([
             'name' => 'required|max:5|min:2'
         ]);
 
-        StatisticsPrefixes::findOrNew([
-            'name' => $validated['name']
-        ]);
+        StatisticsPrefixes::firstOrNew(['name' => $validated['name']]);
 
-        Log::info('Statistics prefix {prefix} added by user {user}', ['prefix' => $validated['name'], 'user' => auth()->user()->id]);
-
-        return redirect()->back()->with('success', 'Prefix added successfully');
+        Log::info('Statistics prefix {prefix} added by user {user}', ['prefix' => $validated['name'], 'user' => Auth::user()->id]);
+        return redirect()->back()->with('success', Str::upper($validated['name']).' added succesfully!');
     }
 
     /**
@@ -42,7 +43,7 @@ class StatisticsPrefixesController extends Controller
     {
         StatisticsPrefixes::destroy($id);
 
-        Log::info('Statistics prefix {prefix} deleted by user {user}', ['prefix' => $id, 'user' => auth()->user()->id]);
+        Log::info('Statistics prefix {prefix} deleted by user {user}', ['prefix' => $id, 'user' => Auth::user()->id]);
 
         return redirect()->back()->with('success', 'Prefix removed successfully');
     }

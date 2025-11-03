@@ -15,7 +15,7 @@
                     <th class="cursor-pointer px-4 py-2 text-left">CID</th>
                     <th>Name (OIs)</th>
                     <th>Rating</th>
-                    @haspermission('manage roster')
+                    @haspermission('manage users')
                         <th>Email</th>
                         <th>Joined</th>
                         <th>Last Activity</th>
@@ -42,7 +42,8 @@
                             @endunless
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $user->rating->mapToString() }}</td>
-                        @haspermission('manage roster')
+                        
+                        @haspermission('manage users')
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->joined_at }}</td>
                             <td>{{ $user->updated_at }}</td>

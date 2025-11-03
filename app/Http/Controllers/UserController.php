@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Log;
 
 class UserController extends Controller implements HasMiddleware
@@ -51,7 +52,7 @@ class UserController extends Controller implements HasMiddleware
 
         Log::info('User {id} updated by user {id2}', [
             'id' => $user->id,
-            'id2' => auth()->user()->id
+            'id2' => Auth::user()->id
         ]);
         return redirect()->route('users.edit', ['user' => $user->id])->with('success', 'User updated successfully');
     }

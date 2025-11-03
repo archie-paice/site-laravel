@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\StatisticsPrefixesController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\UserController;
 use App\Jobs\SyncRoster;
+use App\Jobs\UpdateOnlineControllers;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
@@ -36,5 +37,9 @@ if (App::environment('development', 'local')) {
     Route::get('/sync', function() {
         SyncRoster::dispatch();
         return 'scheduled';
+    });
+
+    Route::get('/online', function() {
+        UpdateOnlineControllers::dispatch();
     });
 }
