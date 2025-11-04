@@ -15,6 +15,11 @@ class Staff extends Model
         'title_long',
         'user_id'
     ];
+
+    public function user() {
+        return $this->hasOne(User::class);
+    }
+
     public static function fromFacilityInfoDTO(\App\DTOs\VatusaFacilityInfoDTO $infoDTO)
     {
         static::upsert([

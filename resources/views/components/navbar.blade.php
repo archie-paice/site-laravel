@@ -1,6 +1,12 @@
 <div class="navbar bg-primary text-primary-content z-20">
     <div class="flex-1 ml-5">
-        <a href='{{ route('home') }}' class='font-bold text-2xl'>ZJX ARTCC</a>
+        <a href='{{ route('home') }}' class='font-bold text-2xl'>
+            ZJX ARTCC
+
+            @env('development')
+                <h1 class="text-error font-bold">development</h1>
+            @endenv
+        </a>
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
@@ -9,7 +15,7 @@
                 <summary>Controllers</summary>
                 <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                     <li><a href={{ route('roster') }}>Roster</a></li>
-                    <li><a>ARTCC Staff</a></li>
+                    <li><a href={{ route('staff') }}>ARTCC Staff</a></li>
                 </ul>
             </details>
         </li>
