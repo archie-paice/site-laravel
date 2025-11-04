@@ -13,7 +13,7 @@
             <video autoplay class='w-full h-full absolute  object-cover'
             muted
             loop
-            playbackRSate='2'
+            playbackRate='2'
             controls='false'
             disablePictureInPicture
             src={{ asset('images/ZJX_home.mp4') }}>

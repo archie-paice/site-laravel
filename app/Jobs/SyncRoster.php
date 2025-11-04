@@ -3,7 +3,9 @@
 namespace App\Jobs;
 
 use App;
+use App\DTOs\VatusaFacilityInfoDTO;
 use App\DTOs\VatusaRosterUser;
+use App\Models\Staff;
 use App\Models\User;
 use DateTime;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
@@ -16,7 +18,8 @@ use function Pest\Laravel\json;
 class SyncRoster implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
-    private string $ROSTER_API_ENDPOINT;
+    private readonly string $ROSTER_API_ENDPOINT;
+    private readonly string $FACILITY_INFO_ENDPOINT;
 
     /**
      * Create a new job instance.
@@ -24,26 +27,22 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     public function __construct()
     {
         $this->ROSTER_API_ENDPOINT = env('VATUSA_API_URL') . '/facility/' . env('VATUSA_FACILITY') . '/roster/both';
+        $this->FACILITY_INFO_ENDPOINT = env('VATUSA_API_URL') . '/facility/' . env('VATUSA_FACILITY');
     }
 
-    /**
-     * Execute the job.
-     */
-    public function handle(): void
-    {
-
+    private function updateRoster() {
         $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
             'apikey' => env('VATUSA_API_KEY')
         ]);
 
         $roster = json_decode($rosterData, true);
         User::where(['rostered' => true])->update(['rostered' => false]);
-        
+
         for ($i = 0; $i < count($roster['data']); $i++) {
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
-            
+
             User::updateFromVatusa($vatusaUser);
-        }  
+        }
 
         if (App::environment('local', 'development')) {
             $user = User::createOrFirst([
@@ -62,5 +61,25 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
 
         };
+    }
+
+    private function updateStaffMembers() {
+        $facilityInfo = Http::get($this->FACILITY_INFO_ENDPOINT, [
+            'apikey' => env('VATUSA_API_KEY')
+        ]);
+
+        $infoDTO = new VatusaFacilityInfoDTO($facilityInfo['data']);
+
+        Staff::fromFacilityInfoDTO($infoDTO);
+    }
+
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
+    {
+        $this->updateRoster();
+
+        $this->updateStaffMembers();
     }
 }
