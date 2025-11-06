@@ -95,4 +95,8 @@ class User extends Authenticatable
             set: fn($value) => strtoupper($value)
         );
     }
+
+    public function staffRoles() {
+        return $this->hasMany(Staff::class);
+    }
 }

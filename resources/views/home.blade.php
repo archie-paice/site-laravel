@@ -23,8 +23,8 @@
                 <div class="absolute glass opacity-25 rounded-2xl bg-info h-full w-full">
 
                 </div>
-                <h1 class='text-accent text-7xl z-20'>Virtual Jacksonville ARTCC</h1>
-                <h2 class='text-5xl z-20'>Pride of VATUSA South</h2>
+                <h1 class='text-primary text-7xl z-20'>Virtual Jacksonville ARTCC</h1>
+                <h2 class='text-primary-content text-5xl z-20'>Pride of VATUSA South</h2>
             </div>
         </div>
 @endsection

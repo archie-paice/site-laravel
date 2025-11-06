@@ -64,6 +64,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     }
 
     private function updateStaffMembers() {
+        Staff::truncate();
+
         $facilityInfo = Http::get($this->FACILITY_INFO_ENDPOINT, [
             'apikey' => env('VATUSA_API_KEY')
         ]);
