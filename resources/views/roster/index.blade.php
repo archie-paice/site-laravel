@@ -26,7 +26,7 @@
                             <a href='{{ route('users.show', ['user' => $user->id]) }}' class='text-base-content no-underline'>{{ $user->id }}</a>
                         </td>
                         <td class='border-r-1 border-base-300'>
-                            <a href='{{route(' users.show', ['user' => $user->id])}}' class='text-base-content no-underline'>
+                            <a href='{{route('users.show', ['user' => $user->id])}}' class='text-base-content no-underline'>
                                 {{ $user->last_name }}, {{ $user->first_name }}
                             </a>
 

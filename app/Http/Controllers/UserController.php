@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -18,11 +19,11 @@ class UserController extends Controller implements HasMiddleware
     }
 
     public function index() {
-        $users = User::all();
+        $user = Auth::user();
+        $trainingAssignments = TrainingAssignment::where(['trainee_id' => $user->id])->orderBy('created_at', 'desc')->get();
 
-        return view('users.index', ['users' => $users]);
+        return view('users.index', ['user' => $user, 'trainingAssignments' => $trainingAssignments]);
     }
-
 
     public function show(int $id) {
         $user = User::findOrFail($id);
@@ -32,7 +33,7 @@ class UserController extends Controller implements HasMiddleware
 
     public function edit(Request $request, int $id) {
         $user = User::findOrFail($id);
-        
+
         return view('users.edit', ['user'=> $user]);
     }
 

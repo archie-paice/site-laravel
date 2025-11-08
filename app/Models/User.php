@@ -99,4 +99,12 @@ class User extends Authenticatable
     public function staffRoles() {
         return $this->hasMany(Staff::class);
     }
+
+    public function trainingAssignmentsAsStudent() {
+        return $this->hasMany(TrainingAssignment::class, 'trainee_id');
+    }
+
+    public function trainingAssignmentsAsInstructor() {
+        return $this->hasMany(TrainingAssignment::class, 'instructor_id');
+    }
 }

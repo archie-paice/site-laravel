@@ -3,12 +3,12 @@
     @if ($user->rostered && strcasecmp($user->facility, 'ZJX') == 0)
         <h2 class='text-lg text-accent'>Home Controller</h2>
     @elseif ($user->rostered)
-        <h2 class='text-lg text-error'>Visitng Controller</h2>
+        <h2 class='text-lg text-error'>Visiting Controller</h2>
     @endif
 </div>
 
 <div class="grid grid-cols-2 gap-x-20">
-    <a href={{ route('users.edit', $user) }} class='link absolute top-5 right-5'>Edit User</a>
+    <a href='{{ route('users.edit', $user) }}' class='link absolute top-5 right-5'>Edit User</a>
     <x-label label='CID' :value="$user->id"/>
     <x-label label='Rating' :value="$user->rating->mapToString()"/>
 
@@ -17,9 +17,9 @@
     @else
         <x-label label='Operating Initials' value="Unassigned"/>
     @endunless
-    
+
     @if($user->rostered && $user->joined_at != null)
-        <x-label label='Member Since' :value='new DateTime($user->joined_at)->format("M d Y")'/>
+        <x-label label='Member Since' :value='(new DateTime($user->joined_at))->format("M d Y")'/>
     @endif
 
     @unless(strcasecmp($user->facility, 'ZJX') == 0)

@@ -47,7 +47,7 @@
                 <details>
                     <summary>{{  auth()->user()->first_name }} {{  auth()->user()->last_name }} - {{  auth()->user()->id }}</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('users.show', ['user' => auth()->user()->id]) }}>Profile</a></li>
+                        <li><a href={{ route('profile') }}>Profile</a></li>
                         <li><a href={{ route('auth.logout') }}>Logout</a></li>
                     </ul>
                 </details>
