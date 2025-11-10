@@ -18,13 +18,6 @@ class UserController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index() {
-        $user = Auth::user();
-        $trainingAssignments = TrainingAssignment::where(['trainee_id' => $user->id])->orderBy('created_at', 'desc')->get();
-
-        return view('users.index', ['user' => $user, 'trainingAssignments' => $trainingAssignments]);
-    }
-
     public function show(int $id) {
         $user = User::findOrFail($id);
 

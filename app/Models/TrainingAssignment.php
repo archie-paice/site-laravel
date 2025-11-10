@@ -15,6 +15,10 @@ class TrainingAssignment extends Model
         'active'
     ];
 
+    protected $casts = [
+        'active' => 'boolean',
+    ];
+
     public function trainee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trainee_id');

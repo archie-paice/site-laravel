@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
 use Livewire\WithPagination;
 
-class UserTable extends Component
+class UserTable extends SortableTable
 {
     use WithPagination;
     public string $search = '';
@@ -22,7 +22,7 @@ class UserTable extends Component
         ->orWhere('id', 'ilike', "%$this->search%")
         ->orderBy($this->sortField, $this->sortDirection)
         ->paginate(25);
-        
+
         return view('livewire.user-table', ['users' => $users]);
     }
 }

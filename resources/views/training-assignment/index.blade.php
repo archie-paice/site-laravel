@@ -3,7 +3,5 @@
 @section('title', 'Training Assignments')
 
 @section('body')
-    <div>
-        <!-- Nothing worth having comes easy. - Theodore Roosevelt -->
-    </div>
+    <livewire:training-assignments-table/>
 @endsection

@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('training_assignments', function(Blueprint $table) {
             $table->id();
-            $table->foreignId('trainee_id')->constrained('users');
-            $table->foreignId('instructor_id')->nullable()->constrained('users');
+            $table->foreignId('trainee_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('instructor_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->boolean('active')->default(true);
             $table->string('training_type');
             $table->timestamps();

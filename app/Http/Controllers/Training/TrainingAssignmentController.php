@@ -29,14 +29,45 @@ class TrainingAssignmentController extends Controller
 
         if (!in_array($validated['trainingType'], $this->VALID_TRAINING_TYPES)) {
             return redirect()->back(400)->with('error', 'Invalid Training Type');
-        } else {
-            TrainingAssignment::create([
-                'training_type' => $validated['trainingType'],
-                'trainee_id' => Auth::user()->id,
-                'instructor_id' => null
-            ]);
+        }
 
-            return redirect()->back()->with('success', 'Training requested successfully');
+        $activeAssignments = TrainingAssignment::where([
+            "trainee_id" => Auth::user()->id,
+            "active" => true
+        ])->get();
+
+        if(count($activeAssignments) > 0) {
+            return redirect()->back(400)->with('error', 'Training already assigned');
+        }
+
+        TrainingAssignment::create([
+            'training_type' => $validated['trainingType'],
+            'trainee_id' => Auth::user()->id,
+            'instructor_id' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Training requested successfully');
+    }
+
+    public function destroy(Request $request) {
+        $user = Auth::user();
+        $validated = $request->validate([
+            'id' => 'string|required'
+        ]);
+
+        $assignment = TrainingAssignment::find($validated['id']);
+
+        if (is_null($assignment)) {
+            return redirect()->back(400)->with('error', 'Training assignment not found');
+        }
+
+        if ($assignment->trainee_id == $user->id || $user->hasPermissionTo('deactivate training assignments')) {
+            $assignment->active = false;
+            $assignment->save();
+
+            return redirect()->back()->with('success', 'Training assignment deactivated successfully');
+        } else {
+            return redirect()->back(400)->with('error', 'Invalid permissions');
         }
     }
 }

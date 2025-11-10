@@ -101,7 +101,7 @@ class User extends Authenticatable
     }
 
     public function trainingAssignmentsAsStudent() {
-        return $this->hasMany(TrainingAssignment::class, 'trainee_id');
+        return $this->hasMany(TrainingAssignment::class, 'trainee_id')->orderBy('created_at', 'desc');
     }
 
     public function trainingAssignmentsAsInstructor() {
