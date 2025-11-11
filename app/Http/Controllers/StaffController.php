@@ -8,12 +8,12 @@ use Illuminate\Http\Request;
 class StaffController extends Controller
 {
     public function index() {
-        $atm = Staff::where(['title_short' => 'ATM'])->first()->user;
-        $datm = Staff::where(['title_short' => 'DATM', 'primary_contact' => true])->first()->user;
-        $ta = Staff::where(['title_short' => 'TA', 'primary_contact' => true])->first()->user;
-        $ec = Staff::where(['title_short' => 'EC', 'primary_contact' => true])->first()->user;
-        $fe = Staff::where(['title_short' => 'FE', 'primary_contact' => true])->first()->user;
-        $wm = Staff::where(['title_short' => 'WM', 'primary_contact' => true])->first()->user;
+        $atm = Staff::where(['title_short' => 'ATM'])->first();
+        $datm = Staff::where(['title_short' => 'DATM', 'primary_contact' => true])->first();
+        $ta = Staff::where(['title_short' => 'TA', 'primary_contact' => true])->first();
+        $ec = Staff::where(['title_short' => 'EC', 'primary_contact' => true])->first();
+        $fe = Staff::where(['title_short' => 'FE', 'primary_contact' => true])->first();
+        $wm = Staff::where(['title_short' => 'WM', 'primary_contact' => true])->first();
         $webTeam = Staff::where(['title_short' => 'WM', 'primary_contact' => false])->get();
         $eventsTeam = Staff::where(['title_short' => 'EC', 'primary_contact' => false])->get();
         $facilitiesTeam = Staff::where(['title_short' => 'FE', 'primary_contact' => false])->get();

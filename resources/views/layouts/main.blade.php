@@ -18,7 +18,7 @@
         <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
         @livewireStyles
         @livewireScripts
-        
+
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
@@ -26,13 +26,9 @@
     <body class='min-h-dvh' data-theme='light'>
         <x-navbar/>
 
-        @if ($errors->any())
-            <div class="alert alert-danger" x-data="{open: true}" x-show='open' >
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+        @if(session('error'))
+            <div x-data="{open: true}" x-show='open' class="alert alert-error alert-dismissible fade show" role="alert">
+                {{ session('error') }}
                 <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
             </div>
         @endif

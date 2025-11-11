@@ -29,6 +29,20 @@ class UserSeeder extends Seeder
             ]);
 
             $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+
+            $user = User::create([
+                'id' => 10000009,
+                'first_name' => 'Web',
+                'last_name' => 'Nine',
+                'email' => 'web09@vatusa.net',
+                'rating' => 10,
+                'joined_at' => new DateTime(),
+                'division' => 'USA',
+                'facility' => 'ZJX',
+                'rostered' => true,
+            ]);
+
+            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
         };
     }
 }

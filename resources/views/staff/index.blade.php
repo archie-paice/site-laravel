@@ -7,28 +7,28 @@
         <x-staff-card
             position="Air Traffic Manager"
             description="The Air Traffic Manager oversees day-to-day operations and collaborates with all staff members of the ARTCC."
-            :user="$atm"
+            :user="$atm->user"
             reportsTo="VATUSA"
         />
 
         <x-staff-card
             position="Deputy Air Traffic Manager"
             description="The Deputy Air Traffic Manager assists the Air Traffic Manager in overseeing the ARTCC. The Deputy Air Traffic Manager also oversees the Web, Events, and Facilities Department and assists as needed."
-            :user="$datm"
+            :user="$datm->user"
             reportsTo="Air Traffic Manager"
         />
 
         <x-staff-card
             position="Training Administrator"
             description="The Training Administrator is responsible for overseeing the training department of the ARTCC."
-            :user="$ta"
+            :user="$ta->user"
             reportsTo="Air Traffic Manager"
         />
 
         <x-staff-card
             position="Events Coordinator"
             description="The Events Coordinator manages the planning and execution of events related to vZJX or our neighbors.."
-            :user="$ec"
+            :user="$ec->user"
             reportsTo="Deputy Air Traffic Manager"
         >
             <x-assistant-staff
@@ -40,7 +40,7 @@
         <x-staff-card
             position="Facility Engineer"
             description="The Facility Engineer is responsible for managing all data related to the VATSIM network, such as standard operating procedures and radar maps."
-            :user="$fe"
+            :user="$fe->user"
             reportsTo="Deputy Air Traffic Manager"
         >
             <x-assistant-staff
@@ -52,7 +52,7 @@
         <x-staff-card
             position="Webmaster"
             description="The Webmaster handles all management of data systems in the vZJX network, including the website, relational databases, email systems, and more."
-            :user="$wm"
+            :user="$wm->user"
             reportsTo="Deputy Air Traffic Manager"
         >
             <x-assistant-staff

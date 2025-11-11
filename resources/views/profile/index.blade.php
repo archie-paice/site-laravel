@@ -38,7 +38,7 @@
     </dialog>
 
     <div class="tabs tabs-box">
-        <input type="radio" name="my_tabs_6" class="tab" aria-label="User Info"/>
+        <input type="radio" name="my_tabs_6" class="tab" aria-label="User Info" checked/>
         <div class="tab-content bg-base-100 border-base-300 p-6">
             <div class='card w-max p-5'>
                 <x-user-data :user='$user'/>
@@ -48,9 +48,9 @@
         <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Sessions"/>
         <div class="tab-content bg-base-100 border-base-300 p-6">show the training sessions here</div>
 
-        <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Requests" checked/>
+        <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Requests"/>
         <div class="tab-content bg-base-100 border-base-300 p-6">
-            @if(is_null($trainingAssignments) || count($trainingAssignments) == 0 || !$trainingAssignments->first()->active)
+            @if(Auth::user()->rostered && (is_null($trainingAssignments) || count($trainingAssignments) == 0 || !$trainingAssignments->first()->active))
                 <strong>You don't have an active training request. Request training here.</strong>
 
                 <form action="{{route('training-assignment.create')}}"

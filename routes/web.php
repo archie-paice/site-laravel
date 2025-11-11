@@ -38,6 +38,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     Route::prefix('/training')->middleware('role:training')->group(function() {
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignment');
+        Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignment.claim');
+        Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignment.drop');
         Route::delete('assignments', TrainingAssignmentController::class.'@destroy')->name('training-assignment.destroy'); //id sent in payload
     });
 });

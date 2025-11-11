@@ -55,7 +55,48 @@
                     @else
                         <td class="text-error">Inactive</td>
                     @endif
+                    <td>
+                        <ul class='text-accent menu menu-horizontal h-10 items-center gap-x-5 justify-center'>
+                            <li>
+                                <details>
+                                    <summary>Actions</summary>
+                                    <ul class="bg-base-100 text-base-content rounded-t-none p-2 z-10">
+                                        @haspermission('claim students')
+                                            @if (is_null($trainingAssignment->instructor))
+                                                <li>
+                                                    <form
+                                                        action="{{route("training-assignment.claim", ["assignment" => $trainingAssignment->id])}}"
+                                                        method="POST"
+                                                    >
+                                                        @method('PUT')
+                                                        @csrf
+                                                        <button type="submit">Claim Student</button>
+                                                    </form>
+                                                </li>
+                                            @endif
+                                        @endhaspermission
 
+                                        @if($trainingAssignment->instructor_id == Auth::user()->id)
+                                            <li>
+                                                <form
+                                                    action="{{route("training-assignment.drop", ["assignment" => $trainingAssignment->id])}}"
+                                                    method="POST"
+                                                >
+                                                    @method('PUT')
+                                                    @csrf
+                                                    <button type="submit">Drop Student</button>
+                                                </form>
+                                            </li>
+                                        @endif
+
+                                        @haspermission('manage students')
+                                            <li><a href={{ route('training-assignment.edit', ['assignment' => $trainingAssignment->id]) }}>Edit</a></li>
+                                        @endhaspermission
+                                    </ul>
+                                </details>
+                            </li>
+                        </ul>
+                    </td>
                 </tr>
             @endforeach
             </tbody>
