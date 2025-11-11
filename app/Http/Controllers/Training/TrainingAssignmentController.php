@@ -65,8 +65,24 @@ class TrainingAssignmentController extends Controller
         return view('training-assignment.edit', ["assignment" => $trainingAssignment, "instructors" => $instructors]);
     }
 
-    public function update(Request $request) {
+    public function update(Request $request, int $id) {
+        $user = Auth::user();
 
+        if (!$user->hasPermissionTo('manage students')) {
+            return redirect()->back()->with('error', 'Insufficient permissions to edit training assignment');
+        }
+
+        $validated = $request->validate([
+            'instructorId' => 'string|nullable',
+            'active' => 'sometimes|in:on,1|nullable'
+        ]);
+
+        $trainingAssignment = TrainingAssignment::findOrFail($id);
+        $trainingAssignment->instructor_id = $validated['instructorId'];
+        $trainingAssignment->active = $request->boolean('active');
+        $trainingAssignment->save();
+
+        return redirect()->back()->with('success', 'Training request updated successfully');
     }
 
     public function claim(Request $request, int $id) {

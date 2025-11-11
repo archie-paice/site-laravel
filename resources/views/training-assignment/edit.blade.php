@@ -5,7 +5,7 @@
 @section('body')
     <div class="card card-body bg-base-300 max-w-100">
         <form
-            action=""
+            action="{{route('training-assignment.update', ['assignment' => $assignment->id])}}"
             method="POST"
         >
             @csrf
@@ -19,9 +19,9 @@
                     <label class='label'>Instructor</label>
                     <select
                         class='input'
-                        name="instructoId"
+                        name="instructorId"
                     >
-                        <option value="">None</option>
+                        <option value="null">None</option>
                         @foreach($instructors as $instructor)
                             <option
                                 @if($instructor->user_id == $assignment->instructor_id)
@@ -37,16 +37,21 @@
 
                 <div class="flex flex-col mb-5">
                     <label for="active" class="label">Active</label>
-                    <input type="checkbox" class="checkbox checkbox-primary">
+                    <input
+                        name="active"
+                        type="checkbox"
+                        class="checkbox checkbox-primary"
+                        checked="$assignment->active"
+                        value="1"/>
                 </div>
 
                 <div class="flex flex-col mb-5">
-                    <label for="active" class="label">Created At</label>
+                    <label for="created_at" class="label">Created At</label>
                     <input type="text" readonly class="input" value="{{$assignment->created_at}}">
                 </div>
 
                 <div class="flex flex-col mb-5">
-                    <label for="active" class="label">Last Updated</label>
+                    <label for="updated_at" class="label">Last Updated</label>
                     <input type="text" readonly class="input" value="{{$assignment->updated_at}}">
                 </div>
 

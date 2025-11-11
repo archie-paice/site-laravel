@@ -7,7 +7,7 @@
         <form action={{ route('users.update', $user) }} method='POST'>
             @csrf
             @method('PUT')
-            
+
             <input hidden name='id' value='{{ $user->id }}'/>
 
             <div class="mb-5">
@@ -20,21 +20,21 @@
             </div>
 
             <div class="grid grid-cols-2 gap-x-20">
-                <a href={{ route('users.show', $user) }} class='link absolute top-5 right-5'>View User</a>
+                <a href="{{ route('users.show', $user) }}" class="link absolute top-5 right-5">View User</a>
                 <x-label label='CID' :value="$user->id"/>
                 <x-label label='Rating' :value="$user->rating->mapToString()"/>
                 <x-label-slot label='Operating Initials'>
-                    <input 
-                    type="text" 
+                    <input
+                    type="text"
                     name='operatingInitials'
                     maxlength='2'
-                    class='input input-sm' 
+                    class='input input-sm'
                     placeholder='Enter OIs'
                     value={{ $user->operating_initials }}>
-                </x-label>
-                
+                </x-label-slot>
+
                 @if($user->rostered && $user->joined_at != null)
-                    <x-label label='Member Since' :value='new DateTime($user->joined_at)->format("M d Y")'/>
+                    <x-label label='Member Since' :value='(new DateTime($user->joined_at))->format("M d Y")'/>
                 @endif
 
                 @unless(strcasecmp($user->facility, 'ZJX') == 0)

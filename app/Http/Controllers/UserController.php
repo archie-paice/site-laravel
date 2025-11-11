@@ -33,10 +33,14 @@ class UserController extends Controller implements HasMiddleware
     public function update(Request $request) {
         $validated = $request->validate([
             'id' => 'required|integer',
-            'operatingInitials' => 'string|nullable|size:2'
+            'operatingInitials' => 'string|nullable|size:2',
         ], [
             'operatingInitials.max' => 'Operating initials must be 2 characters long'
         ]);
+
+        if (User::where('operating_initials', strtoupper($validated['operatingInitials']))->count() > 0) {
+            return redirect()->back()->with('error', 'OIs already assigned.');
+        }
 
         $user = User::findOrFail($validated['id']);
 

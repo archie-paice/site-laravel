@@ -4,6 +4,8 @@
         <h2 class='text-lg text-accent'>Home Controller</h2>
     @elseif ($user->rostered)
         <h2 class='text-lg text-error'>Visiting Controller</h2>
+    @else
+        <h2 class='text-lg'>Not Rostered</h2>
     @endif
 </div>
 

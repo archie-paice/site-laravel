@@ -26,6 +26,16 @@
     <body class='min-h-dvh' data-theme='light'>
         <x-navbar/>
 
+        @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         @if(session('error'))
             <div x-data="{open: true}" x-show='open' class="alert alert-error alert-dismissible fade show" role="alert">
                 {{ session('error') }}
