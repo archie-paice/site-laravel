@@ -110,6 +110,14 @@ class User extends Authenticatable
         return $this->hasMany(TrainingAssignment::class, 'instructor_id');
     }
 
+    public function trainingTicketsAsStudent() {
+        return $this->hasMany(TrainingTicket::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    public function trainingTicketsAsInstructor() {
+        return $this->hasMany(TrainingAssignment::class, 'instructor_id');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
