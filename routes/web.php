@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\Auth\VatsimOauthController;
@@ -34,6 +35,10 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     Route::middleware('permission:manage statistics prefixes')->group(function() {
         Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
+    });
+
+    Route::middleware('permission:view audit logs')->group(function() {
+        Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
     });
 
     Route::prefix('/training')->middleware('role:training')->group(function() {

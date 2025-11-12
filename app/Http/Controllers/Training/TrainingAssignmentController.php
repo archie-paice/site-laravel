@@ -74,7 +74,7 @@ class TrainingAssignmentController extends Controller
 
         $validated = $request->validate([
             'instructorId' => 'string|nullable',
-            'active' => 'sometimes|in:on,1|nullable'
+            'active' => 'sometimes|in:on,1'
         ]);
 
         $trainingAssignment = TrainingAssignment::findOrFail($id);

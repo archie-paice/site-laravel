@@ -21,7 +21,7 @@
                         class='input'
                         name="instructorId"
                     >
-                        <option value="null">None</option>
+                        <option value="">None</option>
                         @foreach($instructors as $instructor)
                             <option
                                 @if($instructor->user_id == $assignment->instructor_id)
@@ -41,7 +41,9 @@
                         name="active"
                         type="checkbox"
                         class="checkbox checkbox-primary"
-                        checked="$assignment->active"
+                        @if($assignment->active)
+                            checked
+                        @endif
                         value="1"/>
                 </div>
 

@@ -55,6 +55,7 @@
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                         <li><a href={{ route('admin.index') }}>Dashboard</a></li>
                         <li><a href={{ route('users.index') }}>User Management</a></li>
+                        <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                     </ul>
                 </details>
             </li>
