@@ -98,6 +98,29 @@ class User extends Authenticatable
         );
     }
 
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn(mixed $value, array $attributes) => ucfirst($attributes['first_name']) . ' ' . ucfirst($attributes['last_name'])
+        );
+    }
+
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucfirst($value),
+            set: fn (string $value) => ucfirst($value),
+        );
+    }
+
+    protected function lastName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucfirst($value),
+            set: fn (string $value) => ucfirst($value),
+        );
+    }
+
     public function staffRoles() {
         return $this->hasMany(Staff::class);
     }

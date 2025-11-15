@@ -1,15 +1,16 @@
 <?php
 
 use App\Http\Controllers\Admin\AuditLogController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\RosterController;
-use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\StatisticsPrefixesController;
+use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Training\TrainingAssignmentController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\Training\TrainingAssignmentController;
+use App\Http\Controllers\Training\TrainingTicketController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Jobs\SyncRoster;
 use App\Jobs\UpdateOnlineControllers;
@@ -42,10 +43,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     });
 
     Route::prefix('/training')->middleware('role:training')->group(function() {
-        Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignment');
-        Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignment.claim');
-        Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignment.drop');
-        Route::delete('assignments', TrainingAssignmentController::class.'@destroy')->name('training-assignment.destroy'); //id sent in payload
+        Route::resource('tickets', TrainingTicketController::class)->names('training-tickets');
+        Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
+        Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignments.claim');
+        Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignments.drop');
+        Route::delete('assignments', TrainingAssignmentController::class.'@destroy')->name('training-assignments.destroy'); //id sent in payload
     });
 });
 

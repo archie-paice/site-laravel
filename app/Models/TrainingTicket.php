@@ -21,7 +21,7 @@ class TrainingTicket extends Model
         'vatusa_synced'
     ];
 
-    public function user() {
+    public function student() {
         return $this->belongsTo('App\Models\User', 'user_id');
     }
 

@@ -65,7 +65,7 @@
                                             @if (is_null($trainingAssignment->instructor))
                                                 <li>
                                                     <form
-                                                        action="{{route("training-assignment.claim", ["assignment" => $trainingAssignment->id])}}"
+                                                        action="{{route("training-assignments.claim", ["assignment" => $trainingAssignment->id])}}"
                                                         method="POST"
                                                     >
                                                         @method('PUT')
@@ -79,7 +79,7 @@
                                         @if($trainingAssignment->instructor_id == Auth::user()->id)
                                             <li>
                                                 <form
-                                                    action="{{route("training-assignment.drop", ["assignment" => $trainingAssignment->id])}}"
+                                                    action="{{route("training-assignments.drop", ["assignment" => $trainingAssignment->id])}}"
                                                     method="POST"
                                                 >
                                                     @method('PUT')
@@ -90,7 +90,7 @@
                                         @endif
 
                                         @haspermission('manage students')
-                                            <li><a href={{ route('training-assignment.edit', ['assignment' => $trainingAssignment->id]) }}>Edit</a></li>
+                                            <li><a href={{ route('training-assignments.edit', ['assignment' => $trainingAssignment->id]) }}>Edit</a></li>
                                         @endhaspermission
                                     </ul>
                                 </details>

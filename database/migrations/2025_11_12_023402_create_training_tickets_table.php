@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('instructor_id')->constrained('users');
             $table->timestamp('session_date')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->string('position');
             $table->string('duration');
             $table->integer('movements')->default(0);
             $table->integer('score', false, false)->default(1);
@@ -24,7 +25,7 @@ return new class extends Migration
             $table->integer('ots_status')->default(0);
             $table->boolean('solo_granted')->default(false);
             $table->integer('vatusa_id')->nullable();
-            $table->boolean('vatusa_synced');
+            $table->boolean('vatusa_synced')->default(false);
             $table->timestamps();
         });
     }

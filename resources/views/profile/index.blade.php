@@ -8,7 +8,7 @@
             <h3 class="font-bold text-lg">Confirm Action</h3>
             <p class="py-4">Confirm </p>
             <div class="modal-action">
-                <form action="{{route('training-assignment.destroy')}}" method="POST">
+                <form action="{{route('training-assignments.destroy')}}" method="POST">
                     @method('DELETE')
                     @csrf
                     <input

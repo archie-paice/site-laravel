@@ -1,7 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Training;
 
+use App\Http\Controllers\Controller;
+use App\Models\TrainingTicket;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class TrainingTicketController extends Controller
@@ -11,7 +14,8 @@ class TrainingTicketController extends Controller
      */
     public function index()
     {
-        //
+        $trainingTickets = TrainingTicket::all();
+        return view('training-tickets.index', compact('trainingTickets'));
     }
 
     /**
@@ -19,6 +23,10 @@ class TrainingTicketController extends Controller
      */
     public function create()
     {
+        $users = User::where(['rostered' => true])->get();
+        return view('training-tickets.create', [
+            'users' => $users
+        ]);
         ///^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/
     }
 
@@ -35,7 +43,8 @@ class TrainingTicketController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $trainingTicket = TrainingTicket::findOrFail($id);
+        return view('training-tickets.show', compact('trainingTicket'));
     }
 
     /**
