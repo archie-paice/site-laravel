@@ -5,7 +5,7 @@
 @section('body')
     <div class="card card-body bg-base-300 max-w-100">
         <form
-            action="{{route('training-assignment.update', ['assignment' => $assignment->id])}}"
+            action="{{route('training-assignments.update', ['assignment' => $assignment->id])}}"
             method="POST"
         >
             @csrf
@@ -66,6 +66,7 @@
                     </button>
                 </div>
             </form>
+            add a dropdown for status (active, solo, mock, checkout, complete, forfeit)
         </form>
     </div>
 @endsection

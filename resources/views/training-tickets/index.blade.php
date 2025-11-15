@@ -27,7 +27,7 @@
                     <td>{{$trainingTicket->instructor->first_name.' '.$trainingTicket->instructor->last_name}}</td>
                     <td>{{$trainingTicket->position}}</td>
                     <td>{{$trainingTicket->score}}</td>
-                    <td>{{$trainingTicket->session_date}}</td>
+                    <td>{{$trainingTicket->session_start}}</td>
                     <td>
                         <a href="{{route('training-tickets.show', ['ticket' => $trainingTicket->id])}}">
                             View

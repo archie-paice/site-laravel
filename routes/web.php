@@ -47,7 +47,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
         Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignments.claim');
         Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignments.drop');
-        Route::delete('assignments', TrainingAssignmentController::class.'@destroy')->name('training-assignments.destroy'); //id sent in payload
+        Route::delete('assignments', [TrainingAssignmentController::class, 'destroy'])->name('training-assignments.destroy'); //id sent in payload
     });
 });
 
@@ -58,10 +58,7 @@ Route::get('/roster', [RosterController::class, 'index'])->name('roster');
 if (App::environment('development', 'local')) {
     Route::get('/sync', function() {
         SyncRoster::dispatch();
-        return 'scheduled';
-    });
-
-    Route::get('/online', function() {
         UpdateOnlineControllers::dispatch();
+        return 'scheduled';
     });
 }

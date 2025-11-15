@@ -16,6 +16,7 @@
 
         <!-- Styles / Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
+        <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
         @livewireStyles
         @livewireScripts
 
@@ -25,6 +26,8 @@
     </head>
     <body class='min-h-dvh' data-theme='light'>
         <x-navbar/>
+
+        @yield('secondary-navbar')
 
         @if ($errors->any())
             <div class="alert alert-danger">

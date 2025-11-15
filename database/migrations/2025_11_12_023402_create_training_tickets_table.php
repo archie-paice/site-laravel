@@ -15,12 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('instructor_id')->constrained('users');
-            $table->timestamp('session_date')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('session_start')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('session_end');
             $table->string('position');
-            $table->string('duration');
             $table->integer('movements')->default(0);
             $table->integer('score', false, false)->default(1);
-            $table->string('notes');
+            $table->string('notes', 2048);
             $table->integer('location');
             $table->integer('ots_status')->default(0);
             $table->boolean('solo_granted')->default(false);

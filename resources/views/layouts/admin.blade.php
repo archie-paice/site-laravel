@@ -1,6 +1,7 @@
 @extends('layouts.main')
 
 @section('title', 'Admin Center')
-@section('body-nopad')
+
+@section('secondary-navbar')
     <x-admin-navbar/>
 @endsection

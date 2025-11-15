@@ -78,8 +78,8 @@ class User extends Authenticatable
     public static function updateFromVatusa(VatusaRosterUser $vatusaUser) {
         $user = static::upsert([
             'id' => $vatusaUser->cid,
-            'first_name' => $vatusaUser->firstName,
-            'last_name' => $vatusaUser->lastName,
+            'first_name' => ucfirst($vatusaUser->firstName),
+            'last_name' => ucfirst($vatusaUser->lastName),
             'email' => $vatusaUser->email,
             'rating' => $vatusaUser->rating,
             'joined_at' => $vatusaUser->joinedFacility,
@@ -102,6 +102,13 @@ class User extends Authenticatable
     {
         return Attribute::make(
             get: fn(mixed $value, array $attributes) => ucfirst($attributes['first_name']) . ' ' . ucfirst($attributes['last_name'])
+        );
+    }
+
+    protected function nameReversed(): Attribute
+    {
+        return Attribute::make(
+            get: fn(mixed $value, array $attributes) => ucfirst($attributes['last_name']. ', ' . ucfirst($attributes['first_name']))
         );
     }
 
@@ -145,6 +152,5 @@ class User extends Authenticatable
     {
         return LogOptions::defaults()
             ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
-        // Chain fluent methods for configuration options
     }
 }
