@@ -89,7 +89,8 @@ class TrainingTicketController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $trainingTicket = TrainingTicket::findOrFail($id);
+        return view('training-tickets.edit', ['trainingTicket' => $trainingTicket]);
     }
 
     /**

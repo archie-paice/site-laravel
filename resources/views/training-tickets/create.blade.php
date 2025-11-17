@@ -104,9 +104,7 @@
                 id="notes"
                 class="textarea"
                 minlength="20"
-                maxlength="2048">
-
-            </textarea>
+                maxlength="2048"></textarea>
 
             <div class="card-actions mt-5">
                 <button
