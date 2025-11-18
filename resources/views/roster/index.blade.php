@@ -13,7 +13,6 @@
                     <th>CID</th>
                     <th>Name</th>
                     <th>Rating</th>
-                    <th>Facility</th>
                     <th>Cert 1</th>
                     <th>Cert 2</th>
                     <th>Cert 3</th>
@@ -31,11 +30,10 @@
                             </a>
 
                             @unless(strcasecmp($user->facility, env('VATUSA_FACILITY')) == 0)
-                                <h3 class='badge badge-primary badge-sm ml-2'>{{ $user->facility }} Visitor</h3>
+                                <h3 class='badge badge-error badge-sm ml-2'>{{ $user->facility }} Visitor</h3>
                             @endunless
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $user->rating->mapToString() }}</td>
-                        <td class='border-r-1 border-base-300'>{{ $user->facility }}</td>
                         <td class='border-r-1 border-base-300'>TBD</td>
                     </tr>
                 @endforeach

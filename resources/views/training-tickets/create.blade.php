@@ -102,7 +102,7 @@
             <textarea
                 name="notes"
                 id="notes"
-                class="textarea"
+                class="textarea w-100 h-50"
                 minlength="20"
                 maxlength="2048"></textarea>
 

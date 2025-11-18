@@ -98,7 +98,29 @@ class TrainingTicketController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'position' => ['required', 'regex:/^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/'],
+            'location' => 'required|integer|min:0|max:2',
+            'sessionStart' => 'required|date',
+            'sessionEnd' => 'required|date|after:sessionStart',
+            'movements' => 'required|integer',
+            'score' => 'required|integer|between:1,5',
+            'notes' => 'required|min:20|max:2048',
+        ]);
+
+        $ticket = TrainingTicket::findOrFail($id)->update([
+            'position' => $validated['position'],
+            'session_start' => $validated['sessionStart'],
+            'session_end' => $validated['sessionEnd'],
+            'movements' => $validated['movements'],
+            'score' => $validated['score'],
+            'notes' => $validated['notes'],
+            'location' => $validated['location'],
+            'vatusa_synced' => false
+        ]);
+
+
+        return redirect(route('training-tickets.show', [$id]));
     }
 
     /**

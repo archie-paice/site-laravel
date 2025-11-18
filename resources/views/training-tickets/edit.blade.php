@@ -4,6 +4,12 @@
 
 @section('body')
     <div class="card card-body bg-base-300 max-w-150">
+        <a
+            class="absolute top-5 right-5 link"
+            href="{{route('training-tickets.show', ['ticket' => $trainingTicket->id])}}"
+        >
+            View
+        </a>
         <form
             class="flex flex-col"
             action="{{route('training-tickets.update', ['ticket' => $trainingTicket->id])}}"

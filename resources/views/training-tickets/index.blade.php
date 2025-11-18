@@ -12,6 +12,7 @@
                 <th>Position</th>
                 <th>Progress Rating</th>
                 <th>Session Date</th>
+                <th>Status</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -26,8 +27,17 @@
                     <td>{{$trainingTicket->student->first_name.' '.$trainingTicket->student->last_name}}</td>
                     <td>{{$trainingTicket->instructor->first_name.' '.$trainingTicket->instructor->last_name}}</td>
                     <td>{{$trainingTicket->position}}</td>
-                    <td>{{$trainingTicket->score}}</td>
+                    <td>
+                        <x-rating-readonly :rating="$trainingTicket->score"/>
+                    </td>
                     <td>{{$trainingTicket->session_start}}</td>
+                    <td>
+                        @if ($trainingTicket->vatusa_synced)
+                            <h2 class="badge badge-success">VATUSA Synced</h2>
+                        @else
+                            <h2 class="badge badge-warning">Pending VATUSA Sync</h2>
+                        @endif
+                    </td>
                     <td>
                         <a href="{{route('training-tickets.show', ['ticket' => $trainingTicket->id])}}">
                             View

@@ -19,15 +19,11 @@
             <x-label label="Instructor" :value="$trainingTicket->instructor->first_name.' '.$trainingTicket->instructor->last_name"/>
             <x-label label="Position" :value="$trainingTicket->position"/>
             <x-label-slot label="Score">
-                <div class="rating">
-                    <div class="mask mask-star" {{ $trainingTicket->score == 1 ? 'aria-current="true"' : "" }} aria-label="1 star"></div>
-                    <div class="mask mask-star" {{ $trainingTicket->score == 2 ? 'aria-current="true"' : "" }} aria-label="2 star"></div>
-                    <div class="mask mask-star" {{ $trainingTicket->score == 3 ? 'aria-current="true"' : "" }} aria-label="3 star"></div>
-                    <div class="mask mask-star" {{ $trainingTicket->score == 4 ? 'aria-current="true"' : "" }} aria-label="4 star"></div>
-                    <div class="mask mask-star" {{ $trainingTicket->score == 5 ? 'aria-current="true"' : ""}} aria-label="5 star"></div>
-                </div>
+                <x-rating-readonly :rating="$trainingTicket->score"/>
             </x-label-slot>
-            <x-label label="Notes" :value="$trainingTicket->notes"/>
         </div>
+        <x-label-slot label="Notes">
+            <textarea class="textarea" readonly>{{$trainingTicket->notes}}</textarea>
+        </x-label-slot>
     </div>
 @endsection
