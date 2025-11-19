@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\UserController;
 use App\Jobs\SyncRoster;
 use Illuminate\Support\Facades\App;
@@ -19,7 +20,7 @@ Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth
 
 Route::resource('users', UserController::class);
 Route::resource('admin', AdminController::class)->middleware('permission:view dashboard');
-
+Route::resource('events', EventController::class)->middleware('permission:view dashboard');
 
 Route::get('/roster', RosterController::class . '@index')->name('roster');
 

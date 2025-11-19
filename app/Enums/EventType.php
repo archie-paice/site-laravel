@@ -1,0 +1,14 @@
+<?php
+
+namespace App\Enums;
+
+enum EventType: string 
+{
+    case HOME = 'HOME';
+    case SUPPORT_REQUIRED = 'SUPPORT_REQUIRED';
+    case SUPPORT_OPTIONAL = 'SUPPORT_OPTIONAL';
+    case GROUP_FLIGHT = 'GROUP_FLIGHT';
+    case FRIDAY_NIGHT_OPERATIONS = 'FRIDAY_NIGHT_OPERATIONS';
+    case SATURDAY_NIGHT_OPERATIONS = 'SATURDAY_NIGHT_OPERATIONS';
+    case TRAINING = 'TRAINING';
+}
