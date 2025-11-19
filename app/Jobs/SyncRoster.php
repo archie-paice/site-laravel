@@ -26,13 +26,13 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
      */
     public function __construct()
     {
-        $this->ROSTER_API_ENDPOINT = env('VATUSA_API_URL') . '/facility/' . env('VATUSA_FACILITY') . '/roster/both';
-        $this->FACILITY_INFO_ENDPOINT = env('VATUSA_API_URL') . '/facility/' . env('VATUSA_FACILITY');
+        $this->ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/facility/' . config('app.vatusa_facility') . '/roster/both';
+        $this->FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/facility/' . config('app.vatusa_facility');
     }
 
     private function updateRoster() {
         $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
-            'apikey' => env('VATUSA_API_KEY')
+            'apikey' => config('app.vatusa_api_key')
         ]);
 
         $roster = json_decode($rosterData, true);
@@ -67,7 +67,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         Staff::truncate();
 
         $facilityInfo = Http::get($this->FACILITY_INFO_ENDPOINT, [
-            'apikey' => env('VATUSA_API_KEY')
+            'apikey' => config('app.vatusa_api_key')
         ]);
 
         $infoDTO = new VatusaFacilityInfoDTO($facilityInfo['data']);

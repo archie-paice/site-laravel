@@ -18,6 +18,7 @@
                 name="student"
                 id=""
                 class="select"
+                value="{{old('student')}}"
                 required
             >
                 <option value="">Select a Student</option>
@@ -30,10 +31,14 @@
             <br>
 
             <label for="position" class="label">Position (must be in XXX_XXX form)</label>
+            @error('position')
+                <p>Position must be in XXX_XXX format</p>
+            @enderror
             <input
                 type="text"
                 name="position"
                 class="input"
+                value="{{old('position')}}"
                 oninput="this.value = this.value.toUpperCase();"
                 pattern="^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$"
                 required
@@ -46,6 +51,7 @@
                 name="location"
                 id=""
                 class="select"
+                value="{{old('location')}}"
                 required
             >
                 <option value="">Select a Location</option>
@@ -57,10 +63,14 @@
             <br>
 
             <label for="sessionStart" class="label">Start Date</label>
+            @error('sessionStart')
+                <p class="text-error">Must be after session end</p>
+            @enderror
             <input
                 type="datetime-local"
                 name="sessionStart"
                 class="input"
+                value="{{old('sessionStart')}}"
                 required
             >
 
@@ -71,6 +81,7 @@
                 type="datetime-local"
                 name="sessionEnd"
                 class="input"
+                value="{{old('sessionEnd')}}"
                 required
             >
 
@@ -81,7 +92,7 @@
                 name="movements"
                 type="number"
                 class="input"
-                value="0"
+                value="{{old('movements', 0)}}"
                 required
             >
 
@@ -92,7 +103,7 @@
                 <input type="radio" name="score" value="1" class="mask mask-star" aria-label="1 star" />
                 <input type="radio" name="score" value="2" class="mask mask-star" aria-label="2 star" />
                 <input type="radio" name="score" value="3" class="mask mask-star" aria-label="3 star" />
-                <input type="radio" name="score" value="4" class="mask mask-star" aria-label="4 star" checked />
+                <input type="radio" name="score" value="4" class="mask mask-star" aria-label="4 star" />
                 <input type="radio" name="score" value="5" class="mask mask-star" aria-label="5 star" />
             </div>
 
@@ -103,6 +114,7 @@
                 name="notes"
                 id="notes"
                 class="textarea w-100 h-50"
+                value="{{old('notes')}}"
                 minlength="20"
                 maxlength="2048"></textarea>
 

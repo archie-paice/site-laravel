@@ -21,7 +21,7 @@ class UpdateOnlineControllers implements ShouldQueue
      */
     public function __construct()
     {
-        $this->API_ENDPOINT = env('VATSIM_API_URL') . '/v2/atc/online';
+        $this->API_ENDPOINT = config('app.vatsim_api_url') . '/v2/atc/online';
     }
 
     /**
@@ -41,6 +41,6 @@ class UpdateOnlineControllers implements ShouldQueue
                 echo 'ran';
                 OnlineController::fromDTO($onlineController);
             }
-        }  
+        }
     }
 }

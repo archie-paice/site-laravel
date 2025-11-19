@@ -55,6 +55,8 @@ class SyncTrainingTickets implements ShouldQueue
             if ($request->ok()) {
                 $ticket->vatusa_synced = true;
                 $ticket->save();
+            } else {
+                echo('Request Failed: '.$request);
             }
         } catch (ConnectionException $e) {
             echo $e;

@@ -16,10 +16,7 @@ class UserTable extends SortableTable
 
     public function render()
     {
-        $users = User::query()
-        ->orWhere('first_name', 'ilike', "%$this->search%")
-        ->orWhere('last_name', 'ilike', "%$this->search%")
-        ->orWhere('id', 'ilike', "%$this->search%")
+        $users = User::search($this->search)
         ->orderBy($this->sortField, $this->sortDirection)
         ->paginate(25);
 

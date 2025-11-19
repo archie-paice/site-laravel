@@ -30,21 +30,29 @@
 @endsection
 
 @section('body')
-    <div class="grid grid-cols-3">
-            <x-card-component title="Online Controllers">
+    <div class="grid grid-cols-3 gap-x-5">
+        <x-card-component title="Online Controllers">
 
-                @unless(sizeof($onlineSessions) == 0)
-                    @foreach ($onlineSessions as $session)
-                        <x-online-controller
-                        :callsign='$session->callsign'
-                        :user='$session->user'
-                        :userId='$session->user_id'
-                        :onlineSince='new DateTime($session->start)'/>
-                    @endforeach
-                @else
-                    <h1 class="text-lg">No controllers online</h1>
-                @endunless
+            @unless(sizeof($onlineSessions) == 0)
+                @foreach ($onlineSessions as $session)
+                    <x-online-controller
+                    :callsign='$session->callsign'
+                    :user='$session->user'
+                    :userId='$session->user_id'
+                    :onlineSince='new DateTime($session->start)'/>
+                @endforeach
+            @else
+                <h1 class="text-lg">No controllers online</h1>
+            @endunless
 
-            </x-card-component>
+        </x-card-component>
+        <x-card-component title="Upcoming Events">
+
+        </x-card-component>
+        <x-card-component title="News">
+            <ul>
+                <li class="text-lg">11-25-2025 Jud Lopez promoted to C1</li>
+            </ul>
+        </x-card-component>
     </div>
 @endsection

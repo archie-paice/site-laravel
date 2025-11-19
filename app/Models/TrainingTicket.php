@@ -6,12 +6,14 @@ use DateTime;
 use Exception;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class TrainingTicket extends Model
 {
     use LogsActivity;
+    use Searchable;
 
     public $fillable = [
         'user_id',
@@ -57,5 +59,17 @@ class TrainingTicket extends Model
     {
         return LogOptions::defaults()
             ->logOnly(['user_id', 'instructor_id', 'session_date', 'duration', 'movements', 'score', 'notes', 'location', 'ots_status']);
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'user_id' => $this->student->id,
+            'instructor_id' => $this->instructor->id,
+            'student_name' => $this->student->name,
+            'instructor_name' => $this->instructor->name,
+            'position' => $this->position,
+            'date' => $this->session_start
+        ];
     }
 }

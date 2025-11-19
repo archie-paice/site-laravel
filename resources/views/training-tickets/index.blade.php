@@ -4,6 +4,9 @@
 
 @section('body')
     <a href="{{route('training-tickets.create')}}" class="btn btn-primary">Create a Training Ticket</a>
+
+    <x-search/>
+
     <table class="table table-zebra">
         <thead>
             <tr>

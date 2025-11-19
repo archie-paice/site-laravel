@@ -129,4 +129,5 @@ return [
     'vatsim_client_secret' => env('VATSIM_CLIENT_SECRET'),
     'vatsim_auth_url' => env('VATSIM_AUTH_URL'),
     'vatusa_facility' => env('VATUSA_FACILITY'),
+    'vatsim_api_url' => env('VATSIM_API_URL')
 ];

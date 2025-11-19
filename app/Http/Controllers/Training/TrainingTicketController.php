@@ -15,9 +15,11 @@ class TrainingTicketController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $trainingTickets = TrainingTicket::all();
+        $query = $request->input('search');
+        $trainingTickets = TrainingTicket::search($query)->paginate(25);
+
         return view('training-tickets.index', compact('trainingTickets'));
     }
 

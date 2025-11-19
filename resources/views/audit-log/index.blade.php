@@ -3,6 +3,7 @@
 @section('title', 'Audit Log')
 
 @section('body')
+    <x-search/>
     <table class="table table-zebra">
         <thead>
         <tr>
@@ -29,4 +30,6 @@
             @endforeach
         </tbody>
     </table>
+
+    {{$logs->links()}}
 @endsection
