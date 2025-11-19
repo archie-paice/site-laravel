@@ -22,9 +22,6 @@ return new class extends Migration
             $table->integer('score', false, false)->default(1);
             $table->string('notes', 2048);
             $table->integer('location');
-            $table->integer('ots_status')->default(0);
-            $table->boolean('solo_granted')->default(false);
-            $table->integer('vatusa_id')->nullable();
             $table->boolean('vatusa_synced')->default(false);
             $table->timestamps();
         });

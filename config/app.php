@@ -123,4 +123,10 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    'vatusa_api_key' => env('VATUSA_API_KEY'),
+    'vatusa_api_url' => env('VATUSA_API_URL'),
+    'vatsim_client_id' => env('VATSIM_CLIENT_ID'),
+    'vatsim_client_secret' => env('VATSIM_CLIENT_SECRET'),
+    'vatsim_auth_url' => env('VATSIM_AUTH_URL'),
+    'vatusa_facility' => env('VATUSA_FACILITY'),
 ];

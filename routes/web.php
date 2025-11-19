@@ -13,6 +13,7 @@ use App\Http\Controllers\Training\TrainingTicketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Jobs\SyncRoster;
+use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,11 @@ if (App::environment('development', 'local')) {
     Route::get('/sync', function() {
         SyncRoster::dispatch();
         UpdateOnlineControllers::dispatch();
+        return 'scheduled';
+    });
+
+    Route::get('/sync-training', function() {
+        SyncTrainingTickets::dispatch();
         return 'scheduled';
     });
 }
