@@ -23,7 +23,7 @@ class EventController extends Controller
         $event = new Event();
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
-        
+
         return view('admin.events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
@@ -65,7 +65,38 @@ class EventController extends Controller
         return view('admin.events.show', ['event' => $event]);
     }
 
-    public function destroy($id) {
+    public function edit($id)
+    {
+        $event = Event::find($id);
+        $types = EventType::cases();
+        $featuredFields = FeaturedField::orderBy('name')->pluck('name');
+        
+        return view('admin.events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $featuredFields = FeaturedField::pluck('name')->toArray();
+
+        $validated = $request->validate([
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'start' => 'required|date',
+            'end' => 'required|date',
+            'type' => [new Enum(EventType::class)],
+            'featured_fields' => ['array'],
+            'featured_fields.*' => ['string', Rule::in($featuredFields)],
+        ]);
+
+        $event = Event::find($id);
+        $event->update($validated);
+
+        return redirect()->route('events.index')
+            ->with('success', 'Post updated successfully.');
+    }
+
+    public function destroy($id)
+    {
         $event = Event::find($id);
         $event->delete();
         return redirect()->route('events.index')->with('success', 'Post deleted successfully');
@@ -73,17 +104,6 @@ class EventController extends Controller
 
 
     // TODO
-    // public function update(Request $request, $id) {
-
-    // }
-
-    // public function destroy($id) {
-
-    // }
-
-    // public function show($id) {
-
-    // }
 
     // public function edit($id) {
 

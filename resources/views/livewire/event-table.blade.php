@@ -29,7 +29,9 @@
                         <td class='border-r-1 border-base-300'>{{ $event->hidden ? 'Yes' : 'No' }}</td>
                         <td class='border-r-1 border-base-300'>
                             <button class="btn btn-primary">Manage</button>
-                            <button class="btn btn-accent">Edit</button>
+                            <a href="{{ route('events.edit', ['event' => $event->id]) }}" class="btn btn-accent">
+                                Edit
+                            </a>
                             <form action="{{ route('events.destroy', ['event' => $event->id]) }}" method="POST"
                                 class="inline">
                                 @csrf
