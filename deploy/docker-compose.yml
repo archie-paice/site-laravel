@@ -1,25 +1,46 @@
-# deploy/docker-compose.yml
-
+# docker compose -f deploy/docker-compose.yml --env-file ./.env up --build
 version: '3.8'
 
 services:
   laravel:
+    image: ghcr.io/zjx-artcc/site-laravel:master
     restart: unless-stopped
     container_name: zjx-laravel
     build:
       context: ../
       dockerfile: ./deploy/Dockerfile
-    # allocate as many volumes as necessary, if needed.
     volumes:
       - ../storage/app:/var/www/html/storage/app
-    environment:
-      ENV_FILE: ${ENV_FILE}
+    secrets:
+        - source: app_config
+          target: /run/secrets/app_config
     ports:
       - "8080:80"
     networks:
       - laravel
 
+  queue:
+    image: ghcr.io/zjx-artcc/site-laravel:master
+    container_name: laravel_queue
+    restart: unless-stopped
+    # Overwrite the default command to run the queue worker
+    command: php artisan queue:work --tries=3 --timeout=90
+    depends_on:
+        - laravel
+
+  scheduler:
+    image: ghcr.io/zjx-artcc/site-laravel:master
+    container_name: laravel_scheduler
+    restart: unless-stopped
+    # "schedule:work" runs the scheduler in the foreground (available in Laravel 8+)
+    command: php artisan schedule:work
+    depends_on:
+        - laravel
 
 networks:
   laravel:
     driver: bridge
+
+secrets:
+    app_config:
+        file: .env
