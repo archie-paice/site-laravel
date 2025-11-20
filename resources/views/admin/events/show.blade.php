@@ -1,28 +1,37 @@
 @extends('layouts.main')
 
 @section('body')
-    <div class='card w-max bg-base-300 p-5'>
-        <div class="mb-5">
-            <h1 class='card-title'>{{ $event->name }}</h1>
-            {{-- @if ($event->rostered && strcasecmp($event->facility, 'ZJX') == 0)
-                <h2 class='text-lg text-accent'>Home Controller</h2>
-            @elseif ($event->rostered)
-                <h2 class='text-lg text-error'>Visitng Controller</h2>
-            @endif --}}
+    <div class="flex flex-col justify-center items-center gap-6">
+        <div class="card card-dash bg-base-100 w-xl shadow-sm">
+            <figure>
+                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" />
+            </figure>
+            <div class="card-body bg-neutral">
+                <h1 class="card-title">
+                    {{ $event->name }}
+                    <div class="badge badge-secondary">{{ $event->type }}</div>
+                </h1>
+                <h2>
+                    {{ $event->start }} - {{ $event->end }}
+                </h2>
+                @if ($event->featured_fields)
+                    <p>{{ implode(', ', $event->featured_fields) }}</p>
+                @else
+                    <p>No fields</p>
+                @endif
+                <br />
+                <p>{{ $event->description }}</p>
+            </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-x-20">
-            {{-- <x-label label='CID' :value="$event->id"/>
-            <x-label label='Rating' :value="$event->rating->mapToString()"/>
-            
-            @if($event->rostered && $event->joined_at != null)
-                <x-label label='Member Since' :value='new DateTime($event->joined_at)->format("M d Y")'/>
-            @endif
-
-            @unless(strcasecmp($event->facility, 'ZJX') == 0)
-                <x-label label='Home Division' :value='$event->division'/>
-                <x-label label='Home Subdivision' :value='$event->facility'/>
-            @endunless --}}
+        <div class="card bg-base-100 w-xl shadow-sm">
+            <div class="card-body bg-neutral">
+                <h2 class="card-title">Request Position</h2>
+                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
+                <div class="card-actions justify-end">
+                    <button class="btn btn-primary">Buy Now</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
