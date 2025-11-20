@@ -17,8 +17,17 @@ class TrainingAssignmentController extends Controller
         $this->VALID_TRAINING_TYPES = ['S1', 'S2', 'S3', 'C1', 'MCO GND', 'MCO TWR', 'F11 TRACON'];
     }
 
-    public function index() {
-        return view('training-assignment.index');
+    public function index(Request $request) {
+        $request->validate([
+            'search' => 'nullable|string',
+            'showInactive' => 'nullable|sometimes:on',
+        ]);
+
+        $trainingAssignments = TrainingAssignment::search($request->input('search'))
+            ->where('active', is_null(!$request->input('showInactive')))
+        ->paginate(20);
+
+        return view('training-assignment.index', compact('trainingAssignments'));
     }
 
     public function create(Request $request) {

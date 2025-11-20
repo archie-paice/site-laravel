@@ -1,0 +1,25 @@
+# deploy/docker-compose.yml
+
+version: '3.8'
+
+services:
+  laravel:
+    restart: unless-stopped
+    container_name: zjx-laravel
+    build:
+      context: ../
+      dockerfile: ./deploy/Dockerfile
+    # allocate as many volumes as necessary, if needed.
+    volumes:
+      - ../storage/app:/var/www/html/storage/app
+    environment:
+      ENV_FILE: ${ENV_FILE}
+    ports:
+      - "8080:80"
+    networks:
+      - laravel
+
+
+networks:
+  laravel:
+    driver: bridge

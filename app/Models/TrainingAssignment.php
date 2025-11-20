@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
 class TrainingAssignment extends Model
 {
-    use LogsActivity;
+    use LogsActivity, Searchable;
     protected $fillable = [
         'id',
         'instructor_id',
@@ -22,7 +23,7 @@ class TrainingAssignment extends Model
         'active' => 'boolean',
     ];
 
-    public function trainee(): BelongsTo
+    public function student(): BelongsTo
     {
         return $this->belongsTo(User::class, 'trainee_id');
     }
@@ -35,5 +36,13 @@ class TrainingAssignment extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults();
+    }
+
+    public function toSearchableArray(): array {
+        return [
+            'name' => $this->student->name,
+            'trainingType' => $this->training_type,
+            'date' => $this->created_at
+        ];
     }
 }

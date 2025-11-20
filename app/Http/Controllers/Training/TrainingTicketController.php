@@ -122,7 +122,8 @@ class TrainingTicketController extends Controller
         ]);
 
 
-        return redirect(route('training-tickets.show', [$id]));
+        return redirect(route('training-tickets.show', [$id]))
+            ->with('success', 'Training ticket successfully updated!');
     }
 
     /**
