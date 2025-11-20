@@ -5,6 +5,7 @@ FROM php:8.3-fpm-alpine as build
 
 # installing system dependencies and php extensions
 RUN apk add --no-cache \
+    libpq-dev \
     zip \
     libzip-dev \
     freetype \
@@ -13,10 +14,11 @@ RUN apk add --no-cache \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
+    libpq-dev \
     nodejs \
     npm \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install zip pdo pdo_mysql \
+    && docker-php-ext-install zip pdo pdo_pgsql \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd
@@ -57,8 +59,9 @@ RUN apk add --no-cache \
     gettext-dev \
     freetype-dev \
     nginx \
+    libpq-dev \
     && docker-php-ext-configure zip \
-    && docker-php-ext-install zip pdo pdo_mysql \
+    && docker-php-ext-install zip pdo pdo_pgsql \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
     && docker-php-ext-install -j$(nproc) gd \
     && docker-php-ext-enable gd \

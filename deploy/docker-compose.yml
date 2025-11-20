@@ -11,13 +11,14 @@ services:
       dockerfile: ./deploy/Dockerfile
     volumes:
       - ../storage/app:/var/www/html/storage/app
-    secrets:
-        - source: app_config
-          target: /run/secrets/app_config
+    env_file:
+        - ../.env.prod
     ports:
       - "8080:80"
     networks:
       - laravel
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
 
   queue:
     image: ghcr.io/zjx-artcc/site-laravel:master
@@ -25,8 +26,12 @@ services:
     restart: unless-stopped
     # Overwrite the default command to run the queue worker
     command: php artisan queue:work --tries=3 --timeout=90
+    env_file:
+        -   ../.env.prod
     depends_on:
         - laravel
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
 
   scheduler:
     image: ghcr.io/zjx-artcc/site-laravel:master
@@ -36,11 +41,10 @@ services:
     command: php artisan schedule:work
     depends_on:
         - laravel
+    extra_hosts:
+        - "host.docker.internal:host-gateway"
 
 networks:
   laravel:
     driver: bridge
 
-secrets:
-    app_config:
-        file: .env

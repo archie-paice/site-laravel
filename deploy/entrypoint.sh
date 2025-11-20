@@ -1,9 +1,14 @@
 # 1. Load Secrets (The "Whole-File" Pattern)
 # If the secret file exists, export its contents as environment variables
 if [ -f /run/secrets/app_config ]; then
-    echo "Loading secrets..."
-    export $(grep -v '^#' /run/secrets/app_config | xargs)
+    # Read line by line, ignoring comments and empty lines
+    while IFS='=' read -r key value; do
+        if [ -n "$key" ] && [ "${key#\#}" = "$key" ]; then
+            export "$key=$value"
+        fi
+    done < /run/secrets/app_config
 fi
+exec "$@"
 
 php artisan config:clear
 
