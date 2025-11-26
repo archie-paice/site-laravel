@@ -18,7 +18,7 @@ class StatisticsPrefixesSeeder extends Seeder
     public function run(): void
     {
         foreach($this->fields as $field) {
-            StatisticsPrefixes::createOrFirst([
+            StatisticsPrefixes::firstOrCreate([
                 'name' => $field
             ]);
         }

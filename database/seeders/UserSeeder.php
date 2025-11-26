@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         if (App::environment('local', 'development')) {
-            $user = User::create([
+            $user = User::firstOrCreate([
                 'id' => 10000010,
                 'first_name' => 'Web',
                 'last_name' => 'Ten',
@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
 
             $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
 
-            $user = User::create([
+            $user = User::firstOrCreate([
                 'id' => 10000009,
                 'first_name' => 'Web',
                 'last_name' => 'Nine',

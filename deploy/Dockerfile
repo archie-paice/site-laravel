@@ -45,6 +45,9 @@ RUN chown -R www-data:www-data /var/www/html/vendor \
 # stage 2: production stage
 FROM php:8.3-fpm-alpine
 
+RUN apk add --no-cache libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql
+
 # copy files from the build stage
 COPY --from=build /var/www/html /var/www/html
 COPY ./deploy/nginx.conf /etc/nginx/http.d/default.conf

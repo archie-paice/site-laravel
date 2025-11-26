@@ -1,6 +1,3 @@
-echo "Running migrations..."
-php artisan migrate --seed --force
-
 # 2. Production Optimizations
 echo "Caching configuration..."
 php artisan config:clear
@@ -11,3 +8,5 @@ php artisan view:cache
 # 3. Start PHP-FPM (The main process)
 echo "Starting PHP-FPM..."
 exec php-fpm
+
+exec "$@"
