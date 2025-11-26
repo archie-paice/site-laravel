@@ -1,6 +1,5 @@
 echo "Running migrations..."
-php artisan migrate --force
-php artisan db:seed --force
+php artisan migrate --seed --force
 
 # 2. Production Optimizations
 echo "Caching configuration..."

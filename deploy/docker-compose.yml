@@ -59,6 +59,15 @@ services:
       networks:
           - laravel
 
+  nginx:
+    image: nginx:alpine
+    volumes:
+        - .:/var/www # Needs access to static files (images/css)
+    depends_on:
+        - laravel
+    ports:
+        - "80:80"
+
 networks:
   laravel:
     driver: bridge
