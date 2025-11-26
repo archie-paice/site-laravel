@@ -6,7 +6,7 @@
     <dialog id="withdraw_modal" class="modal">
         <div class="modal-box">
             <h3 class="font-bold text-lg">Confirm Action</h3>
-            <p class="py-4">Confirm </p>
+            <p class="py-4">Are you sure you want to widthdraw this training request?</p>
             <div class="modal-action">
                 <form action="{{route('training-assignments.destroy')}}" method="POST">
                     @method('DELETE')
@@ -46,7 +46,9 @@
         </div>
 
         <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Sessions"/>
-        <div class="tab-content bg-base-100 border-base-300 p-6">show the training sessions here</div>
+        <div class="tab-content bg-base-100 border-base-300 p-6">
+            <x-profile-training-tickets-table :training-tickets="$trainingTickets"/>
+        </div>
 
         @if(Auth::user()->rostered)
             <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Requests"/>

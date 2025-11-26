@@ -53,6 +53,7 @@ class SyncTrainingTickets implements ShouldQueue
             ]);
 
             if ($request->ok()) {
+                echo $request->body();
                 $ticket->vatusa_synced = true;
                 $ticket->save();
             } else {

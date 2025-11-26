@@ -6,8 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\TrainingTicket;
 use App\Models\User;
 use Auth;
-use DateTime;
-use Exception;
 use Illuminate\Http\Request;
 
 class TrainingTicketController extends Controller
@@ -54,7 +52,7 @@ class TrainingTicketController extends Controller
         ]);
 
         if($instructor->id == $validated['student']) {
-            return redirect()->back()->with('error', 'Cannot create training ticket with yourself as the student.');
+            return redirect()->back()->withInput($request->input())->with('error', 'Cannot create training ticket with yourself as the student.');
         }
 
 
@@ -92,6 +90,11 @@ class TrainingTicketController extends Controller
     public function edit(string $id)
     {
         $trainingTicket = TrainingTicket::findOrFail($id);
+
+        if ($trainingTicket->vatusa_synced) {
+            return back()->with('error', 'Cannot edit a training ticket that has been synced to VATUSA.');
+        }
+
         return view('training-tickets.edit', ['trainingTicket' => $trainingTicket]);
     }
 
@@ -110,7 +113,13 @@ class TrainingTicketController extends Controller
             'notes' => 'required|min:20|max:2048',
         ]);
 
-        $ticket = TrainingTicket::findOrFail($id)->update([
+        $ticket = TrainingTicket::findOrFail($id);
+
+        if ($ticket->vatusa_synced) {
+            return back()->with('error', 'Cannot edit a training ticket that has been synced to VATUSA.');
+        }
+
+        $ticket->update([
             'position' => $validated['position'],
             'session_start' => $validated['sessionStart'],
             'session_end' => $validated['sessionEnd'],
@@ -118,7 +127,6 @@ class TrainingTicketController extends Controller
             'score' => $validated['score'],
             'notes' => $validated['notes'],
             'location' => $validated['location'],
-            'vatusa_synced' => false
         ]);
 
 

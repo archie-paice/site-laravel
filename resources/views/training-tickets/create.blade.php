@@ -114,10 +114,15 @@
                 name="notes"
                 id="notes"
                 class="textarea w-100 h-50"
-                value="{{old('notes')}}"
                 minlength="20"
-                maxlength="2048"></textarea>
+                maxlength="2048">{{old('notes')}}</textarea>
 
+            <br>
+
+            <div class="flex flex-row max-w-full">
+                <input type="checkbox" class="checkbox mr-2" name="confirm" required>
+                <label for="confirm" class="">I understand that this training ticket, once synced to VATUSA, will be immutable and final.</label>
+            </div>
             <div class="card-actions mt-5">
                 <button
                     class="btn btn-primary"

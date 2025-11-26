@@ -4,7 +4,7 @@
 
 @section('body')
     <div class="card card-body bg-base-300 w-max">
-        @if($trainingTicket->instructor_id == Auth::user()->id || Auth::user()->hasPermissionTo('manage training tickets'))
+        @if(($trainingTicket->instructor_id == Auth::user()->id || Auth::user()->hasPermissionTo('manage training tickets')) && !$trainingTicket->vatusa_synced)
             <a
                 class="absolute top-5 right-5 link"
                 href="{{route('training-tickets.edit', ['ticket' => $trainingTicket->id])}}"

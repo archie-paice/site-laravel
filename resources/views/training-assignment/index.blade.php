@@ -22,8 +22,8 @@
             <table class='table table-zebra table-md w-max border-2 border-base-300'>
                 <thead>
                 <tr>
-                    <th>CID</th>
-                    <th>Name</th>
+                    <th>Student CID</th>
+                    <th>Student</th>
                     <th>Instructor</th>
                     <th>Training Requested</th>
                     <th>Requested At</th>
@@ -36,13 +36,13 @@
                 @foreach ($trainingAssignments as $trainingAssignment)
                     <tr>
                         <td>
-                            <a href="{{route('users.show', ['user' => $trainingAssignment->trainee_id])}}">
-                                {{$trainingAssignment->trainee_id}}
+                            <a href="{{route('users.show', ['user' => $trainingAssignment->user_id])}}">
+                                {{$trainingAssignment->student->id}}
                             </a>
                         </td>
                         <td>
-                            <a href="{{route('users.show', ['user' => $trainingAssignment->trainee_id])}}">
-                                {{$trainingAssignment->trainee->first_name.' '.$trainingAssignment->trainee->last_name}}
+                            <a href="{{route('users.show', ['user' => $trainingAssignment->user_id])}}">
+                                {{$trainingAssignment->student->name}}
                             </a>
                         </td>
 
@@ -51,20 +51,24 @@
                         @else
                             <td>
                                 <a href="{{route('users.show', ['user' => $trainingAssignment->instructor_id])}}">
-                                    {{$trainingAssignment->instructor->first_name.' '.$trainingAssignment->instructor->last_name}}
+                                    {{$trainingAssignment->instructor->name}}
                                 </a>
                             </td>
                         @endif
 
                         <td>{{$trainingAssignment->training_type}}</td>
                         <td>{{(new DateTime($trainingAssignment->created_at))->format("m-d-y, h:m A")}}</td>
-                        <td>NOT IMPL. YET</td>
+                        <td>
+                            @if(count($trainingAssignment->student->trainingTicketsAsStudent) == 0)
+                                None Logged
+                            @else
+                                {{(new DateTime($trainingAssignment->student->trainingTicketsAsStudent->first()->session_start))->format("m-d-y, h:m A")}}
+                            @endif
+                        </td>
 
-                        @if ($trainingAssignment->active)
-                            <td class="text-success">Active</td>
-                        @else
-                            <td class="text-error">Inactive</td>
-                        @endif
+                        <td>
+                            <x-training-assignment-status-label :status="$trainingAssignment->status"/>
+                        </td>
                         <td>
                             <ul class='text-accent menu menu-horizontal h-10 items-center gap-x-5 justify-center'>
                                 <li>

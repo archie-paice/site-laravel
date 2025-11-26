@@ -43,7 +43,7 @@
                 @endunless
             </div>
 
-            <button type="submit" class='btn btn-accent'>Submit Changes</button>
+            <button type="submit" class='btn btn-primary'>Submit Changes</button>
         </form>
     </div>
 @endsection

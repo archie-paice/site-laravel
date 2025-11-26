@@ -15,7 +15,8 @@ class TrainingAssignment extends Model
         'id',
         'instructor_id',
         'training_type',
-        'trainee_id',
+        'user_id',
+        'status',
         'active'
     ];
 
@@ -25,7 +26,7 @@ class TrainingAssignment extends Model
 
     public function student(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'trainee_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function instructor(): BelongsTo
@@ -35,13 +36,15 @@ class TrainingAssignment extends Model
 
     public function getActivitylogOptions(): LogOptions
     {
-        return LogOptions::defaults();
+        return LogOptions::defaults()
+            ->logOnly(['user_id', 'instructor_id', 'status']);
     }
 
     public function toSearchableArray(): array {
         return [
             'name' => $this->student->name,
             'trainingType' => $this->training_type,
+            'status' => $this->status,
             'date' => $this->created_at
         ];
     }

@@ -11,7 +11,7 @@
             @csrf
             @method("PUT")
 
-            <x-label label="Student" :value="$assignment->trainee->first_name.' '.$assignment->trainee->last_name"/>
+            <x-label label="Student" :value="$assignment->student->name"/>
             <x-label label="Requested Training" :value="$assignment->training_type"/>
 
             <form action="">
@@ -47,6 +47,18 @@
                         value="1"/>
                 </div>
 
+                <div class="mb-6">
+                    <label for="status" class="label">Status</label>
+                    <select name="status" id="" class="select">
+                        <option class="badge badge-accent" value="active" @if($assignment->status == 'active') selected @endif>Active</option>
+                        <option class="badge badge-secondary" value="solo" @if($assignment->status == 'solo') selected @endif>Solo Cert</option>
+                        <option class="badge badge-warning" value="mock" @if($assignment->status == 'mock') selected @endif>Mock OTS</option>
+                        <option class="badge badge-info" value="checkout" @if($assignment->status == 'checkout') selected @endif>Checkout</option>
+                        <option class="badge badge-success" value="complete" @if($assignment->status == 'complete') selected @endif>Complete</option>
+                        <option class="badge badge-error" value="forfeit" @if($assignment->status == 'forfeit') selected @endif>Forfeit</option>
+                    </select>
+                </div>
+
                 <div class="flex flex-col mb-5">
                     <label for="created_at" class="label">Created At</label>
                     <input type="text" readonly class="input" value="{{$assignment->created_at}}">
@@ -66,7 +78,6 @@
                     </button>
                 </div>
             </form>
-            add a dropdown for status (active, solo, mock, checkout, complete, forfeit)
         </form>
     </div>
 @endsection

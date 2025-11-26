@@ -3,11 +3,11 @@
 @section('title', 'Training Tickets')
 
 @section('body')
-    <a href="{{route('training-tickets.create')}}" class="btn btn-primary">Create a Training Ticket</a>
+    <a href="{{route('training-tickets.create')}}" class="btn btn-primary mb-2">Create a Training Ticket</a>
 
     <x-search/>
 
-    <table class="table table-zebra">
+    <table class="table table-zebra mt-2">
         <thead>
             <tr>
                 <th>Student</th>
@@ -27,8 +27,16 @@
             @endif
             @foreach($trainingTickets as $trainingTicket)
                 <tr>
-                    <td>{{$trainingTicket->student->first_name.' '.$trainingTicket->student->last_name}}</td>
-                    <td>{{$trainingTicket->instructor->first_name.' '.$trainingTicket->instructor->last_name}}</td>
+                    <td>
+                        <a href="{{route('users.show', ['user' => $trainingTicket->student->id])}}">
+                            {{$trainingTicket->student->name}}
+                        </a>
+                    </td>
+                    <td>
+                        <a href="{{route('users.show', ['user' => $trainingTicket->instructor->id])}}">
+                            {{$trainingTicket->instructor->name}}
+                        </a>
+                    </td>
                     <td>{{$trainingTicket->position}}</td>
                     <td>
                         <x-rating-readonly :rating="$trainingTicket->score"/>

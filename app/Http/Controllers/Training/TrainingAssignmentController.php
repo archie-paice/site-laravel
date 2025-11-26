@@ -23,9 +23,13 @@ class TrainingAssignmentController extends Controller
             'showInactive' => 'nullable|sometimes:on',
         ]);
 
-        $trainingAssignments = TrainingAssignment::search($request->input('search'))
-            ->where('active', is_null(!$request->input('showInactive')))
-        ->paginate(20);
+        $query = TrainingAssignment::search($request->input('search'));
+
+        if (!$request->boolean('showInactive')) {
+            $query->where('active', true);
+        }
+
+        $trainingAssignments = $query->paginate(20);
 
         return view('training-assignment.index', compact('trainingAssignments'));
     }
@@ -42,7 +46,7 @@ class TrainingAssignmentController extends Controller
         }
 
         $activeAssignments = TrainingAssignment::where([
-            "trainee_id" => Auth::user()->id,
+            "user_id" => Auth::user()->id,
             "active" => true
         ])->get();
 
@@ -56,8 +60,9 @@ class TrainingAssignmentController extends Controller
 
         TrainingAssignment::create([
             'training_type' => $validated['trainingType'],
-            'trainee_id' => Auth::user()->id,
-            'instructor_id' => null
+            'user_id' => Auth::user()->id,
+            'instructor_id' => null,
+            'status' => 'active'
         ]);
 
         return redirect()->back()->with('success', 'Training requested successfully');
@@ -83,12 +88,14 @@ class TrainingAssignmentController extends Controller
 
         $validated = $request->validate([
             'instructorId' => 'string|nullable',
-            'active' => 'sometimes|in:on,1'
+            'active' => 'sometimes|in:on,1',
+            'status' => 'string|required|in:active,solo,mock,checkout,complete,forfeit'
         ]);
 
         $trainingAssignment = TrainingAssignment::findOrFail($id);
         $trainingAssignment->instructor_id = $validated['instructorId'];
         $trainingAssignment->active = $request->boolean('active');
+        $trainingAssignment->status = $validated['status'];
         $trainingAssignment->save();
 
         return redirect()->back()->with('success', 'Training request updated successfully');
@@ -101,8 +108,12 @@ class TrainingAssignmentController extends Controller
 
         $assignment = TrainingAssignment::findOrFail($id);
 
-        if ($assignment->trainee_id == Auth::user()->id) {
+        if ($assignment->user_id == Auth::user()->id) {
             return redirect()->back()->with('error', 'You cannot claim yourself.');
+        }
+
+        if (!$assignment->active) {
+            return redirect()->back()->with('error', 'Cannot update inactive training assignment.');
         }
 
         $assignment->update([
@@ -119,6 +130,10 @@ class TrainingAssignmentController extends Controller
         }
 
         $assignment = TrainingAssignment::findOrFail($id);
+
+        if (!$assignment->active) {
+            return redirect()->back()->with('error', 'Cannot update inactive training assignment.');
+        }
 
         if ($assignment->instructor_id == $user->id || $user->hasPermissionTo('manage students')) {
             $assignment->update([
@@ -141,8 +156,9 @@ class TrainingAssignmentController extends Controller
             return redirect()->back(400)->with('error', 'Training assignment not found');
         }
 
-        if ($assignment->trainee_id == $user->id || $user->hasPermissionTo('deactivate training assignments')) {
+        if ($assignment->user_id == $user->id || $user->hasPermissionTo('deactivate training assignments')) {
             $assignment->active = false;
+            $assignment->status = 'withdrawn';
             $assignment->save();
 
             return redirect()->back()->with('success', 'Training assignment deactivated successfully');
