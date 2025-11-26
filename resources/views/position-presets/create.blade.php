@@ -4,7 +4,7 @@
 
 @section('body')
     <div class="card card-body bg-base-300">
-        <form method="POST" action="{{ route('position-preset.store') }}" class="flex flex-col">
+        <form method="POST" action="{{ route('position-presets.store') }}" class="flex flex-col">
             @csrf
             <label for="positions" class="label">Preset Name</label>
             <input name="name" type="text" required placeholder="Eg. Generic Positions by Rating" class="input" />

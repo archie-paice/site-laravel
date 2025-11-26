@@ -43,7 +43,8 @@
                     <summary>Events Administration</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                         <li><a href={{ route('events.index') }}>Events</a></li>
-                        <li><a href="{{ route('position-preset.index') }}">Position Presets + Fields</a></li>
+                        <li><a href="{{ route('position-presets.index') }}">Position Presets</a></li>
+                        <li><a href="{{ route('event-fields.index') }}">Event Field Presets</a></li>
                         <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
                         <li><a href={{ route('admin.index') }}>Logs</a></li>
                     </ul>

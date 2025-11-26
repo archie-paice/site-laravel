@@ -15,7 +15,7 @@ class EventController extends Controller
     public function index()
     {
         $events = Event::all();
-        return view('admin.events.index', ['events' => $events]);
+        return view('events.index', ['events' => $events]);
     }
 
     public function create()
@@ -24,7 +24,7 @@ class EventController extends Controller
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
 
-        return view('admin.events.create', [
+        return view('events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
         ]);
@@ -32,17 +32,21 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
-        $featuredFields = FeaturedField::pluck('name')->toArray();
-
         $validated = $request->validate([
             'name' => 'required|string',
             'description' => 'required|string',
             'start' => 'required|date',
             'end' => 'required|date',
             'type' => [new Enum(EventType::class)],
-            'featured_fields' => ['array'],
-            'featured_fields.*' => ['string', Rule::in($featuredFields)],
+            'featured_fields' => 'required|string',
         ]);
+
+        // for validated:
+         //   'featured_fields' => ['array'],
+          //  'featured_fields.*' => ['string', Rule::in($featuredFields)],
+
+        $featuredFields = explode(', ', $validated['featured_fields']);
+        $featuredFields = array_map('trim', $featuredFields);
 
         $event = Event::create([
             'name' => $validated['name'],
@@ -50,7 +54,7 @@ class EventController extends Controller
             'start' => $validated['start'],
             'end' => $validated['end'],
             'type' => $validated['type'],
-            'featured_fields' => $validated['featured_fields'] ?? [],
+            'featured_fields' => $featuredFields,
         ]);
 
 
@@ -62,7 +66,7 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        return view('admin.events.show', ['event' => $event]);
+        return view('events.show', ['event' => $event]);
     }
 
     public function edit($id)
@@ -71,7 +75,7 @@ class EventController extends Controller
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         
-        return view('admin.events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
+        return view('events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
     }
 
     public function update(Request $request, $id)

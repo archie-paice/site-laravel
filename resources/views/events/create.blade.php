@@ -57,16 +57,12 @@
                 <input type="radio" name="my-accordion-1" checked="checked" />
                 <div class="collapse-title font-semibold">Featured Fields</div>
                 <div class="collapse-content text-sm">
-                    @foreach ($featuredFields as $field)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="featured_fields[]" value="{{ $field }}">
-                            <span class="px-3 py-1 border rounded">
-                                {{ $field }}
-                            </span>
-                        </label>
-                    @endforeach
+                    <label for="featured_fields" class="label">Featured Fields (ICAO or IATA fields only, separated by commas)</label>
+                    <input name="featured_fields" type="text" required placeholder="Eg. KMCO, KJAX, KDAB, KORL" class="input" />
                 </div>
             </div>
+
+
 
 
             <div class="collapse bg-base-100 border border-base-300">

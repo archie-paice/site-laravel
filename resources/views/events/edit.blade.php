@@ -62,15 +62,10 @@
                 <input type="radio" name="my-accordion-1" checked="checked" />
                 <div class="collapse-title font-semibold">Featured Fields</div>
                 <div class="collapse-content text-sm">
-                    @foreach ($featuredFields as $field)
-                        <label class="flex items-center">
-                            <input type="checkbox" name="featured_fields[]" value="{{ $field }}"
-                                {{ in_array($field, old('featured_fields', $event->featured_fields ?? [])) ? 'checked' : '' }}>
-                            <span class="px-3 py-1 border rounded">
-                                {{ $field }}
-                            </span>
-                        </label>
-                    @endforeach
+                    <label class="label">Featured Fields (comma-separated)</label>
+
+                    <input type="text" name="featured_fields" class="input" placeholder="KMCO, KJAX, KDAB"
+                        value="{{ old('featured_fields', isset($event) ? implode(', ', $event->featured_fields) : '') }}" />
                 </div>
             </div>
 

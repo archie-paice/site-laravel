@@ -9,6 +9,7 @@ use App\Jobs\SyncRoster;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventPositionPresetController;
+use App\Http\Controllers\EventFieldController;
 
 Route::get('/', function () {
     return view('home');
@@ -22,7 +23,8 @@ Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth
 Route::resource('users', UserController::class);
 Route::resource('admin', AdminController::class)->middleware('permission:view dashboard');
 Route::middleware('permission:view dashboard')->group(function () {
-    Route::resource('position-preset', EventPositionPresetController::class);
+    Route::resource('event-fields', EventFieldController::class);
+    Route::resource('position-presets', EventPositionPresetController::class);
     Route::resource('events', EventController::class);
 });
 

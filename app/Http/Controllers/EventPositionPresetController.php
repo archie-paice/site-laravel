@@ -13,7 +13,7 @@ class EventPositionPresetController extends Controller
     public function index()
     {
         $positions = EventPositionPreset::all();
-        return view('admin.events.position-preset.index', compact('positions'));
+        return view('position-presets.index', compact('positions'));
     }
 
     /**
@@ -23,7 +23,7 @@ class EventPositionPresetController extends Controller
     {
         $preset = new EventPositionPreset();
 
-        return view('admin.events.position-preset.create');
+        return view('position-presets.create');
     }
 
     /**
@@ -44,7 +44,7 @@ class EventPositionPresetController extends Controller
             'positions' => $positions,
         ]);
 
-        return redirect()->route('position-preset.index')
+        return redirect()->route('position-presets.index')
             ->with('success', 'Preset created successfully.');
     }
 
@@ -62,7 +62,7 @@ class EventPositionPresetController extends Controller
     public function edit($id)
     {
         $position = EventPositionPreset::find($id);
-        return view('admin.events.position-preset.edit', ['position' => $position]);
+        return view('position-presets.edit', ['position' => $position]);
     }
 
     /**
@@ -84,7 +84,7 @@ class EventPositionPresetController extends Controller
             'positions' => $positions,
         ]);
 
-        return redirect()->route('position-preset.index')
+        return redirect()->route('position-presets.index')
             ->with('success', 'Preset updated successfully.');
     }
 
@@ -95,6 +95,6 @@ class EventPositionPresetController extends Controller
     {
         $position = EventPositionPreset::find($id);
         $position->delete();
-        return redirect()->route('position-preset.index')->with('success', 'Preset deleted successfully');
+        return redirect()->route('position-presets.index')->with('success', 'Preset deleted successfully');
     }
 }
