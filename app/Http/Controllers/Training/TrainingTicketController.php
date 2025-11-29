@@ -15,6 +15,10 @@ class TrainingTicketController extends Controller
      */
     public function index(Request $request)
     {
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+        ]);
+
         $query = $request->input('search');
         $trainingTickets = TrainingTicket::search($query)->paginate(25);
 

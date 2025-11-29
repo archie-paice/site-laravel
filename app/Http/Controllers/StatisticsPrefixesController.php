@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\StatisticsPrefixes;
@@ -25,12 +25,12 @@ class StatisticsPrefixesController extends Controller
      */
     public function store(Request $request)
     {
-       
+
         $validated = $request->validate([
             'name' => 'required|max:5|min:2'
         ]);
 
-        StatisticsPrefixes::firstOrNew(['name' => $validated['name']]);
+        StatisticsPrefixes::firstOrCreate(['name' => $validated['name']]);
 
         Log::info('Statistics prefix {prefix} added by user {user}', ['prefix' => $validated['name'], 'user' => Auth::user()->id]);
         return redirect()->back()->with('success', Str::upper($validated['name']).' added succesfully!');

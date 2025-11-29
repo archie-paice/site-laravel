@@ -8,6 +8,7 @@ use App\DTOs\VatusaRosterUser;
 use App\Enums\ControllerRating;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -129,23 +130,23 @@ class User extends Authenticatable
         );
     }
 
-    public function staffRoles() {
+    public function staffRoles(): HasMany {
         return $this->hasMany(Staff::class);
     }
 
-    public function trainingAssignmentsAsStudent() {
+    public function trainingAssignmentsAsStudent(): HasMany {
         return $this->hasMany(TrainingAssignment::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
-    public function trainingAssignmentsAsInstructor() {
+    public function trainingAssignmentsAsInstructor(): HasMany {
         return $this->hasMany(TrainingAssignment::class, 'instructor_id');
     }
 
-    public function trainingTicketsAsStudent() {
+    public function trainingTicketsAsStudent(): HasMany {
         return $this->hasMany(TrainingTicket::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
-    public function trainingTicketsAsInstructor() {
+    public function trainingTicketsAsInstructor(): HasMany {
         return $this->hasMany(TrainingAssignment::class, 'instructor_id');
     }
 
@@ -153,6 +154,10 @@ class User extends Authenticatable
     {
         return LogOptions::defaults()
             ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
+    }
+
+    public function soloCerts(): HasMany {
+        return $this->hasMany(SoloCert::class, 'user_id');
     }
 
     public function toSearchableArray(): array

@@ -21,6 +21,7 @@
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                         <li><a href={{ route('training-tickets.index') }}>Training Tickets</a></li>
                         <li><a href={{ route('training-assignments.index') }}>Training Assignments</a></li>
+                        <li><a href={{ route('solo-certs.index') }}>Solo Certs</a></li>
                     </ul>
                 </details>
             </li>

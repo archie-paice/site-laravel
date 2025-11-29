@@ -17,7 +17,11 @@
         <tbody>
             @foreach($logs as $log)
                 <tr>
-                    <td>{{$log->subject->first_name.' '.$log->subject->last_name}} ({{$log->subject->id}})</td>
+                    @if (is_null($log->subject))
+                        <td>None</td>
+                    @else
+                        <td>{{$log->subject->first_name.' '.$log->subject->last_name}} ({{$log->subject->id}})</td>
+                    @endif
                     @if (is_null($log->causer))
                         <td>None</td>
                     @else

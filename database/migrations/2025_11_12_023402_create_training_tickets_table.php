@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('training_tickets', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('instructor_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('instructor_id')->constrained('users')->onDelete('set null');
             $table->timestamp('session_start')->default(DB::raw('CURRENT_TIMESTAMP'));
             $table->timestamp('session_end');
             $table->string('position');
