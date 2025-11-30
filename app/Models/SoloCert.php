@@ -20,6 +20,7 @@ class SoloCert extends Model
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'revoked' => 'boolean'
     ];
 
     public function user(): BelongsTo {
@@ -37,11 +38,18 @@ class SoloCert extends Model
         );
     }
 
+    public function expired(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->expires->isBefore(now()),
+        );
+    }
+
     public function toSearchableArray(): array {
         return [
-            'user_id' => $this->user->fullName,
+            'user' => $this->user->name,
             'position' => $this->position,
-            'issued_by_id' => $this->issued_by->name
+            'issued_by_id' => is_null($this->issued_by) ? null : $this->issued_by->name
         ];
     }
 }

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('issued_by_id')->constrained('users')->onDelete('set null');
             $table->string('position');
+            $table->boolean('revoked')->default(false);
             $table->timestamps(); // auto expires in 30 days - see model
         });
     }

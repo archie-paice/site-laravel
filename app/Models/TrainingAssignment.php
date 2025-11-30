@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\TrainingStatus;
+use Attribute;
+use Dom\Attr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
@@ -34,6 +37,11 @@ class TrainingAssignment extends Model
         return $this->belongsTo(User::class, 'instructor_id');
     }
 
+    public function status(): Attribute {
+        return Attribute::make(
+            set: fn ($value) => strtolower($value)
+        );
+    }
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

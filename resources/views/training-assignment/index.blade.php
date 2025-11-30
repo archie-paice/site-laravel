@@ -19,7 +19,7 @@
             <x-search/>
         </form>
         @unless(sizeof($trainingAssignments) == 0)
-            <table class='table table-zebra table-md w-max border-2 border-base-300'>
+            <table class='table table-zebra table-md w-max border-2 border-base-300 mt-5'>
                 <thead>
                 <tr>
                     <th>Student CID</th>
