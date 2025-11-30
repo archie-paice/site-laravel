@@ -14,7 +14,7 @@ class VatsimProvider extends AbstractProvider {
     protected $BASE_URL;
 
     public function __construct(Request $request, $clientId, $clientSecret, $redirectUrl, $guzzle) {
-        $this->BASE_URL = env('VATSIM_AUTH_URL');
+        $this->BASE_URL = config('app.vatsim_auth_url');
 
         parent::__construct($request, $clientId, $clientSecret, $redirectUrl, $guzzle);
     }

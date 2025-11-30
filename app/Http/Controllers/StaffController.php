@@ -20,6 +20,7 @@ class StaffController extends Controller
         $mentors = Staff::where(['title_short' => 'MTR'])->get();
         $instructors = Staff::where(['title_short' => 'INS'])->get();
 
+        // fix: Attempt to read property "user" on null
         return view('staff.index', [
             'staff' => Staff::all(),
             'atm' => $atm,
