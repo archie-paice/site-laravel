@@ -20,7 +20,7 @@ class SoloCertController extends Controller
         ]);
 
         $query = $request->input('search');
-        $soloCerts = SoloCert::search($query)->paginate(25);
+        $soloCerts = SoloCert::search($query)->orderBy('created_at', 'desc')->paginate(25);
 
         return view('solo-certs.index', compact('soloCerts'));
     }
