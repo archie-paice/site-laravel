@@ -21,7 +21,12 @@ class UserController extends Controller implements HasMiddleware
     public function show(int $id) {
         $user = User::findOrFail($id);
 
-        return view('users.show', ['user' => $user]);
+        $trainingAssignments = Auth::user()->trainingAssignmentsAsStudent;
+
+        return view('users.show', [
+            'user' => $user,
+            'trainingAssignments' => $trainingAssignments,
+        ]);
     }
 
     public function edit(Request $request, int $id) {
