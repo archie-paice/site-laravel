@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TrainingStatus;
+use App\Enums\TrainingType;
 use Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,6 +26,7 @@ class TrainingAssignment extends Model
     protected $casts = [
         'active' => 'boolean',
         'status' => TrainingStatus::class,
+        'training_type' => TrainingType::class,
     ];
 
     public function student(): BelongsTo

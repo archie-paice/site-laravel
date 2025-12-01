@@ -1,4 +1,4 @@
-<div class="card card-body bg-base-300 w-max">
+<div class="w-max">
     <div class="w-max">
         @if ($user->rostered && strcasecmp($user->facility, 'ZJX') == 0)
             <h2 class='text-lg text-accent'>Home Controller</h2>

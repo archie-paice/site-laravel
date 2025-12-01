@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Training;
 
+use App\Enums\TrainingType;
 use App\Http\Controllers\Controller;
 use App\Models\Staff;
 use App\Models\TrainingAssignment;
@@ -36,13 +37,13 @@ class TrainingAssignmentController extends Controller
 
     public function create(Request $request) {
         $validated = $request->validate([
-            'trainingType' => 'string|required'
+            'trainingType' => 'int|required'
         ], [
             'trainingType.required' => 'Training Type must be specified.'
         ]);
 
-        if (!in_array($validated['trainingType'], $this->VALID_TRAINING_TYPES)) {
-            return redirect()->back(400)->with('error', 'Invalid Training Type');
+        if (is_null(TrainingType::tryFrom($request->input('trainingType')))) {
+            return redirect()->back()->with('error', 'Invalid Training Type');
         }
 
         $activeAssignments = TrainingAssignment::where([

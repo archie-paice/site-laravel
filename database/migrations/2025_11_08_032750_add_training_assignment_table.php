@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('instructor_id')->nullable()->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->boolean('active')->default(true);
-            $table->string('training_type');
+            $table->integer('training_type', false, true)->default(0);
             $table->integer('status', false, true)->default(1);
             $table->timestamps();
         });
