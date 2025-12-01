@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Training;
 
+use App\Enums\TrainingStatus;
 use App\Http\Controllers\Controller;
 use App\Jobs\CreateVatusaSoloCert;
 use App\Jobs\RevokeVatusaSoloCert;
@@ -59,7 +60,7 @@ class SoloCertController extends Controller
         ])->get();
 
         foreach ($relaventAssignments as $relaventAssignment) {
-            $relaventAssignment->status = "solo";
+            $relaventAssignment->status = TrainingStatus::SOLO;
             $relaventAssignment->save();
         }
 
@@ -83,7 +84,7 @@ class SoloCertController extends Controller
         ])->get();
 
         foreach ($relaventAssignments as $relaventAssignment) {
-            $relaventAssignment->status = "active";
+            $relaventAssignment->status = TRAININGStatus::ACTIVE;
             $relaventAssignment->save();
         }
 

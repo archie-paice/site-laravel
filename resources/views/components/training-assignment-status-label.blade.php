@@ -1,22 +1,22 @@
 <div>
     @switch($status)
-        @case ('active')
-            <span class="badge badge-accent">Active</span>
+        @case (\App\Enums\TrainingStatus::ACTIVE)
+            <span class="badge badge-accent text-accent-content">Active</span>
             @break
-        @case ('solo')
-            <span class="badge badge-secondary">Solo Cert</span>
+        @case (\App\Enums\TrainingStatus::SOLO)
+            <span class="badge badge-secondary text-secondary-content">Solo Cert</span>
             @break
-        @case ('mock')
-            <span class="badge badge-warning">Mock OTS</span>
+        @case (\App\Enums\TrainingStatus::MOCK)
+            <span class="badge badge-warning text-warning-content">Mock OTS</span>
             @break
-        @case ('checkout')
-            <span class="badge badge-info">Checkout</span>
+        @case (\App\Enums\TrainingStatus::CHECKOUT)
+            <span class="badge badge-info text-info-content">Checkout</span>
             @break
-        @case ('complete')
-            <span class="badge badge-success">Complete</span>
+        @case (\App\Enums\TrainingStatus::COMPLETE)
+            <span class="badge badge-success text-success-content">Complete</span>
             @break
-        @case ('forfeit')
-            <span class="badge badge-error">Forfeit</span>
+        @case (\App\Enums\TrainingStatus::FORFEIT)
+            <span class="badge badge-error text-error-content">Forfeit</span>
             @break
         @default
             <span class="badge badge-ghost">Unknown</span>

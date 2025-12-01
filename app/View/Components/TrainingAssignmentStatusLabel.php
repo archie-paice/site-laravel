@@ -2,17 +2,18 @@
 
 namespace App\View\Components;
 
+use App\Enums\TrainingStatus;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
 class TrainingAssignmentStatusLabel extends Component
 {
-    public string $status;
+    public TrainingStatus $status;
     /**
      * Create a new component instance.
      */
-    public function __construct(string $status)
+    public function __construct(TrainingStatus $status)
     {
         $this->status = $status;
     }

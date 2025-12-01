@@ -40,26 +40,19 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
 
         for ($i = 0; $i < count($roster['data']); $i++) {
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
-
             User::updateFromVatusa($vatusaUser);
         }
 
         if (App::environment('local', 'development')) {
-            $user = User::createOrFirst([
-                'id' => 10000010,
-            ], [
-                'id' => 10000010,
-                'first_name' => 'Web',
-                'last_name' => 'Ten',
-                'email' => 'web10@vatusa.net',
-                'rating' => 11,
-                'joined_at' => new DateTime(),
-                'division' => 'USA',
-                'facility' => 'ZJX',
-                'rostered' => true,]);
+            $testUsers = User::where([
+                'first_name' => "Web"
+            ])->get();
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
-
+            foreach ($testUsers as $user) {
+                $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+                $user->rostered = true;
+                $user->save();
+            }
         };
     }
 

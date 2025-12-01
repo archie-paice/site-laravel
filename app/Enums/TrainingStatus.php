@@ -2,14 +2,14 @@
 
 namespace App\Enums;
 
-enum TrainingStatus: string
+enum TrainingStatus: int
 {
-    case ACTIVE = 'active';
-    case SOLO = 'solo';
-    case MOCK = 'mock';
-    case CHECKOUT = 'checkout';
-    case COMPLETE = 'complete';
-    case FORFEIT = 'forfeit';
+    case ACTIVE = 1;
+    case SOLO = 2;
+    case MOCK = 3;
+    case CHECKOUT = 4;
+    case COMPLETE = 5;
+    case FORFEIT = 6;
 
     public function label(): string
     {
@@ -23,19 +23,7 @@ enum TrainingStatus: string
         };
     }
 
-    public function badgeClass(): string
-    {
-        return match ($this) {
-            self::ACTIVE => 'badge badge-accent',
-            self::SOLO => 'badge badge-secondary',
-            self::MOCK => 'badge badge-warning',
-            self::CHECKOUT => 'badge badge-info',
-            self::COMPLETE => 'badge badge-success',
-            self::FORFEIT => 'badge badge-error',
-        };
-    }
-
-    public static function fromValue(string $value): ?self
+    public static function fromValue(int $value): ?self
     {
         return self::tryFrom($value);
     }

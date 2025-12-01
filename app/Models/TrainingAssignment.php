@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\TrainingStatus;
 use Attribute;
-use Dom\Attr;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
@@ -25,6 +24,7 @@ class TrainingAssignment extends Model
 
     protected $casts = [
         'active' => 'boolean',
+        'status' => TrainingStatus::class,
     ];
 
     public function student(): BelongsTo

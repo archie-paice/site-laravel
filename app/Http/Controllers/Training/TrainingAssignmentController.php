@@ -51,18 +51,17 @@ class TrainingAssignmentController extends Controller
         ])->get();
 
         if(count($activeAssignments) > 0) {
-            return redirect()->back(400)->with('error', 'Training already assigned');
+            return redirect()->back()->withErrors('Training already assigned');
         }
 
         if (!Auth::user()->rostered) {
-            return redirect()->back(400)->with('error', 'Not an active controller.');
+            return redirect()->back()->withErrors( 'Not an active controller.');
         }
 
         TrainingAssignment::create([
             'training_type' => $validated['trainingType'],
             'user_id' => Auth::user()->id,
             'instructor_id' => null,
-            'status' => 'active'
         ]);
 
         return redirect()->back()->with('success', 'Training requested successfully');
@@ -89,7 +88,7 @@ class TrainingAssignmentController extends Controller
         $validated = $request->validate([
             'instructorId' => 'string|nullable',
             'active' => 'sometimes|in:on,1',
-            'status' => 'string|required|in:active,solo,mock,checkout,complete,forfeit'
+            'status' => 'int|required|min:1|max:5'
         ]);
 
         $trainingAssignment = TrainingAssignment::findOrFail($id);

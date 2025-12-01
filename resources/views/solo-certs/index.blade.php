@@ -12,6 +12,7 @@
         <tr>
             <th>User</th>
             <th>Issued By</th>
+            <th>Position</th>
             <th>Created At</th>
             <th>Expires On</th>
             <th>Status</th>
@@ -36,6 +37,7 @@
                         {{$soloCert->issuedBy->nameReversed}} ({{$soloCert->issuedBy->id}})
                     </a>
                 </td>
+                <td>{{$soloCert->position}}</td>
                 <td>{{$soloCert->created_at->format('Y-m-d')}}</td>
                 <td>{{$soloCert->expires->format('Y-m-d')}}</td>
                 <td>
