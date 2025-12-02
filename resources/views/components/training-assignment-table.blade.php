@@ -36,13 +36,15 @@
                     </td>
                 @endif
 
-                <td>{{$trainingAssignment->training_type}}</td>
+                <td>{{$trainingAssignment->training_type->mapToString()}}</td>
                 <td>{{(new DateTime($trainingAssignment->created_at))->format("m-d-y, h:m A")}}</td>
                 <td>
                     @if(count($trainingAssignment->student->trainingTicketsAsStudent) == 0)
                         None Logged
                     @else
-                        {{(new DateTime($trainingAssignment->student->trainingTicketsAsStudent->first()->session_start))->format("m-d-y, h:m A")}}
+                        <a href="{{route('training-tickets.show', ['ticket' => $trainingAssignment->student->trainingTicketsAsStudent->first()])}}">
+                            {{(new DateTime($trainingAssignment->student->trainingTicketsAsStudent->first()->session_start))->format("m-d-y, h:m A")}}
+                        </a>
                     @endif
                 </td>
 

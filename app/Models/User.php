@@ -150,14 +150,14 @@ class User extends Authenticatable
         return $this->hasMany(TrainingAssignment::class, 'instructor_id');
     }
 
+    public function soloCerts(): HasMany {
+        return $this->hasMany(SoloCert::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
-    }
-
-    public function soloCerts(): HasMany {
-        return $this->hasMany(SoloCert::class, 'user_id');
     }
 
     public function toSearchableArray(): array

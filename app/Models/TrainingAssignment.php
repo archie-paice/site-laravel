@@ -53,7 +53,7 @@ class TrainingAssignment extends Model
     public function toSearchableArray(): array {
         return [
             'name' => $this->student->name,
-            'trainingType' => $this->training_type,
+            'trainingType' => $this->training_type->mapToString(),
             'status' => $this->status,
             'date' => $this->created_at
         ];

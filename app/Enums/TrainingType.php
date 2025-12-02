@@ -25,5 +25,8 @@ enum TrainingType: int
         };
     }
 
-
+    public static function fromValue(int $value): ?self
+    {
+        return self::tryFrom($value);
+    }
 }

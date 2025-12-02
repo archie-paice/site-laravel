@@ -15,7 +15,9 @@
             <div class="tabs tabs-box">
                 <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Tickets" checked/>
                 <div class="tab-content bg-base-100 border-base-300 p-6">
-                    <x-label label="" value=""/>
+                    <x-training-ticket-table :trainingTickets="$trainingTickets"/>
+
+                    {{ $trainingTickets->links() }}
                 </div>
 
                 <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Assignments"/>
@@ -44,7 +46,7 @@
                                         </td>
                                     @endif
 
-                                    <td>{{$trainingAssignment->training_type}}</td>
+                                    <td>{{$trainingAssignment->training_type->mapToString()}}</td>
                                     <td>{{(new DateTime($trainingAssignment->created_at))->format("m-d-y, h:m A")}}</td>
                                     <td>
                                         @if(count($trainingAssignment->student->trainingTicketsAsStudent) == 0)
@@ -64,6 +66,8 @@
                     @else
                         <h1>There are no training assignments.</h1>
                     @endunless
+
+                    {{ $trainingAssignments->links() }}
                 </div>
 
                 <input type="radio" name="my_tabs_6" class="tab" aria-label="Solo Certs"/>

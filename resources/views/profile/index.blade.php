@@ -89,17 +89,19 @@
                             <tr>
                                 <td>{{$trainingAssignment->training_type->mapToString()}}</td>
                                 @unless (is_null($trainingAssignment->instructor))
-                                    <td>{{$trainingAssignment->instructor}}</td>
+                                    <td>
+                                        <a href="{{route('users.show', ['user' => $trainingAssignment->instructor])}}">
+                                            {{$trainingAssignment->instructor->name}}
+                                        </a>
+                                    </td>
                                 @else
                                     <td>Unassigned</td>
                                 @endunless
                                 <td>{{$trainingAssignment->updated_at}}</td>
                                 <td>{{$trainingAssignment->created_at}}</td>
-                                @if ($trainingAssignment->active)
-                                    <td class="text-success">Active</td>
-                                @else
-                                    <td class="text-error">Inactive</td>
-                                @endif
+                                <td>
+                                    <x-training-assignment-status-label :status="$trainingAssignment->status"/>
+                                </td>
                                 <td>
                                     @if ($trainingAssignment->active)
                                         <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>

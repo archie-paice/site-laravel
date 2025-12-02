@@ -46,7 +46,7 @@
                         @if ($trainingTicket->vatusa_synced)
                             <h2 class="badge badge-success">VATUSA Synced</h2>
                         @else
-                            <h2 class="badge badge-warning">Pending VATUSA Sync</h2>
+                            <h2 class="badge badge-warning ">Pending VATUSA Sync</h2>
                         @endif
                     </td>
                     <td>

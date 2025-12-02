@@ -4,14 +4,6 @@
 
 @section('body')
     <div class="card card-body bg-base-300 w-max">
-        @if(($trainingTicket->instructor_id == Auth::user()->id || Auth::user()->hasPermissionTo('manage training tickets')) && !$trainingTicket->vatusa_synced)
-            <a
-                class="absolute top-5 right-5 link"
-                href="{{route('training-tickets.edit', ['ticket' => $trainingTicket->id])}}"
-            >
-                Edit
-            </a>
-        @endif
         <div class="grid grid-cols-2 w-max gap-x-10">
             <x-label label="Session Date" :value="$trainingTicket->session_start"/>
             <x-label label="Session Duration" :value="$trainingTicket->duration"/>

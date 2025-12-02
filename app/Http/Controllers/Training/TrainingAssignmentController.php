@@ -11,12 +11,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TrainingAssignmentController extends Controller
 {
-    private readonly array $VALID_TRAINING_TYPES;
-
-    public function __construct()
-    {
-        $this->VALID_TRAINING_TYPES = ['S1', 'S2', 'S3', 'C1', 'MCO GND', 'MCO TWR', 'F11 TRACON'];
-    }
 
     public function index(Request $request) {
         $request->validate([
@@ -89,13 +83,15 @@ class TrainingAssignmentController extends Controller
         $validated = $request->validate([
             'instructorId' => 'string|nullable',
             'active' => 'sometimes|in:on,1',
-            'status' => 'int|required|min:1|max:5'
+            'status' => 'int|required|min:1',
+            'trainingType' => 'int|required'
         ]);
 
         $trainingAssignment = TrainingAssignment::findOrFail($id);
         $trainingAssignment->instructor_id = $validated['instructorId'];
         $trainingAssignment->active = $request->boolean('active');
         $trainingAssignment->status = $validated['status'];
+        $trainingAssignment->training_type = $validated['trainingType'];
         $trainingAssignment->save();
 
         return redirect()->back()->with('success', 'Training request updated successfully');
