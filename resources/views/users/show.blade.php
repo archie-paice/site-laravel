@@ -9,7 +9,7 @@
             <x-user-data :user='$user'/>
         </div>
 
-        @hasrole('training')
+        @if(!is_null(auth()->user()) && (auth()->user()->hasRole('training') || auth()->user()->id == $user->id))
         <div>
             <h2 class="text-xl">Training</h2>
             <div class="tabs tabs-box">
@@ -72,11 +72,11 @@
 
                 <input type="radio" name="my_tabs_6" class="tab" aria-label="Solo Certs"/>
                 <div class="tab-content bg-base-100 border-base-300 p-6">
-
+                    <x-solo-certs-table-user-profile :soloCerts="$soloCerts"/>
                 </div>
 
             </div>
         </div>
-        @endhasrole
+        @endif
     </div>
 @endsection

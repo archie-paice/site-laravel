@@ -13,12 +13,20 @@ class TrainingAssignmentController extends Controller
 {
 
     public function index(Request $request) {
-        $request->validate([
+        $validated = $request->validate([
             'search' => 'nullable|string',
+            'trainingType' => 'sometimes|min:0',
             'showInactive' => 'nullable|sometimes:on',
         ]);
 
-        $query = TrainingAssignment::search($request->input('search'));
+
+        $query = null;
+
+        if (is_null($request->input('trainingType'))) {
+            $query = TrainingAssignment::search($request->input('search'));
+        } else {
+            $query = TrainingAssignment::search($request->input('search'))->where('training_type', $validated['trainingType']);
+        }
 
         if (!$request->boolean('showInactive')) {
             $query->where('active', true);

@@ -16,7 +16,7 @@
                 />
             </div>
 
-            <x-search/>
+            <x-search-training-assignments/>
         </form>
 
         <x-training-assignment-table :training-assignments="$trainingAssignments"/>

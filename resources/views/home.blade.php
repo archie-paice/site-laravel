@@ -46,13 +46,34 @@
             @endunless
 
         </x-card-component>
+
         <x-card-component title="Upcoming Events">
 
         </x-card-component>
+
         <x-card-component title="News">
             <ul>
                 <li class="text-lg">11-25-2025 Jud Lopez promoted to C1</li>
             </ul>
         </x-card-component>
+
+        @if(count($soloCerts) > 0)
+            <x-card-component title="Solo Certs">
+                <ul>
+                    @foreach ($soloCerts as $soloCert)      
+                        <li class="text-lg">
+                            <div class='card bg-sky-100'>
+                                <div class='p-2 flex flex-col'>
+                                    <a class='font-bold' href={{ route('users.show', $soloCert->user->id) }} class='text-xl'>{{ $soloCert->user->name }}</a>
+
+                                    <h2 class='absolute top-2 right-2 text-lg'>{{ $soloCert->position }}</h2>
+                                    <h2 class='text-lg'>Expires on {{ $soloCert->expires->format('Y-m-d') }}</h2>
+                                </div>
+                            </div>
+                        </li>    
+                    @endforeach
+                </ul>
+            </x-card-component>
+        @endif
     </div>
 @endsection

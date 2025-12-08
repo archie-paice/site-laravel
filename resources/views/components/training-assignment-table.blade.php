@@ -49,7 +49,7 @@
                 </td>
 
                 <td>
-                    <x-training-assignment-status-label :status="$trainingAssignment->status"/>
+                    {{  $trainingAssignment->training_type->mapToString() }}
                 </td>
                 <td>
                     <ul class='text-accent menu menu-horizontal h-10 items-center gap-x-5 justify-center'>
