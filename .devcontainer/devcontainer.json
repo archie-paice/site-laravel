@@ -1,0 +1,40 @@
+{
+  "name": "Laravel Dev Environment",
+  
+  // CHANGED: Use the Dockerfile we just created instead of "image"
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+
+  "features": {
+    // Replaced with the official standard Postgres feature
+    "ghcr.io/itsmechlark/features/postgresql": {
+      "version": "16",
+      "username": "postgres",
+      "password": "postgres",
+      "dbName": "zjx_website"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "18"
+    },
+    // You don't actually need the composer feature; 
+    // the base Microsoft image already includes Composer!
+    // But keeping it doesn't hurt.
+    "ghcr.io/devcontainers-extra/features/composer:1": {}
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "mikestead.dotenv"
+      ]
+    }
+  },
+
+  // This will now pass because 'zip' is installed in the Dockerfile
+  "postCreateCommand": "composer install && npm install && php artisan key:generate && php artisan migrate --seed",
+
+  "remoteUser": "root"
+}

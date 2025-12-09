@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App;
+use App\Jobs\SyncRoster;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,5 +16,9 @@ class DatabaseSeeder extends Seeder
         $permissionSeeder->run();
         $userSeeder->run();
         $statisticsPrefixes->run();
+
+        if (App::environment() === 'development') {
+            SyncRoster::dispatch();
+        }
     }
 }
