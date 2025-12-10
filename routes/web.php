@@ -16,6 +16,8 @@ use App\Http\Controllers\UserManagementController;
 use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
+use App\Mail\Welcome;
+use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
@@ -27,7 +29,6 @@ Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('
 Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth.logout');
 
 Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
-Route::get('profile', [ProfileController::class, 'index'])->middleware('auth')->name('profile');
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
