@@ -13,7 +13,9 @@
     <tbody>
     @if(count($trainingTickets) == 0)
         <tr>
-            <td colspan="5" class="text-xl">No Training Data to Display</td>
+            <td colspan="5" class="text-center">
+                No training tickets found.
+            </td>
         </tr>
     @endif
 

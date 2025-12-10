@@ -12,8 +12,10 @@
         <tbody>
         @if(count($soloCerts) == 0)
             <tr>
-                <td colspan="5" class="text-xl">No Solo Cert Data to Display</td>
-            </tr>
+                    <td colspan="5" class="text-center">
+                        No solo certifications found.
+                    </td>
+                </tr>
         @endif
 
         @foreach($soloCerts as $soloCert)

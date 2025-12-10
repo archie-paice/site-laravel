@@ -1,7 +1,9 @@
-FROM mcr.microsoft.com/devcontainers/php:1-8.4-bullseye
+FROM php:8.3-fpm-alpine
 
-# Install the system dependency (libzip-dev) and the PHP extension (zip)
-RUN sudo apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && sudo apt-get install -y libzip-dev libpq-dev \
-    && docker-php-ext-install zip \
-    && docker-php-ext-install pdo pdo_pgsql
+# Install build dependencies, configure and install PHP extensions, then remove build deps
+RUN set -eux; \
+    apk add --no-cache --virtual .build-deps $PHPIZE_DEPS libzip-dev postgresql-dev; \
+    apk add --no-cache libzip postgresql-libs; \
+    docker-php-ext-configure zip --with-libzip; \
+    docker-php-ext-install zip pdo pdo_pgsql; \
+    apk del .build-deps

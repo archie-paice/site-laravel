@@ -12,65 +12,33 @@
         @if(!is_null(auth()->user()) && (auth()->user()->hasRole('training') || auth()->user()->id == $user->id))
         <div>
             <h2 class="text-xl">Training</h2>
-            <div class="tabs tabs-box">
-                <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Tickets" checked/>
+            <div class="tabs tabs-box" x-data="{
+                activeTab: localStorage.getItem('activeTab') || 'tickets'
+            }">
+                {{-- this section uses alpine to save the state of the currently active tab --}}
+                <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Tickets"
+                @click="activeTab = 'tickets'; localStorage.setItem('activeTab', 'tickets')"
+                x-bind:checked='activeTab === "tickets"'
+                />
                 <div class="tab-content bg-base-100 border-base-300 p-6">
                     <x-training-ticket-table :trainingTickets="$trainingTickets"/>
 
                     {{ $trainingTickets->links() }}
                 </div>
 
-                <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Assignments"/>
+                <input type="radio" name="my_tabs_6" class="tab" aria-label="Training Assignments"
+                @click="activeTab = 'assignments'; localStorage.setItem('activeTab', 'assignments')"
+                x-bind:checked='activeTab === "assignments"'
+                />
                 <div class="tab-content bg-base-100 border-base-300 p-2">
-                    @unless(sizeof($trainingAssignments) == 0)
-                        <table class='table table-zebra table-md w-max border-2 border-base-300 mt-5'>
-                            <thead>
-                            <tr>
-                                <th>Instructor</th>
-                                <th>Training Requested</th>
-                                <th>Requested At</th>
-                                <th>Last Session</th>
-                                <th>Status</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach ($trainingAssignments as $trainingAssignment)
-                                <tr>
-                                    @if(is_null($trainingAssignment->instructor))
-                                        <td>None</td>
-                                    @else
-                                        <td>
-                                            <a href="{{route('users.show', ['user' => $trainingAssignment->instructor_id])}}">
-                                                {{$trainingAssignment->instructor->name}}
-                                            </a>
-                                        </td>
-                                    @endif
-
-                                    <td>{{$trainingAssignment->training_type->mapToString()}}</td>
-                                    <td>{{(new DateTime($trainingAssignment->created_at))->format("m-d-y, h:m A")}}</td>
-                                    <td>
-                                        @if(count($trainingAssignment->student->trainingTicketsAsStudent) == 0)
-                                            None Logged
-                                        @else
-                                            {{(new DateTime($trainingAssignment->student->trainingTicketsAsStudent->first()->session_start))->format("m-d-y, h:m A")}}
-                                        @endif
-                                    </td>
-
-                                    <td>
-                                        <x-training-assignment-status-label :status="$trainingAssignment->status"/>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    @else
-                        <h1>There are no training assignments.</h1>
-                    @endunless
-
-                    {{ $trainingAssignments->links() }}
+                    <x-training-assignments-profile-table :trainingAssignments="$trainingAssignments"/>
                 </div>
 
-                <input type="radio" name="my_tabs_6" class="tab" aria-label="Solo Certs"/>
+                <input type="radio" name="my_tabs_6" class="tab" aria-label="Solo Certs"
+                @click="activeTab = 'soloCerts'; localStorage.setItem('activeTab', 'soloCerts')"
+                x-bind:checked='activeTab === "soloCerts"'
+                />
+
                 <div class="tab-content bg-base-100 border-base-300 p-6">
                     <x-solo-certs-table-user-profile :soloCerts="$soloCerts"/>
                 </div>

@@ -62,6 +62,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'rating' => ControllerRating::class,
+            'joined_at' => 'datetime',
+            'rostered' => 'boolean',
         ];
     }
 
