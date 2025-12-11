@@ -38,7 +38,7 @@ class TrainingAssignmentUpdated extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.training-assignment-updated',
+            view: 'mail.training-assignment-updated',
         );
     }
 

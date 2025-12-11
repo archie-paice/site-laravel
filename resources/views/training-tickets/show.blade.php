@@ -15,7 +15,22 @@
             </x-label-slot>
         </div>
         <x-label-slot label="Notes">
-            <textarea class="textarea" readonly>{{$trainingTicket->notes}}</textarea>
+            <div id="notes" class='bg-white p-2 rounded-md min-h-50 w-125'>{!! $trainingTicket->notes !!}</div>
         </x-label-slot>
     </div>
 @endsection
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown-common-style.css" />
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const quill = new Quill('#notes', {
+            theme: 'snow',
+            modules: {
+                toolbar: false
+            },
+            readOnly: true
+        });
+    });
+</script>

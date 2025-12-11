@@ -3,7 +3,7 @@
 @section('title', 'Edit Training Assignment - #'.$assignment->id)
 
 @section('body')
-    <div class="card card-body bg-base-300 max-w-100">
+    <div class="card card-body bg-base-300 w-max">
         <form
             action="{{route('training-assignments.update', ['assignment' => $assignment->id])}}"
             method="POST"
@@ -59,7 +59,7 @@
                     value="1"/>
             </div>
 
-            <div class="mb-6">
+            <div class="flex flex-col mb-6">
                 <label for="status" class="label">Status</label>
                 <select name="status" id="" class="select">
                     @foreach(\App\Enums\TrainingStatus::cases() as $status)
@@ -76,6 +76,12 @@
             <div class="flex flex-col mb-5">
                 <label for="updated_at" class="label">Last Updated</label>
                 <input type="text" readonly class="input" value="{{$assignment->updated_at}}">
+            </div>
+
+            <div class="flex flex-col mb-5">
+                <label for="notifyUser" class="label">Notify user of changes</label>
+                <label for="notifyUser" class="label">(will send an email to user informing them of their training type, status, and instructor)</label>
+                <input name="notifyUser" type="checkbox" class="checkbox-primary checkbox">
             </div>
 
             <div class="card-actions">

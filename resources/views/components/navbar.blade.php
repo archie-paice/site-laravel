@@ -1,6 +1,8 @@
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20">
     <div class="flex-1 ml-5">
-        <a href='{{ route('home') }}' class='font-bold text-2xl'>ZJX ARTCC</a>
+        <a href='{{ route('home') }}' class='font-bold text-2xl'>
+            <img src="{{ asset('images/zjx_wide.png') }}" alt="">
+        </a>
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>

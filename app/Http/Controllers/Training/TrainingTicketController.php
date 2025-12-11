@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Training;
 
 use App\Http\Controllers\Controller;
+use App\Mail\TrainingTicketCreated;
 use App\Models\TrainingTicket;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class TrainingTicketController extends Controller
 {
@@ -52,7 +54,7 @@ class TrainingTicketController extends Controller
             'sessionEnd' => 'required|date|after:sessionStart',
             'movements' => 'required|integer',
             'score' => 'required|integer|between:1,5',
-            'notes' => 'required|min:20|max:2048',
+            'notes' => 'required',
         ]);
 
         if($instructor->id == $validated['student']) {
@@ -75,6 +77,8 @@ class TrainingTicketController extends Controller
 
         $ticket->save();
 
+        Mail::to($ticket->student->email)->bcc($ticket->instructor->email)->queue(new TrainingTicketCreated($ticket));
+
         return redirect(route('training-tickets.show', [$ticket]))
             ->with('success', 'Training ticket successfully created.');
     }
@@ -90,6 +94,7 @@ class TrainingTicketController extends Controller
 
     /**
      * Show the form for editing the specified resource.
+     * !!!! NOT IN USE !!!!
      */
     public function edit(string $id)
     {
@@ -104,6 +109,7 @@ class TrainingTicketController extends Controller
 
     /**
      * Update the specified resource in storage.
+     * !!!! NOT IN USE !!!!
      */
     public function update(Request $request, string $id)
     {

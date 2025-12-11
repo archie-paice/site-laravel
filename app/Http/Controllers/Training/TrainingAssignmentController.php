@@ -8,6 +8,7 @@ use App\Models\Staff;
 use App\Models\TrainingAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class TrainingAssignmentController extends Controller
 {
@@ -92,7 +93,8 @@ class TrainingAssignmentController extends Controller
             'instructorId' => 'string|nullable',
             'active' => 'sometimes|in:on,1',
             'status' => 'int|required|min:1',
-            'trainingType' => 'int|required'
+            'trainingType' => 'int|required',
+            'notifyUser' => 'sometimes|in:on,1',
         ]);
 
         $trainingAssignment = TrainingAssignment::findOrFail($id);
@@ -101,6 +103,10 @@ class TrainingAssignmentController extends Controller
         $trainingAssignment->status = $validated['status'];
         $trainingAssignment->training_type = $validated['trainingType'];
         $trainingAssignment->save();
+
+        if ($validated['notifyUser'] ?? false) {
+            Mail::to($trainingAssignment->student->email)->bcc($trainingAssignment->instructor ?? null)->queue(new \App\Mail\TrainingAssignmentUpdated($trainingAssignment));
+        }
 
         return redirect()->back()->with('success', 'Training request updated successfully');
     }
@@ -124,6 +130,7 @@ class TrainingAssignmentController extends Controller
             "instructor_id" => Auth::user()->id,
         ]);
 
+        Mail::to($assignment->student->email)->bcc($assignment->instructor ?? null)->queue(new \App\Mail\TrainingAssignmentUpdated($assignment));
         return redirect()->back()->with('success', 'Training assignment claimed successfully');
     }
 
@@ -145,6 +152,7 @@ class TrainingAssignmentController extends Controller
             ]);
         }
 
+        Mail::to($assignment->student->email)->queue(new \App\Mail\TrainingAssignmentUpdated($assignment));
         return redirect()->back()->with('success', 'Training assignment dropped successfully');
     }
 

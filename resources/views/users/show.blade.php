@@ -3,16 +3,14 @@
 @section('title', 'Profile - '.$user->first_name.' '.$user->last_name)
 
 @section('body')
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2">
-        <div>
-            <h2 class="text-xl">General Info</h2>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-2 h-fit">
+        <x-card-component title='General Info'>
             <x-user-data :user='$user'/>
-        </div>
+        </x-card-component>
 
         @if(!is_null(auth()->user()) && (auth()->user()->hasRole('training') || auth()->user()->id == $user->id))
-        <div>
-            <h2 class="text-xl">Training</h2>
-            <div class="tabs tabs-box" x-data="{
+        <div class='max-h-full'>
+            <div class="tabs tabs-box h-full" x-data="{
                 activeTab: localStorage.getItem('activeTab') || 'tickets'
             }">
                 {{-- this section uses alpine to save the state of the currently active tab --}}
@@ -46,5 +44,27 @@
             </div>
         </div>
         @endif
+
+        <x-card-component title='Statistics'>
+            <div class='flex flex-row justify-evenly border-b-1'>
+                <x-profile-statistics-time-label
+                    label='Total Time Online'
+                    :time-interval='new DateInterval("PT300H")'/>
+
+                <x-profile-statistics-time-label
+                    label='This Month'
+                    :time-interval='new DateInterval("PT20H25M")'/>
+
+                <x-profile-statistics-time-label
+                    label='This Year'
+                    :time-interval='new DateInterval("PT112H35M")'/>
+            </div>
+
+            <div class='mt-2'>
+                <h1 class='text-xl'>Last 10 Sessions</h1>
+
+                
+            </div>
+        </x-card-component>
     </div>
 @endsection

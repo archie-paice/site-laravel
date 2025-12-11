@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('position');
             $table->integer('movements')->default(0);
             $table->integer('score', false, false)->default(1);
-            $table->string('notes', 2048);
+            $table->mediumText('notes');
             $table->integer('location');
             $table->boolean('vatusa_synced')->default(false);
             $table->timestamps();
