@@ -1,8 +1,24 @@
-
-
 @extends('layouts.admin')
 
 @section('title', 'Create Training Ticket')
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" />
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quilljs-markdown@latest/dist/quilljs-markdown-common-style.css" />
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    var quill = new Quill('#editor', {
+      theme: 'snow',
+      toolbar: [
+        ['bold', 'italic', 'underline', 'strike'],
+        [ 'link', 'image'],
+    ]
+    });
+    new QuillMarkdown(quill);
+  });
+</script>
 
 @section('body')
     <div class="card card-body bg-base-300 max-w-150">
@@ -110,12 +126,12 @@
             <br>
 
             <label for="notes" class="label">Notes</label>
-            <textarea
-                name="notes"
-                id="notes"
-                class="textarea w-100 h-50"
+            <textarea name="notes" hidden></textarea>
+            <div
+                id="editor"
                 minlength="20"
-                maxlength="2048">{{old('notes')}}</textarea>
+                maxlength="2048">
+            {{ old('notes') }}</div>
 
             <br>
 

@@ -11,7 +11,7 @@ class TrainingAssignmentsProfileTable extends Component
     /**
      * Create a new component instance.
      */
-    public function __construct(public mixed $trainingAssignments)
+    public function __construct(public mixed $trainingAssignments, public int $userId)
     {
         //
     }

@@ -31,7 +31,7 @@
                 x-bind:checked='activeTab === "assignments"'
                 />
                 <div class="tab-content bg-base-100 border-base-300 p-2">
-                    <x-training-assignments-profile-table :trainingAssignments="$trainingAssignments"/>
+                    <x-training-assignments-profile-table :userId="$user->id" :trainingAssignments="$trainingAssignments"/>
                 </div>
 
                 <input type="radio" name="my_tabs_6" class="tab" aria-label="Solo Certs"

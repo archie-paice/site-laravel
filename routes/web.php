@@ -16,7 +16,9 @@ use App\Http\Controllers\UserManagementController;
 use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
+use App\Mail\TrainingAssignmentUpdated;
 use App\Mail\Welcome;
+use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
@@ -68,5 +70,9 @@ if (App::environment('development', 'local')) {
         SyncTrainingTickets::dispatch();
         Mail::to(User::find(1697197))->send(new Welcome(User::find(1697197)));
         return 'scheduled';
+    });
+
+    Route::get('/test-email', function() {
+        return new TrainingAssignmentUpdated(TrainingAssignment::find(1));
     });
 }

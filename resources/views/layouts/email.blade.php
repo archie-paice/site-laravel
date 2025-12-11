@@ -22,7 +22,7 @@
         .text-base-content { color: #1F2937; }
         
         .btn-primary { 
-            background-color: #4F46E5 !important; 
+            background-color: #0080C2 !important; 
             color: #ffffff !important; 
             border-radius: 0.25rem !important; /* Your --radius-selector */
             padding: 12px 24px;
@@ -30,11 +30,11 @@
             display: inline-block;
         }
 
-        .text-primary { color: #4F46E5 !important; }
+        .text-primary { color: #0080C2 !important; }
         .text-secondary { color: #FB923C !important; }
         
         /* Layout resets */
-        .wrapper { width: 100%; background-color: #F3F4F6; padding: 40px 0; }
+        .wrapper { width: 100%; background-color: #F3F4F6; padding: 40px 0; padding-top: 0px;}
         .content-box { 
             background-color: #F9FAFB; 
             margin: 0 auto; 
@@ -51,11 +51,9 @@
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
             <tr>
                 <td align="center">
-                    
-                    <div style="margin-bottom: 24px; text-align: center;">
-                        <h1 style="color: #4F46E5; font-size: 24px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">
-                            {{ config('app.name') }}
-                        </h1>
+                    <div style="margin-bottom: 24px; text-align: center; width: 100%; display: flex; justify-content: center; background-color: #0080C2; padding: 16px;">
+                        <!-- THIS WILL NOT SHOW UP IN LARAVEL PREVIEWS. IF YOU ARE UNSURE IF ITS WORKING CHECK THE MAIL SANDBOX! -->
+                        <img src='{{ $message->embed(public_path('images/zjx_wide.png')) }}'/>
                     </div>
 
                     <table class="content-box" border="0" cellpadding="0" cellspacing="0">
@@ -67,7 +65,7 @@
                     </table>
 
                     <div style="margin-top: 32px; text-align: center; color: #6B7280; font-size: 12px;">
-                        <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved.</p>
+                        <p>&copy; {{ date('Y') }} {{ config('app.name') }}. All rights reserved. vZJX has no affiliation to the real Jacksonville ARTCC, the Federal Aviation Administration, or any governing aviation authority, nor does vZJX intend to impersonate them in any way, shape or form. vZJX is a subdivision of VATUSA and VATNA on the VATSIM network.</p>
                         <p>
                             <a href="#" style="color: #6B7280; text-decoration: underline;">Unsubscribe</a>
                         </p>
