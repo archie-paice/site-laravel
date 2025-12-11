@@ -66,6 +66,7 @@ if (App::environment('development', 'local')) {
 
     Route::get('/sync-training', function() {
         SyncTrainingTickets::dispatch();
+        Mail::to(User::find(1697197))->send(new Welcome(User::find(1697197)));
         return 'scheduled';
     });
 }
