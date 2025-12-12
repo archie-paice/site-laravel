@@ -30,7 +30,14 @@ Route::get('/auth/redirect', [VatsimOauthController::class, 'redirect'])->name('
 Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth.logout');
 
-Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
+Route::resource('users', UserController::class, ['only' => ['edit', 'update']]);
+Route::prefix('users/{user}')->group(function() {
+    Route::get('/', [UserController::class, 'show'])->name('users.show');
+    Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
+    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->name('users.show.training-assignments');
+    Route::get('solo-certs', [UserController::class, 'soloCerts'])->name('users.show.solo-certs');
+});
+
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');

@@ -3,21 +3,25 @@
 @section('title', 'Edit User')
 
 @section('body')
-    <div class='card w-max bg-base-300 p-5 flex flex-col'>
-        <form action={{ route('users.update', $user) }} method='POST'>
+    <x-card-component title='Modify User Information'>
+        <form action={{ route('users.update', $user) }} enctype="multipart/form-data" method='POST'>
             @csrf
             @method('PUT')
 
             <input hidden name='id' value='{{ $user->id }}'/>
 
-            <div class="mb-5">
-                <h1 class='card-title'>{{ $user->first_name.' '.$user->last_name }}</h1>
+            <div class="w-max mb-5">
                 @if ($user->rostered && strcasecmp($user->facility, 'ZJX') == 0)
-                    <h2 class='text-lg text-accent'>Home Controller</h2>
+                    <h2 class='badge badge-lg badge-accent'>Home Controller</h2>
                 @elseif ($user->rostered)
-                    <h2 class='text-lg text-error'>Visitng Controller</h2>
+                    <h2 class='badge badge-lg badge-error'>Visiting Controller</h2>
+                @else
+                    <h2 class='text-lg'>Not Rostered</h2>
                 @endif
             </div>
+
+            <img class='col-span-2 border-2 w-50 h-50 mb-5' src="{{ asset($user->profile_image_route) }}" alt=""/>
+            <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
 
             <div class="grid grid-cols-2 gap-x-20">
                 <a href="{{ route('users.show', $user) }}" class="link absolute top-5 right-5">View User</a>
@@ -28,8 +32,8 @@
                     type="text"
                     name='operatingInitials'
                     maxlength='2'
-                    class='input input-sm'
-                    placeholder='Enter OIs'
+                    class='input input-md w-100'
+                    @disabled(!auth()->user()->hasPermissionTo('manage users'))
                     value={{ $user->operating_initials }}>
                 </x-label-slot>
 
@@ -43,7 +47,12 @@
                 @endunless
             </div>
 
+            <div class='col-span-2'>
+                <x-label-slot label='Biography'>
+                    <textarea name='biography' class='textarea w-full resize-none h-30'>{{ $user->biography }}</textarea>
+                </x-label-slot>
+            </div>
             <button type="submit" class='btn btn-primary'>Submit Changes</button>
         </form>
-    </div>
+    </x-card-component>
 @endsection

@@ -1,4 +1,4 @@
-<div class='mb-5 w-max'>
+<div class='flex flex-col mb-5 w-max'>
     <label class='text-md'>{{ $label }}</label>
-    <h2 class='text-lg font-bold'>{{ $value }}</h2>
+    <input class='input input-md w-100' disabled value="{{ $value }}" />
 </div>

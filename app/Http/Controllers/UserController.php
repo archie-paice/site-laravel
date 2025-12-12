@@ -20,15 +20,10 @@ class UserController extends Controller implements HasMiddleware
 
     public function show(int $id) {
         $user = User::findOrFail($id);
-
-        $trainingAssignments = $user->trainingAssignmentsAsStudent()->paginate(10, ['*'], 'assignmentsPage');
-        $trainingTickets = $user->trainingTicketsAsStudent()->paginate(10, ['*'], 'ticketsPage');
         $soloCerts = $user->soloCerts()->paginate(10, ['*'], 'soloCerts');
 
         return view('users.show', [
             'user' => $user,
-            'trainingAssignments' => $trainingAssignments ?? collect(),
-            'trainingTickets' => $trainingTickets ?? collect(),
             'soloCerts' => $soloCerts ?? collect()
         ]);
     }
@@ -42,25 +37,71 @@ class UserController extends Controller implements HasMiddleware
     public function update(Request $request) {
         $validated = $request->validate([
             'id' => 'required|integer',
-            'operatingInitials' => 'string|nullable|size:2',
+            'operatingInitials' => 'string|nullable|size:2', // can only be edited if admin
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
+            'biography' => 'string|nullable|max:1000'
         ], [
             'operatingInitials.max' => 'Operating initials must be 2 characters long'
         ]);
 
-        if (User::where('operating_initials', strtoupper($validated['operatingInitials']))->count() > 0) {
+        if (Auth::user()->id != $validated['id'] && !Auth::user()->hasPermissionTo('manage users')) {
+            return redirect()->back()->with('error', 'You do not have permission to edit this user.');
+        }
+        $oiCount = User::where('operating_initials', strtoupper($validated['operatingInitials']))->where('id', '!=', $validated['id'])->count();
+
+        if ($oiCount > 0) {
             return redirect()->back()->with('error', 'OIs already assigned.');
         }
 
         $user = User::findOrFail($validated['id']);
 
-        $user->update([
-            'operating_initials' => $validated['operatingInitials']
-        ]);
+        if ($request->hasFile('image')) {
+            $imageName = 'profile_'.$user->id.'.'.$request->file('image')->getClientOriginalExtension();
+            $request->file('image')->move(public_path('images/profiles'), $imageName);
+            $user->profile_image_route = 'images/profiles/'.$imageName;
+        }
 
-        Log::info('User {id} updated by user {id2}', [
-            'id' => $user->id,
-            'id2' => Auth::user()->id
-        ]);
+        $user->biography = $validated['biography'] ?? null;
+
+        if (Auth::user()->hasPermissionTo('manage users')) {
+            $user->operating_initials = strtoupper($validated['operatingInitials'] ?? $user->operating_initials);
+        }
+
+        $user->save();
+
         return redirect()->route('users.edit', ['user' => $user->id])->with('success', 'User updated successfully');
+    }
+
+    public function trainingAssignments(int $id) {
+        $user = User::findOrFail($id);
+
+        $trainingAssignments = $user->trainingAssignmentsAsStudent()->paginate(25, ['*'], 'assignmentsPage');
+
+        return view('users.training-assignments', [
+            'user' => $user,
+            'trainingAssignments' => $trainingAssignments
+        ]);
+    }
+
+    public function trainingTickets(int $id) {
+        $user = User::findOrFail($id);
+
+        $trainingTickets = $user->trainingTicketsAsStudent()->paginate(25, ['*'], 'ticketsPage');
+
+        return view('users.training-tickets', [
+            'user' => $user,
+            'trainingTickets' => $trainingTickets
+        ]);
+    }
+
+    public function soloCerts(int $id) {
+        $user = User::findOrFail($id);
+
+        $soloCerts = $user->soloCerts()->paginate(25, ['*'], 'soloCertsPage');
+
+        return view('users.solo-certs', [
+            'user' => $user,
+            'soloCerts' => $soloCerts
+        ]);
     }
 }

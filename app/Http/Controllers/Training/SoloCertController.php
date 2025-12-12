@@ -6,11 +6,15 @@ use App\Enums\TrainingStatus;
 use App\Http\Controllers\Controller;
 use App\Jobs\CreateVatusaSoloCert;
 use App\Jobs\RevokeVatusaSoloCert;
+use App\Mail\SoloCertIssued;
+use App\Mail\SoloCertRevoked;
 use App\Models\SoloCert;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use App\Services\VatusaSoloCertService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class SoloCertController extends Controller
 {
@@ -44,13 +48,13 @@ class SoloCertController extends Controller
             'position' => ['required', 'regex:/^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/'],
         ]);
 
-        if ($validated['userId'] == auth()->user()->id) {
+        if ($validated['userId'] == Auth::user()->id) {
             return redirect()->back()->withErrors(['userId' => 'You cannot issue a solo certification to yourself.'])->withInput();
         }
 
         $soloCert = SoloCert::create([
             'user_id' => $validated['userId'],
-            'issued_by_id' => auth()->user()->id,
+            'issued_by_id' => Auth::user()->id,
             'position' => $validated['position'],
         ]);
 
@@ -65,6 +69,7 @@ class SoloCertController extends Controller
         }
 
         CreateVatusaSoloCert::dispatch($soloCert);
+        Mail::to($soloCert->user)->bcc([$soloCert->issuedBy, config('app.vatusa_facility').'-ta@vatusa.net'])->queue(new SoloCertIssued($soloCert));
 
         return redirect(route('solo-certs.index'))->with('success', 'Solo certification created successfully.');
     }
@@ -90,6 +95,8 @@ class SoloCertController extends Controller
 
         $soloCert->revoked = true;
         $soloCert->save();
+
+        Mail::to($soloCert->user)->bcc([$soloCert->issuedBy, config('app.vatusa_facility').'-ta@vatusa.net'])->queue(new SoloCertRevoked($soloCert));
 
         return redirect(route('solo-certs.index'))->with('success', 'Solo certification revoked successfully.');
     }
