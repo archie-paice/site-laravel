@@ -11,7 +11,7 @@
 <div class="grid grid-cols-2 gap-x-20 w-max">
     <a href='{{ route('users.edit', $user) }}' class='link absolute top-5 right-5'>Edit User</a>
 
-    <img class='col-span-2 border-2 rounded-full w-25 h-25 mb-5' src="{{ asset($user->profile_image_route) }}" alt=""/>
+    <img class='col-span-2 border-2 rounded-full w-50 h-50 mb-5' src="{{ asset('storage/'.$user->profile_image_route) }}" alt=""/>
 
     <x-label label='CID' :value="$user->id"/>
     <x-label label='Rating' :value="$user->rating->mapToString()"/>

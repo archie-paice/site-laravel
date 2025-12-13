@@ -57,8 +57,9 @@ class UserController extends Controller implements HasMiddleware
 
         if ($request->hasFile('image')) {
             $imageName = 'profile_'.$user->id.'.'.$request->file('image')->getClientOriginalExtension();
-            $request->file('image')->move(public_path('images/profiles'), $imageName);
-            $user->profile_image_route = 'images/profiles/'.$imageName;
+            $path = $request->file('image')->storeAs('profile', $imageName, 'public');
+    
+            $user->profile_image_route = $path;
         }
 
         $user->biography = $validated['biography'] ?? null;
@@ -68,7 +69,6 @@ class UserController extends Controller implements HasMiddleware
         }
 
         $user->save();
-
         return redirect()->route('users.edit', ['user' => $user->id])->with('success', 'User updated successfully');
     }
 

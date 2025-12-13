@@ -5,7 +5,7 @@
     <x-card-component title='General Information'>
         <x-user-data :user="$user"/>
     </x-card-component>
-
+    
     <x-card-component title='Statistics'>
         <div class='flex flex-row justify-evenly border-b-1'>
             <x-profile-statistics-time-label

@@ -49,7 +49,7 @@
                 </td>
 
                 <td>
-                    {{  $trainingAssignment->training_type->mapToString() }}
+                    {{  $trainingAssignment->status->label() }}
                 </td>
                 <td>
                     <ul class='text-accent menu menu-horizontal h-10 items-center gap-x-5 justify-center'>

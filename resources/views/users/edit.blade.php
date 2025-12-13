@@ -20,7 +20,7 @@
                 @endif
             </div>
 
-            <img class='col-span-2 border-2 w-50 h-50 mb-5' src="{{ asset($user->profile_image_route) }}" alt=""/>
+            <img class='col-span-2 border-2 w-50 h-50 mb-5 rounded-full' src="{{ asset('storage/'.$user->profile_image_route) }}" alt=""/>
             <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
 
             <div class="grid grid-cols-2 gap-x-20">
