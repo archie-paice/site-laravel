@@ -48,6 +48,10 @@ FROM php:8.4-fpm-alpine
 RUN apk add --no-cache libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql
 
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 775 /var/www/html/storage \
+    && chmod -R 775 /var/www/html/bootstrap/cache
+
 # copy files from the build stage
 COPY --from=build /var/www/html /var/www/html
 COPY ./deploy/nginx.conf /etc/nginx/http.d/default.conf
