@@ -39,8 +39,8 @@ RUN composer install --no-dev --prefer-dist \
     && npm install \
     && npm run build
 
-RUN chown -R www-data:www-data /var/www/html/vendor \
-    && chmod -R 775 /var/www/html/vendor
+RUN chown -R www-data:www-data /var/www/html/ \
+    && chmod -R 775 /var/www/html/
 
 # stage 2: production stage
 FROM php:8.4-fpm-alpine
@@ -59,8 +59,5 @@ WORKDIR /var/www/html
 VOLUME ["/var/www/html/storage/app"]
 
 COPY ./deploy/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R u+rwX,g+rwX /var/www/html/storage /var/www/html/bootstrap/cache
 
 CMD ["/entrypoint.sh"]
