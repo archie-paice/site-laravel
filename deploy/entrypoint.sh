@@ -3,7 +3,6 @@ php artisan optimize:clear
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
-php artisan key:generate
 php artisan storage:link
 
 echo "Starting PHP-FPM..."
