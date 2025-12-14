@@ -33,18 +33,17 @@ jobs:
 
       # 4. Wait for Database
       # We use the healthcheck you already defined in docker-compose.yml
-      - name: Wait for DB Health
+      - name: Wait for App Readiness
         run: |
-          echo "Waiting for database to become healthy..."
-          timeout 60s sh -c 'until docker inspect --format="{{.State.Health.Status}}" deploy-db-1 | grep -q "healthy"; do sleep 2; done'
+          echo "Waiting for Laravel to start..."
+          # Note: We use the service name 'laravel' combined with project name if needed
+          # or simply wait for the specific container health status
+          timeout 120s sh -c 'until docker inspect --format="{{.State.Health.Status}}" zjx-laravel | grep -q "healthy"; do sleep 2; done'
 
       # 5. Run the Tests INSIDE the container
       - name: Execute Tests
         run: |
-          # Use -T to disable TTY interaction (prevents errors in CI)
-          docker compose -f deploy/docker-compose.yml exec -T laravel sh -c "
-            php artisan key:generate &&
-            php artisan migrate:fresh --force --seed &&
+          docker compose -f deploy/docker-compose.yml exec -T laravel sh -c"
             php artisan test
           "
 
