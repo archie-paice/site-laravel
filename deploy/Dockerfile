@@ -1,7 +1,7 @@
 # deploy/Dockerfile
 
 # stage 1: build stage
-FROM php:8.3-fpm-alpine as build
+FROM php:8.4-fpm-alpine as build
 
 # installing system dependencies and php extensions
 RUN apk add --no-cache \
@@ -43,7 +43,7 @@ RUN chown -R www-data:www-data /var/www/html/vendor \
     && chmod -R 775 /var/www/html/vendor
 
 # stage 2: production stage
-FROM php:8.3-fpm-alpine
+FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql
