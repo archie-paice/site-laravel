@@ -1,54 +1,51 @@
-name: Run Tests in Docker
+name: tests
 
 on:
+  push:
+    branches:
+      - develop
+      - main
   pull_request:
-    branches: [ "main", "develop" ]
-  workflow_dispatch:
+    branches:
+      - develop
+      - main
 
 jobs:
-  test-in-docker:
-    # Works on 'ubuntu-latest' OR 'self-hosted'
-    runs-on: ubuntu-latest 
-    
+  ci:
+    runs-on: ubuntu-latest
+    environment: Testing
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      # 1. Create the .env file for Docker Compose
-      # Even though we are testing, Docker Compose needs this file to 
-      # populate the variables in your YAML (like ${DB_USERNAME})
-      - name: Setup Test Environment
-        run: |
-          echo "${{ secrets.TESTING_ENV_FILE }}" > .env.prod
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: xdebug
 
-      # 2. Build the Stack (CRITICAL: Enable Dev Tools)
-      # We pass INSTALL_DEV=true so Composer includes PHPUnit/Pest
-      - name: Build Containers
-        run: |
-          docker compose -f deploy/docker-compose.yml build \
-            --build-arg INSTALL_DEV=true
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
 
-      # 3. Start the Stack
-      - name: Start Services
-        run: docker compose --env-file .env.prod -f deploy/docker-compose-test.yml up
+      - name: Install Node Dependencies
+        run: npm i
 
-      # 4. Wait for Database
-      # We use the healthcheck you already defined in docker-compose.yml
-      - name: Wait for App Readiness
-        run: |
-          echo "Waiting for Laravel to start..."
-          # Note: We use the service name 'laravel' combined with project name if needed
-          # or simply wait for the specific container health status
-          timeout 120s sh -c 'until docker inspect --format="{{.State.Health.Status}}" zjx-laravel | grep -q "healthy"; do sleep 2; done'
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      # 5. Run the Tests INSIDE the container
-      - name: Execute Tests
-        run: |
-          docker compose -f deploy/docker-compose-test.yml exec -T laravel sh -c"
-            php artisan test
-          "
+      - name: Copy Environment File
+        run: echo {{ secrets.TESTING_ENV_FILE }} >> .env
 
-      # 6. Cleanup
-      # Always run this to remove the containers and the testing volume
-      - name: Teardown
-        if: always()
-        run: docker compose -f deploy/docker-compose.yml down -v
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Run Tests
+        run: ./vendor/bin/pest
