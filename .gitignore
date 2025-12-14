@@ -9,6 +9,7 @@
 /vendor
 .env
 .env.prod
+.env.staging
 .env.backup
 .env.production
 .phpactor.json
