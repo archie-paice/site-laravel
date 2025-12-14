@@ -59,6 +59,6 @@ WORKDIR /var/www/html
 VOLUME ["/var/www/html/storage/app"]
 
 COPY ./deploy/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh \
+RUN chmod +x /entrypoint.sh
 
 CMD ["/entrypoint.sh"]
