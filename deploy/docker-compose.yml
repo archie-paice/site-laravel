@@ -4,7 +4,7 @@ version: '3.8'
 
 services:
   laravel:
-    image: ghcr.io/zjx-artcc/site-laravel:master
+    image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
     restart: unless-stopped
     container_name: zjx-laravel
     build:
@@ -33,7 +33,7 @@ services:
             condition: service_completed_successfully
 
   queue:
-      image: ghcr.io/zjx-artcc/site-laravel:master
+      image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       container_name: laravel_queue
       restart: unless-stopped
       # Wait for DB to accept connections, then run the queue worker
@@ -49,7 +49,7 @@ services:
               condition: service_completed_successfully
 
   scheduler:
-      image: ghcr.io/zjx-artcc/site-laravel:master
+      image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       container_name: laravel_scheduler
       restart: unless-stopped
       command: php artisan schedule:work
@@ -65,7 +65,7 @@ services:
               condition: service_completed_successfully
 
   migrator:
-      image: ghcr.io/zjx-artcc/site-laravel:master
+      image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       deploy:
           restart_policy:
               condition: on-failure
