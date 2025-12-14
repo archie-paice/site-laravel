@@ -34,7 +34,7 @@ jobs:
       # 5. Run the Tests INSIDE the container
       - name: Execute Tests
         run: |
-          docker compose -f deploy/docker-compose-test.yml exec -T laravel sh -c"
+          docker compose -f deploy/docker-compose-test.yml --env-file .env exec -T laravel sh -c"
             php artisan test
           "
 
