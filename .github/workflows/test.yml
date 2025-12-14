@@ -29,7 +29,7 @@ jobs:
 
       # 3. Start the Stack
       - name: Start Services
-        run: docker compose --env-file .env.prod -f deploy/docker-compose.yml up -d
+        run: docker compose --env-file .env.prod -f deploy/docker-compose.yml up
 
       # 4. Wait for Database
       # We use the healthcheck you already defined in docker-compose.yml
