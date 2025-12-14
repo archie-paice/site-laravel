@@ -45,7 +45,7 @@ jobs:
       # Create the .env file dynamically from Secrets
       - name: Create .env file
         run: |
-          echo "${{ secrets.STAGING_ENV_FILE }}" > .env.prod
+          echo "${{ secrets.STAGING_ENV_FILE }}" >> .env.prod
 
       - name: Deploy Staging
         run: |
