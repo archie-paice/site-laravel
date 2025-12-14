@@ -10,6 +10,11 @@ services:
     build:
       context: ../
       dockerfile: ./deploy/Dockerfile
+    healthcheck:
+        test: [ "CMD", "php", "artisan", "--version" ]
+        interval: 10s
+        timeout: 5s
+        retries: 3
     env_file:
         - ../.env.prod
     ports:

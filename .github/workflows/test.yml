@@ -30,16 +30,7 @@ jobs:
       # 3. Start the Stack
       - name: Start Services
         run: docker compose --env-file .env.prod -f deploy/docker-compose-test.yml up -d
-
-      # 4. Wait for Database
-      # We use the healthcheck you already defined in docker-compose.yml
-      - name: Wait for App Readiness
-        run: |
-          echo "Waiting for Laravel to start..."
-          # Note: We use the service name 'laravel' combined with project name if needed
-          # or simply wait for the specific container health status
-          timeout 120s sh -c 'until docker inspect --format="{{.State.Health.Status}}" zjx-laravel | grep -q "healthy"; do sleep 2; done'
-
+        
       # 5. Run the Tests INSIDE the container
       - name: Execute Tests
         run: |
