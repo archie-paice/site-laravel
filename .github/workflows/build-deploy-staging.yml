@@ -43,11 +43,9 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       # Create the .env file dynamically from Secrets
-      - name: Create .env file
+      - name: Setup envionment
         run: |
-          cat << 'EOF' >> .env
-          ${{ secrets.TESTING_ENV_FILE }}
-          EOF
+            echo "${{ secrets.STAGING_ENV_FILE }}" >> ../.env
 
       - name: Deploy Staging
         run: |

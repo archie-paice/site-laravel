@@ -10,9 +10,6 @@ env:
   IMAGE_NAME: ${{ github.repository }}
 
 jobs:
-  test:
-    uses: ./.github/workflows/tests.yml
-
   build:
     needs: test
     runs-on: ubuntu-latest
@@ -46,11 +43,9 @@ jobs:
       - name: Log in to Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-      - name: Create .env file
+      - name: Setup envionment
         run: |
-          cat << 'EOF' >> .env
-          ${{ secrets.TESTING_ENV_FILE }}
-          EOF
+            echo "${{ secrets.PROD_ENV_FILE }}" >> ../.env
 
       - name: Deploy Production
         run: |
