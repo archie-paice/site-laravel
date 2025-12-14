@@ -16,11 +16,6 @@ services:
       - "8080:80"
     networks:
       - laravel
-    healthcheck:
-        test: [ "CMD", "php", "artisan", "--version" ]
-        interval: 10s
-        timeout: 5s
-        retries: 3
     depends_on:
         db:
             condition: service_healthy
