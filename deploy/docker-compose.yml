@@ -1,4 +1,4 @@
-# docker compose --env-file ./.env.prod -f ./deploy/docker-compose.yml up --build
+# docker compose --env-file ./.env -f ./deploy/docker-compose.yml up --build
 # docker compose -f ./deploy/docker-compose.yml down -v
 version: '3.8'
 
@@ -16,7 +16,7 @@ services:
       # Persist runtime uploads/storage separately
       - storage_data:/var/www/html/storage
     env_file:
-        - ../.env.prod
+        - ../.env
     ports:
       - "8080:80"
     networks:
@@ -39,7 +39,7 @@ services:
       # Wait for DB to accept connections, then run the queue worker
       command: php artisan queue:work
       env_file:
-          -   ../.env.prod
+          -   ../.env
       networks:
           - laravel
       depends_on:
@@ -55,7 +55,7 @@ services:
       command: php artisan schedule:work
       # Wait for DB to accept connections, then run the scheduler
       env_file:
-          - ../.env.prod
+          - ../.env
       networks:
           - laravel
       depends_on:
@@ -71,7 +71,7 @@ services:
               condition: on-failure
       command: [ "php", "artisan", "migrate", "--seed", "--force" ]
       env_file:
-          - ../.env.prod
+          - ../.env
       depends_on:
           db:
             condition: service_healthy
@@ -82,7 +82,7 @@ services:
       image: postgres:16  # <--- FIXED: Pinned version to prevent "latest" breaking changes
       restart: always
       env_file:
-          - ../.env.prod
+          - ../.env
       environment:
           POSTGRES_DB: ${DB_DATABASE}
           POSTGRES_USER: ${DB_USERNAME}
