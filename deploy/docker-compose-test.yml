@@ -1,0 +1,71 @@
+# docker compose --env-file ./.env.prod -f ./deploy/docker-compose.yml up --build
+# docker compose -f ./deploy/docker-compose.yml down -v
+version: '3.8'
+
+services:
+  laravel:
+    image: ghcr.io/zjx-artcc/site-laravel:master
+    restart: unless-stopped
+    container_name: zjx-laravel
+    build:
+      context: ../
+      dockerfile: ./deploy/Dockerfile
+    volumes:
+      # Use a named volume that will be populated from the built image on first create.
+      - app_code:/var/www/html
+      # Persist runtime uploads/storage separately
+      - storage_data:/var/www/html/storage
+    env_file:
+        - ../.env.prod
+    ports:
+      - "8080:80"
+    networks:
+      - laravel
+    healthcheck:
+        test: [ "CMD", "php", "artisan", "--version" ]
+        interval: 10s
+        timeout: 5s
+        retries: 3
+    depends_on:
+        db:
+            condition: service_healthy
+        migrator:
+            condition: service_completed_successfully
+
+  migrator:
+      image: ghcr.io/zjx-artcc/site-laravel:master
+      deploy:
+          restart_policy:
+              condition: on-failure
+      command: [ "php", "artisan", "migrate", "--seed", "--force" ]
+      env_file:
+          - ../.env.prod
+      depends_on:
+          db:
+            condition: service_healthy
+      networks:
+          - laravel
+
+  db:
+      image: postgres:16  # <--- FIXED: Pinned version to prevent "latest" breaking changes
+      restart: always
+      env_file:
+          - ../.env.prod
+      environment:
+          POSTGRES_DB: ${DB_DATABASE}
+          POSTGRES_USER: ${DB_USERNAME}
+          POSTGRES_PASSWORD: ${DB_PASSWORD}
+      volumes:
+          - db_data:/var/lib/postgresql/data
+      networks:
+          - laravel
+      healthcheck:
+          test: [ "CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres}" ]
+          interval: 5s
+          timeout: 5s
+          retries: 5
+          start_period: 10s
+
+networks:
+  laravel:
+    driver: bridge
