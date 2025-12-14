@@ -1,10 +1,9 @@
 name: Run Tests in Docker
 
 on:
-  push:
-    branches: [ "**" ]
   pull_request:
     branches: [ "main", "develop" ]
+  workflow_dispatch:
 
 jobs:
   test-in-docker:
@@ -19,7 +18,7 @@ jobs:
       # populate the variables in your YAML (like ${DB_USERNAME})
       - name: Setup Test Environment
         run: |
-          echo "${{ secrets.TESTING_ENV_FILE }}" > .env.testing
+          echo "${{ secrets.TESTING_ENV_FILE }}" > .env.prod
 
       # 2. Build the Stack (CRITICAL: Enable Dev Tools)
       # We pass INSTALL_DEV=true so Composer includes PHPUnit/Pest
@@ -30,22 +29,21 @@ jobs:
 
       # 3. Start the Stack
       - name: Start Services
-        run: docker compose --env-file .env.testing -f deploy/docker-compose.yml up -d
+        run: docker compose --env-file .env.prod -f deploy/docker-compose-test.yml up
 
       # 4. Wait for Database
       # We use the healthcheck you already defined in docker-compose.yml
-      - name: Wait for DB Health
+      - name: Wait for App Readiness
         run: |
-          echo "Waiting for database to become healthy..."
-          timeout 60s sh -c 'until docker inspect --format="{{.State.Health.Status}}" deploy-db-1 | grep -q "healthy"; do sleep 2; done'
+          echo "Waiting for Laravel to start..."
+          # Note: We use the service name 'laravel' combined with project name if needed
+          # or simply wait for the specific container health status
+          timeout 120s sh -c 'until docker inspect --format="{{.State.Health.Status}}" zjx-laravel | grep -q "healthy"; do sleep 2; done'
 
       # 5. Run the Tests INSIDE the container
       - name: Execute Tests
         run: |
-          # Use -T to disable TTY interaction (prevents errors in CI)
-          docker compose -f deploy/docker-compose.yml exec -T laravel sh -c "
-            php artisan key:generate &&
-            php artisan migrate:fresh --force --seed &&
+          docker compose -f deploy/docker-compose-test.yml exec -T laravel sh -c"
             php artisan test
           "
 

@@ -74,7 +74,7 @@ services:
           - ../.env.prod
       depends_on:
           db:
-              condition: service_healthy
+            condition: service_healthy
       networks:
           - laravel
 
@@ -118,25 +118,6 @@ services:
     networks:
         - laravel
 
-  # Add this transient frontend service to run npm builds into the mounted project directory.
-  frontend:
-      image: node:18-alpine
-      container_name: frontend_builder
-      working_dir: /var/www/html
-      volumes:
-          # Use the named app_code volume (populated from image) instead of binding host ../
-          - app_code:/var/www/html
-          # Keep node_modules in a Docker-managed volume to avoid host mounting
-          - node_modules_data:/var/www/html/node_modules
-      restart: 'no'
-      # Force the entrypoint to be shell so we can run complex logic
-      entrypoint: [ "sh", "-c" ]
-      # Wrap the command in a list to ensure it's passed as a single argument to sh -c
-      command:
-          - "npm install && (npm run prod || npm run build)"
-      networks:
-          - laravel
-
 networks:
   laravel:
     driver: bridge
@@ -145,7 +126,6 @@ volumes:
     db_data:
     app_code:
     storage_data:
-    node_modules_data:
 
 # Add a Compose config to inject nginx.conf into the nginx container (no host bind)
 configs:
