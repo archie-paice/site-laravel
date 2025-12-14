@@ -4,14 +4,19 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
-    branches: [ "main" ]
+    inputs:
+      image_tag:
+        description: "Image tag to deploy (e.g., master, staging, sha)"
+        required: false
+        default: "master"
+    
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  IMAGE_TAG: master
 
 jobs:
   build:
-    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -49,7 +54,7 @@ jobs:
 
       - name: Deploy Production
         run: |
-          docker compose -f deploy/docker-compose.yml pull
-          docker compose --env-file .env -f deploy/docker-compose.yml up -d
+          IMAGE_TAG="${IMAGE_TAG}" docker compose -f deploy/docker-compose.yml pull
+          IMAGE_TAG="${IMAGE_TAG}" docker compose --env-file .env -f deploy/docker-compose.yml up -d
           
           docker image prune -f

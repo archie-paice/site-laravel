@@ -9,6 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
+  IMAGE_TAG: staging
 
 jobs:
   build:
@@ -31,7 +32,7 @@ jobs:
           context: .
           file: ./deploy/Dockerfile
           push: true
-          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:staging
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
 
   deploy:
     needs: build
@@ -50,10 +51,10 @@ jobs:
       - name: Deploy Staging
         run: |
           # Pull the image we just built
-          docker compose -f deploy/docker-compose.yml pull
+          IMAGE_TAG="${IMAGE_TAG}" docker compose -f deploy/docker-compose.yml pull
           
           # Start the containers using the fresh .env
-          docker compose --env-file .env -f deploy/docker-compose.yml up -d
+          IMAGE_TAG="${IMAGE_TAG}" docker compose --env-file .env -f deploy/docker-compose.yml up -d
           
           # Clean up old images to save disk space
           docker image prune -f
