@@ -3,6 +3,8 @@ name: Deploy to Staging
 on:
   push:
     branches: [ "develop" ]
+  workflow_dispatch:
+    branches: [ "develop" ]
 
 env:
   REGISTRY: ghcr.io
