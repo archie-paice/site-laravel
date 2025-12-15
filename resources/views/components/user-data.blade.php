@@ -9,9 +9,15 @@
 </div>
 
 <div class="grid grid-cols-2 gap-x-20 w-max">
-    <a href='{{ route('users.edit', $user) }}' class='link absolute top-5 right-5'>Edit User</a>
+    @if (auth()->user() && (auth()->user()->id == $user->id || auth()->user()->hasRole('admin')))
+        <a href='{{ route('users.edit', $user) }}' class='link absolute top-5 right-5'>Edit User</a>
+    @endif
 
-    <img class='col-span-2 border-2 rounded-full w-50 h-50 mb-5' src="{{ asset('storage/'.$user->profile_image_route) }}" alt=""/>
+    @unless(is_null($user->profile_image_route) || strlen($user->profile_image_route) == 0)
+        <img class='col-span-2 border-2 rounded-full w-50 h-50 mb-5' src="{{ asset('storage/'.$user->profile_image_route) }}" alt=""/>
+    @else
+        <img class='col-span-2 border-2 rounded-full w-50 h-50 mb-5' src="{{ asset('images/default_profile.jpg') }}" alt=""/>
+    @endunless
 
     <x-label label='CID' :value="$user->id"/>
     <x-label label='Rating' :value="$user->rating->mapToString()"/>
