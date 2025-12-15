@@ -1,7 +1,10 @@
 <div class='card border-2 border-base-300 mt-2'>
     <div class='flex flex-row align-middle justify-left'>
-            <img class='w-17 h-17 ml-4 rounded-full place-self-center' src="{{ asset($user->profile_image_route) }}" alt="">
-            
+            @unless(is_null($user))
+                <img class='w-17 h-17 ml-4 rounded-full place-self-center' src="{{ asset($user->profile_image_route) }}" alt="">
+            @else
+                <img class='w-17 h-17 ml-4 rounded-full place-self-center' src="{{ asset('images/default_profile.jpg') }}" alt="">
+            @endunless
             <div class='ml-5 p-4 flex flex-col relative w-full'>
                 <strong class='text-xl'>{{ $callsign }}</strong>
 
