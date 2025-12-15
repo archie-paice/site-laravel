@@ -58,10 +58,6 @@ WORKDIR /var/www/html
 # add all folders where files are being stored that require persistence. if needed, otherwise remove this line.
 VOLUME ["/var/www/html/storage/app"]
 
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 775 /var/www/html/storage \
-    && chmod -R 775 /var/www/html/bootstrap/cache
-
 COPY ./deploy/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
