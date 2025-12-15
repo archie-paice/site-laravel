@@ -14,19 +14,16 @@
                     @role('training')
                     <a 
                     role="tab" 
-                    class="tab" 
                     href='{{ route("users.show.training-tickets", $user) }}' 
                     @class(['tab', 'tab-active' => request()->routeIs('users.show.training-tickets')])
                     >Training Tickets</a>
                     <a 
                     role="tab" 
-                    class="tab" 
                     href='{{ route("users.show.training-assignments", $user) }}' 
                     @class(['tab', 'tab-active' => request()->routeIs('users.show.training-assignments')])
                     >Training Assignments</a>
                     <a 
                     role="tab" 
-                    class="tab" 
                     href='{{ route("users.show.solo-certs", $user) }}' 
                     @class(['tab', 'tab-active' => request()->routeIs('users.show.solo-certs')])
                     >Solo Certs</a>

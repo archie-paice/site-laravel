@@ -7,28 +7,28 @@
         <x-staff-card
             position="Air Traffic Manager"
             description="The Air Traffic Manager oversees day-to-day operations and collaborates with all staff members of the ARTCC."
-            :user="$atm->user"
+            :staff="$atm"
             reportsTo="VATUSA"
         />
 
         <x-staff-card
             position="Deputy Air Traffic Manager"
             description="The Deputy Air Traffic Manager assists the Air Traffic Manager in overseeing the ARTCC. The Deputy Air Traffic Manager also oversees the Web, Events, and Facilities Department and assists as needed."
-            :user="$datm->user"
+            :staff="$datm"
             reportsTo="Air Traffic Manager"
         />
 
         <x-staff-card
             position="Training Administrator"
             description="The Training Administrator is responsible for overseeing the training department of the ARTCC."
-            :user="$ta->user"
+            :staff="$ta"
             reportsTo="Air Traffic Manager"
         />
 
         <x-staff-card
             position="Events Coordinator"
             description="The Events Coordinator manages the planning and execution of events related to vZJX or our neighbors.."
-            :user="$ec->user"
+            :staff="$ec"
             reportsTo="Deputy Air Traffic Manager"
         >
             <x-assistant-staff
@@ -40,7 +40,7 @@
         <x-staff-card
             position="Facility Engineer"
             description="The Facility Engineer is responsible for managing all data related to the VATSIM network, such as standard operating procedures and radar maps."
-            :user="$fe->user"
+            :staff="$fe"
             reportsTo="Deputy Air Traffic Manager"
         >
             <x-assistant-staff
@@ -52,7 +52,7 @@
         <x-staff-card
             position="Webmaster"
             description="The Webmaster handles all management of data systems in the vZJX network, including the website, relational databases, email systems, and more."
-            :user="$wm->user"
+            :staff="$wm"
             reportsTo="Deputy Air Traffic Manager"
         >
             <x-assistant-staff
@@ -67,6 +67,10 @@
                     <h2 class="text-2xl mb-2">Instructors</h2>
 
                     <div class="flex flex-row flex-wrap gap-x-5">
+                        @if (count($instructors) == 0)
+                            <p class="text-lg">No instructors.</p>
+                        @endif
+
                         @foreach($instructors as $mentor)
                             <a
                                 href="{{route('users.show', ['user' => $mentor->user->id])}}"
@@ -82,6 +86,10 @@
                     <h2 class="text-2xl mb-2">Mentors</h2>
 
                     <div class="flex flex-row flex-wrap gap-x-5">
+                        @if (count($mentors) == 0)
+                            <p class="text-lg">No mentors.</p>
+                        @endif
+
                         @foreach($mentors as $mentor)
                             <a
                                 href="{{route('users.show', ['user' => $mentor->user->id])}}"

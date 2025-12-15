@@ -3,8 +3,7 @@
 @section('title', 'Statistics Prefixes')
 
 @section('body')
-    <div class="card card-body bg-base-300">
-        <h1 class="card-title">Matrix</h1>
+    <x-card-component title="Manage Statistics Prefixes">
 
         <div class="grid grid-cols-10">
             @foreach($prefixes as $prefix)
@@ -29,5 +28,5 @@
                 <button type="submit" class='btn btn-md btn-accent mt-2'>Submit</button>
             </form>
         </div>
-    </div>
+    </x-card-component>
 @endsection

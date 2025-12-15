@@ -67,6 +67,13 @@ class User extends Authenticatable
         ];
     }
 
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $user->assignRole('core'); // default role
+        });
+    }
+
     /**
      * Get the user's initials
      */
@@ -93,6 +100,8 @@ class User extends Authenticatable
             'discord_id' => $vatusaUser->discordId
         ],
         ['id']);
+
+        return $user;
     }
 
     protected function operatingInitials(): Attribute {
