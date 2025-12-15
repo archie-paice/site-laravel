@@ -12,6 +12,7 @@ use Log;
 
 class UserController extends Controller
 {
+
     public function show(int $id) {
         $user = User::findOrFail($id);
         $soloCerts = $user->soloCerts()->paginate(10, ['*'], 'soloCerts');
@@ -74,6 +75,10 @@ class UserController extends Controller
     public function trainingAssignments(int $id) {
         $user = User::findOrFail($id);
 
+        if (!$user->rostered) {
+            return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
+        }
+        
         $trainingAssignments = $user->trainingAssignmentsAsStudent()->paginate(25, ['*'], 'assignmentsPage');
 
         return view('users.training-assignments', [
@@ -85,6 +90,10 @@ class UserController extends Controller
     public function trainingTickets(int $id) {
         $user = User::findOrFail($id);
 
+        if (!$user->rostered) {
+            return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
+        }
+
         $trainingTickets = $user->trainingTicketsAsStudent()->paginate(25, ['*'], 'ticketsPage');
 
         return view('users.training-tickets', [
@@ -95,6 +104,9 @@ class UserController extends Controller
 
     public function soloCerts(int $id) {
         $user = User::findOrFail($id);
+        if (!$user->rostered) {
+            return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
+        }
 
         $soloCerts = $user->soloCerts()->paginate(25, ['*'], 'soloCertsPage');
 
