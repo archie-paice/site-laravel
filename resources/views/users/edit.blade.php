@@ -36,7 +36,7 @@
                         maxlength='2'
                         class='input input-md w-100'
                         @disabled(!auth()->user()->hasPermissionTo('manage users'))
-                        value={{ $user->operating_initials }}>
+                        value={{ old('operatingInitials', $user->operating_initials) }}>
                     </x-label-slot>
 
                     <x-label label='Member Since' :value='(new DateTime($user->joined_at))->format("M d Y")'/>
@@ -50,7 +50,7 @@
 
             <div class='col-span-2'>
                 <x-label-slot label='Biography'>
-                    <textarea name='biography' class='textarea w-full resize-none h-30'>{{ $user->biography }}</textarea>
+                    <textarea name='biography' class='textarea w-full resize-none h-30'>{{ old('biography', $user->biography) }}</textarea>
                 </x-label-slot>
             </div>
             <button type="submit" class='btn btn-primary'>Submit Changes</button>

@@ -45,11 +45,6 @@ class UserController extends Controller
         if (Auth::user()->id != $id && !Auth::user()->hasPermissionTo('manage users')) {
             return response('Unauthorized', 403 );
         }
-        $oiCount = User::where('operating_initials', strtoupper($validated['operatingInitials']))->where('id', '!=', $id)->count();
-
-        if ($oiCount > 0) {
-            return redirect()->back()->with('error', 'OIs already assigned.');
-        }
 
         $user = User::findOrFail($id);
 
@@ -62,7 +57,13 @@ class UserController extends Controller
 
         $user->biography = $validated['biography'] ?? null;
 
-        if (Auth::user()->hasPermissionTo('manage users')) {
+        if (Auth::user()->hasPermissionTo('manage users') && isset($validated['operatingInitials'])) {
+            $oiCount = User::where('operating_initials', strtoupper($validated['operatingInitials']))->where('id', '!=', $id)->count();
+
+            if ($oiCount > 0) {
+                return redirect()->back()->with('error', 'OIs already assigned.');
+            }
+
             $user->operating_initials = strtoupper($validated['operatingInitials'] ?? $user->operating_initials);
         }
 
