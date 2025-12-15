@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Services\Socialite\VatsimProvider;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Contracts\Factory;
 
@@ -25,6 +26,10 @@ class AppServiceProvider extends ServiceProvider
             $config = $app['config']['services.vatsim'];
             return Socialite::buildProvider(VatsimProvider::class, $config);
         });*/
+
+        if (app()->environment('production')) {
+            URL::forceScheme('https');
+        }
 
         $socialite = $this->app->make('Laravel\Socialite\Contracts\Factory');
 

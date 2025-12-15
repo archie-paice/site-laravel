@@ -17,7 +17,8 @@ class UserSeeder extends Seeder
     {
         if (App::environment('local', 'development')) {
             $user = User::firstOrCreate([
-                'id' => 10000010,
+                'id' => 10000010
+            ], [
                 'first_name' => 'Web',
                 'last_name' => 'Ten',
                 'email' => 'web10@vatusa.net',
@@ -32,6 +33,7 @@ class UserSeeder extends Seeder
 
             $user = User::firstOrCreate([
                 'id' => 10000009,
+            ], [
                 'first_name' => 'Web',
                 'last_name' => 'Nine',
                 'email' => 'web09@vatusa.net',

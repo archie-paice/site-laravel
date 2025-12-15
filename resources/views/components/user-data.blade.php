@@ -9,18 +9,18 @@
 </div>
 
 <div class="grid grid-cols-2 gap-x-20 w-max">
-    <a href='{{ route('users.edit', $user) }}' class='link absolute top-5 right-5'>Edit User</a>
+    @if (auth()->user() && (auth()->user()->id == $user->id || auth()->user()->hasRole('admin')))
+        <a href='{{ route('users.edit', $user) }}' class='link absolute top-5 right-5'>Edit User</a>
+    @endif
 
-    <img class='col-span-2 border-2 rounded-full w-50 h-50 mb-5' src="{{ asset('storage/'.$user->profile_image_route) }}" alt=""/>
+    <img class='col-span-2 border-2 rounded-full w-50 h-50 mb-5' src="{{ asset($user->profile_image_route) }}" alt=""/>
 
     <x-label label='CID' :value="$user->id"/>
     <x-label label='Rating' :value="$user->rating->mapToString()"/>
 
-    @unless(is_null($user->operating_initials) || strlen($user->operating_initials) == 0)
+    @if($user->rostered)
         <x-label label='Operating Initials' :value="$user->operating_initials"/>
-    @else
-        <x-label label='Operating Initials' value="Unassigned"/>
-    @endunless
+    @endif
 
     @if($user->rostered && $user->joined_at != null)
         <x-label label='Member Since' :value='(new DateTime($user->joined_at))->format("M d Y")'/>

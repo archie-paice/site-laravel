@@ -20,24 +20,25 @@
                 @endif
             </div>
 
-            <img class='col-span-2 border-2 w-50 h-50 mb-5 rounded-full' src="{{ asset('storage/'.$user->profile_image_route) }}" alt=""/>
+            <img class='col-span-2 border-2 w-50 h-50 mb-5 rounded-full' src="{{ asset($user->profile_image_route) }}" alt=""/>
             <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
 
             <div class="grid grid-cols-2 gap-x-20">
                 <a href="{{ route('users.show', $user) }}" class="link absolute top-5 right-5">View User</a>
                 <x-label label='CID' :value="$user->id"/>
                 <x-label label='Rating' :value="$user->rating->mapToString()"/>
-                <x-label-slot label='Operating Initials'>
-                    <input
-                    type="text"
-                    name='operatingInitials'
-                    maxlength='2'
-                    class='input input-md w-100'
-                    @disabled(!auth()->user()->hasPermissionTo('manage users'))
-                    value={{ $user->operating_initials }}>
-                </x-label-slot>
 
-                @if($user->rostered && $user->joined_at != null)
+                @if($user->rostered)
+                    <x-label-slot label='Operating Initials'>
+                        <input
+                        type="text"
+                        name='operatingInitials'
+                        maxlength='2'
+                        class='input input-md w-100'
+                        @disabled(!auth()->user()->hasPermissionTo('manage users'))
+                        value={{ $user->operating_initials }}>
+                    </x-label-slot>
+
                     <x-label label='Member Since' :value='(new DateTime($user->joined_at))->format("M d Y")'/>
                 @endif
 
