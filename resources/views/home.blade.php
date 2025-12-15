@@ -20,11 +20,11 @@
             </video>
 
             <div class='font-bold text-accent-content text-center z-10 w-max h-max relative p-10 flex justify-center flex-col items-center'>
-                <div class="absolute glass opacity-25 rounded-2xl bg-info h-full w-full">
+                <div class="absolute opacity-25 rounded-2xl glass h-full w-full">
 
                 </div>
-                <h1 class='text-primary text-7xl z-20'>Virtual Jacksonville ARTCC</h1>
-                <h2 class='text-primary-content text-5xl z-20'>Pride of VATUSA South</h2>
+                <h1 class='text-transparent text-7xl z-20 mix-blend-color bg-gradient-to-br stretch from-secondary to-sky-300 bg-clip-text bg-repeat-round'>Virtual Jacksonville ARTCC</h1>
+                <h2 class='text-transparent text-4xl z-20 mix-blend-color bg-gradient-to-br stretch from-sky-300 to-gray-200 bg-clip-text bg-repeat-round'>Pride of VATUSA South</h2>
             </div>
         </div>
 @endsection
