@@ -76,9 +76,9 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if (!$user->rostered) {
-            return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
+            return redirect()->back()->with('error', 'Training assignments are only available for rostered users.');
         }
-        
+
         $trainingAssignments = $user->trainingAssignmentsAsStudent()->paginate(25, ['*'], 'assignmentsPage');
 
         return view('users.training-assignments', [
@@ -91,7 +91,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if (!$user->rostered) {
-            return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
+            return redirect()->back()->with('error', 'Training tickets are only available for rostered users.');
         }
 
         $trainingTickets = $user->trainingTicketsAsStudent()->paginate(25, ['*'], 'ticketsPage');
