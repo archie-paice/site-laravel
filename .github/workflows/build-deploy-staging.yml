@@ -4,7 +4,6 @@ on:
   push:
     branches: [ "develop" ]
   workflow_dispatch:
-    branches: [ "develop" ]
 
 env:
   REGISTRY: ghcr.io
@@ -51,7 +50,7 @@ jobs:
       - name: Deploy Staging
         run: |
           # Pull the image we just built
-          IMAGE_TAG="${IMAGE_TAG}" docker compose -p staging -f deploy/docker-compose.yml pull
+          IMAGE_TAG="${IMAGE_TAG}" docker compose -p staging --env-file .env -f deploy/docker-compose.yml pull
           
           # Start the containers using the fresh .env
           IMAGE_TAG="${IMAGE_TAG}" docker compose -p staging --env-file .env -f deploy/docker-compose.yml up -d

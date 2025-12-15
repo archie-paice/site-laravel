@@ -24,20 +24,20 @@ jobs:
       # We pass INSTALL_DEV=true so Composer includes PHPUnit/Pest
       - name: Build Containers
         run: |
-          docker compose -f deploy/docker-compose-test.yml --env-file .env build \
+          docker compose -p test -f deploy/docker-compose-test.yml --env-file .env build \
             --build-arg INSTALL_DEV=true
 
       # 3. Start the Stack
       - name: Start Services
-        run: docker compose --env-file .env -f deploy/docker-compose-test.yml up -d
+        run: docker compose -p test --env-file .env -f deploy/docker-compose-test.yml up -d
 
       # 5. Run the Tests INSIDE the container
       - name: Execute Tests
         run: |
-          docker compose --env-file .env -f deploy/docker-compose-test.yml exec -T laravel ./vendor/bin/pest
+          docker compose -p test --env-file .env -f deploy/docker-compose-test.yml exec -T laravel ./vendor/bin/pest
 
       # 6. Cleanup
       # Always run this to remove the containers and the testing volume
       - name: Teardown
         if: always()
-        run: docker compose --env-file .env -f deploy/docker-compose.yml down -v
+        run: docker compose -p test --env-file .env -f deploy/docker-compose-test.yml down -v

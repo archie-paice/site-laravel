@@ -6,7 +6,6 @@ services:
   laravel:
     image: ghcr.io/zjx-artcc/site-laravel:master
     restart: unless-stopped
-    container_name: zjx-laravel
     build:
       context: ../
       dockerfile: ./deploy/Dockerfile

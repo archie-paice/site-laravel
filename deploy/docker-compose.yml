@@ -6,13 +6,10 @@ services:
   laravel:
     image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
     restart: unless-stopped
-    container_name: zjx-laravel
     build:
       context: ../
       dockerfile: ./deploy/Dockerfile
     volumes:
-      # Use a named volume that will be populated from the built image on first create.
-      - app_code:/var/www/html
       # Persist runtime uploads/storage separately
       - storage_data:/var/www/html/storage
     env_file:
@@ -100,9 +97,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    # Mount the application code from the named volume populated from the built image.
-    volumes:
-        - app_code:/var/www/html:ro
     # Use docker config instead of bind-mounting the host nginx.conf
     configs:
         - source: nginx_conf
@@ -124,7 +118,6 @@ networks:
 
 volumes:
     db_data:
-    app_code:
     storage_data:
 
 # Add a Compose config to inject nginx.conf into the nginx container (no host bind)

@@ -10,14 +10,8 @@ use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Log;
 
-class UserController extends Controller implements HasMiddleware
+class UserController extends Controller
 {
-    public static function middleware() {
-        return [
-            new Middleware('permission:manage users', only: ['edit', 'update'])
-        ];
-    }
-
     public function show(int $id) {
         $user = User::findOrFail($id);
         $soloCerts = $user->soloCerts()->paginate(10, ['*'], 'soloCerts');
@@ -30,13 +24,17 @@ class UserController extends Controller implements HasMiddleware
 
     public function edit(Request $request, int $id) {
         $user = User::findOrFail($id);
+        $authenticatedUser = Auth::user();
 
+        if ($authenticatedUser->id != $user->id && !$authenticatedUser->hasPermissionTo('manage users')) {
+            return response('Unauthorized', 403);
+        }
+        
         return view('users.edit', ['user'=> $user]);
     }
 
-    public function update(Request $request) {
+    public function update(Request $request, int $id) {
         $validated = $request->validate([
-            'id' => 'required|integer',
             'operatingInitials' => 'string|nullable|size:2', // can only be edited if admin
             'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
             'biography' => 'string|nullable|max:1000'
@@ -44,22 +42,22 @@ class UserController extends Controller implements HasMiddleware
             'operatingInitials.max' => 'Operating initials must be 2 characters long'
         ]);
 
-        if (Auth::user()->id != $validated['id'] && !Auth::user()->hasPermissionTo('manage users')) {
-            return redirect()->back()->with('error', 'You do not have permission to edit this user.');
+        if (Auth::user()->id != $id && !Auth::user()->hasPermissionTo('manage users')) {
+            return response('Unauthorized', 403 );
         }
-        $oiCount = User::where('operating_initials', strtoupper($validated['operatingInitials']))->where('id', '!=', $validated['id'])->count();
+        $oiCount = User::where('operating_initials', strtoupper($validated['operatingInitials']))->where('id', '!=', $id)->count();
 
         if ($oiCount > 0) {
             return redirect()->back()->with('error', 'OIs already assigned.');
         }
 
-        $user = User::findOrFail($validated['id']);
+        $user = User::findOrFail($id);
 
         if ($request->hasFile('image')) {
             $imageName = 'profile_'.$user->id.'.'.$request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('profile', $imageName, 'public');
     
-            $user->profile_image_route = $path;
+            $user->profile_image_route = 'storage/'.$path;
         }
 
         $user->biography = $validated['biography'] ?? null;
