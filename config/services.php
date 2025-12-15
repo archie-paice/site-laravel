@@ -38,7 +38,7 @@ return [
     'vatsim' => [
         'client_id' => env('VATSIM_CLIENT_ID'),
         'client_secret' => env('VATSIM_CLIENT_SECRET'),
-        'redirect' => '/auth/callback',
+        'redirect' => env('APP_URL').'/auth/callback',
     ],
 
 ];
