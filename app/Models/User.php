@@ -6,16 +6,21 @@ namespace App\Models;
 
 use App\DTOs\VatusaRosterUser;
 use App\Enums\ControllerRating;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasFactory, Notifiable, HasRoles, LogsActivity, Searchable;
 
     /**
      * The attributes that are mass assignable.
@@ -32,7 +37,8 @@ class User extends Authenticatable
         'division',
         'facility',
         'rostered',
-        'discord_id'
+        'discord_id',
+        'operating_initials'
     ];
 
     /**
@@ -56,7 +62,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'rating' => ControllerRating::class,
+            'joined_at' => 'datetime',
+            'rostered' => 'boolean',
         ];
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($user) {
+            $user->assignRole('core'); // default role
+        });
     }
 
     /**
@@ -74,8 +89,8 @@ class User extends Authenticatable
     public static function updateFromVatusa(VatusaRosterUser $vatusaUser) {
         $user = static::upsert([
             'id' => $vatusaUser->cid,
-            'first_name' => $vatusaUser->firstName,
-            'last_name' => $vatusaUser->lastName,
+            'first_name' => ucfirst($vatusaUser->firstName),
+            'last_name' => ucfirst($vatusaUser->lastName),
             'email' => $vatusaUser->email,
             'rating' => $vatusaUser->rating,
             'joined_at' => $vatusaUser->joinedFacility,
@@ -85,5 +100,85 @@ class User extends Authenticatable
             'discord_id' => $vatusaUser->discordId
         ],
         ['id']);
+
+        return $user;
+    }
+
+    protected function operatingInitials(): Attribute {
+        return Attribute::make(
+            get: fn($value) => strtoupper($value),
+            set: fn($value) => strtoupper($value)
+        );
+    }
+
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn(mixed $value, array $attributes) => ucfirst($attributes['first_name']) . ' ' . ucfirst($attributes['last_name'])
+        );
+    }
+
+    protected function nameReversed(): Attribute
+    {
+        return Attribute::make(
+            get: fn(mixed $value, array $attributes) => ucfirst($attributes['last_name']. ', ' . ucfirst($attributes['first_name']))
+        );
+    }
+
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucfirst($value),
+            set: fn (string $value) => ucfirst($value),
+        );
+    }
+
+    protected function lastName(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value) => ucfirst($value),
+            set: fn (string $value) => ucfirst($value),
+        );
+    }
+
+    public function staffRoles(): HasMany {
+        return $this->hasMany(Staff::class);
+    }
+
+    public function trainingAssignmentsAsStudent(): HasMany {
+        return $this->hasMany(TrainingAssignment::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    public function trainingAssignmentsAsInstructor(): HasMany {
+        return $this->hasMany(TrainingAssignment::class, 'instructor_id');
+    }
+
+    public function trainingTicketsAsStudent(): HasMany {
+        return $this->hasMany(TrainingTicket::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    public function trainingTicketsAsInstructor(): HasMany {
+        return $this->hasMany(TrainingAssignment::class, 'instructor_id');
+    }
+
+    public function soloCerts(): HasMany {
+        return $this->hasMany(SoloCert::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'email' => $this->email,
+            'id' => $this->id,
+            'rating' => $this->rating->mapToString(),
+            'facility' => $this->facility
+        ];
     }
 }

@@ -1,7 +1,7 @@
-<div class="card bg-neutral p-5">
+<div class="card border-1 border-base-300 p-5">
     <h1 class="card-title text-2xl">{{ $title }}</h1>
 
-    <div class="card-body p-2">
-        {{  $slot }}
+    <div class="card-body p-0">
+    {{  $slot }}
     </div>
 </div>

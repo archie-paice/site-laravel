@@ -19,7 +19,9 @@
                 <details>
                     <summary>Training Management</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('admin.index') }}>Admin Dashboard</a></li>
+                        <li><a href={{ route('training-tickets.index') }}>Training Tickets</a></li>
+                        <li><a href={{ route('training-assignments.index') }}>Training Assignments</a></li>
+                        <li><a href={{ route('solo-certs.index') }}>Solo Certs</a></li>
                     </ul>
                 </details>
             </li>
@@ -30,7 +32,7 @@
                 <details>
                     <summary>Data Management</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('admin.index') }}>Admin Dashboard</a></li>
+                        <li><a href={{ route('statistics-prefixes.index') }}>Statistics Prefixes</a></li>
                     </ul>
                 </details>
             </li>
@@ -59,6 +61,7 @@
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                         <li><a href={{ route('admin.index') }}>Dashboard</a></li>
                         <li><a href={{ route('users.index') }}>User Management</a></li>
+                        <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                     </ul>
                 </details>
             </li>

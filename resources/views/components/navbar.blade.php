@@ -1,6 +1,8 @@
-<div class="navbar bg-primary text-primary-content z-20">
+<div class="navbar sticky top-0 bg-primary text-primary-content z-20">
     <div class="flex-1 ml-5">
-        <a href='{{ route('home') }}' class='font-bold text-2xl'>ZJX ARTCC</a>
+        <a href='{{ route('home') }}' class='font-bold text-2xl'>
+            <img src="{{ asset('images/zjx_wide.png') }}" alt="">
+        </a>
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
@@ -9,7 +11,7 @@
                 <summary>Controllers</summary>
                 <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                     <li><a href={{ route('roster') }}>Roster</a></li>
-                    <li><a>Link 2</a></li>
+                    <li><a href="{{ route('staff.index') }}">ARTCC Staff</a></li>
                 </ul>
             </details>
         </li>
@@ -32,7 +34,7 @@
                         @hasrole('events')
                             <li><a href={{ route('admin.index') }}>Events Management</a></li>
                         @endhasrole
-                        
+
                         @hasrole('admin')
                             <li><a href={{ route('admin.index') }}>Admin</a></li>
                         @endhasrole
@@ -47,7 +49,7 @@
                 <details>
                     <summary>{{  auth()->user()->first_name }} {{  auth()->user()->last_name }} - {{  auth()->user()->id }}</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('users.show', ['user' => auth()->user()->id]) }}>Profile</a></li>
+                        <li><a href={{ route('users.show', [auth()->user()->id]) }}>Profile</a></li>
                         <li><a href={{ route('auth.logout') }}>Logout</a></li>
                     </ul>
                 </details>
