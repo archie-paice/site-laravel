@@ -3,6 +3,7 @@
 @section('title', 'New Event Position Preset')
 
 @section('body')
+    <x-card-component>
         <form method="POST" action="{{ route('position-presets.store') }}" class="flex flex-col gap-2 w-max">
             @csrf
             <label for="positions" class="label">Preset Name</label>
@@ -14,5 +15,5 @@
 
             <button class="btn btn-primary" type="submit">Create Preset</button>
         </form>
-
+    </x-card-component>
 @endsection

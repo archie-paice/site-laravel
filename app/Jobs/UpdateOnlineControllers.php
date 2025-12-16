@@ -38,7 +38,6 @@ class UpdateOnlineControllers implements ShouldQueue
         foreach ($controllers as $controller) {
             $onlineController = new OnlineControllerDTO($controller);
             if (Str::startsWith($onlineController->callsign, $prefixes)) {
-                echo 'ran';
                 OnlineController::fromDTO($onlineController);
             }
         }

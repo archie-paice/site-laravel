@@ -3,11 +3,11 @@
 @section('title', 'Create Training Ticket')
 
 @section('body')
-    <div class="card card-body bg-base-300 max-w-150">
+    <x-card-component>
         <form
-            class="flex flex-col"
-            action="{{route('training-tickets.store')}}"
-            method="POST"
+        class="flex flex-col"
+        action="{{route('training-tickets.store')}}"
+        method="POST"
         >
             @csrf
 
@@ -124,7 +124,7 @@
                 >Submit</button>
             </div>
         </form>
-    </div>
+    </x-card-component>
 @endsection
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/quill@2.0.0/dist/quill.snow.css" />

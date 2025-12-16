@@ -68,6 +68,7 @@ class TrainingAssignmentController extends Controller
             'instructor_id' => null,
         ]);
 
+        
         return redirect()->back()->with('success', 'Training requested successfully');
     }
 

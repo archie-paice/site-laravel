@@ -3,7 +3,7 @@
 @section('title', 'Edit Training Assignment - #'.$assignment->id)
 
 @section('body')
-    <div class="card card-body bg-base-300 w-max">
+    <x-card-component>
         <form
             action="{{route('training-assignments.update', ['assignment' => $assignment->id])}}"
             method="POST"
@@ -93,5 +93,5 @@
                 </button>
             </div>
         </form>
-    </div>
+    </x-card-component>
 @endsection

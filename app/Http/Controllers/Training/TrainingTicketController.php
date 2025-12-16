@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Training;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SyncTrainingTickets;
 use App\Mail\TrainingTicketCreated;
 use App\Models\TrainingTicket;
 use App\Models\User;
@@ -78,7 +79,8 @@ class TrainingTicketController extends Controller
         $ticket->save();
 
         Mail::to($ticket->student->email)->bcc($ticket->instructor->email)->queue(new TrainingTicketCreated($ticket));
-
+        SyncTrainingTickets::dispatch();
+        
         return redirect(route('training-tickets.show', [$ticket]))
             ->with('success', 'Training ticket successfully created.');
     }

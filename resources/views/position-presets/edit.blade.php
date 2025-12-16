@@ -3,8 +3,8 @@
 @section('title', 'Edit Preset')
 
 @section('body')
-    <div class="card card-body bg-base-300">
-        <form method="POST" action="{{ route('position-preset.update', ['position_preset' => $position->id]) }}"
+    <x-card-component>
+        <form method="POST" action="{{ route('position-presets.update', ['position_preset' => $position->id]) }}"
             class="flex flex-col">
             @csrf
             @method('PUT')
@@ -18,6 +18,7 @@
 
             <button class="btn" type="submit">Update Preset</button>
         </form>
-    </div>
+    </x-card-component>
+
 
 @endsection

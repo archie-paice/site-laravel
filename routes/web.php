@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\EventFieldController;
 use App\Http\Controllers\ManageEventController;
+use App\Mail\TrainingAssignmentCreated;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -85,11 +86,10 @@ if (App::environment('development', 'local')) {
 
     Route::get('/sync-training', function() {
         SyncTrainingTickets::dispatch();
-        Mail::to(User::find(1697197))->send(new Welcome(User::find(1697197)));
         return 'scheduled';
     });
 
     Route::get('/test-email', function() {
-        return new TrainingAssignmentUpdated(TrainingAssignment::find(1));
+        return new TrainingAssignmentCreated(TrainingAssignment::find(1));
     });
 }
