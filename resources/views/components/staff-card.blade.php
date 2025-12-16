@@ -1,7 +1,7 @@
 <x-card-component :title="$position">
     <div class="flex flex-col h-full content-stretch">
-        @unless(is_null($user))
-            <a href="{{route('users.show', ['user' => $user->id])}}" class="text-2xl mb-5">{{ $user->first_name.' '.$user->last_name }} ({{$user->rating->mapToString()}})</a>
+        @unless(is_null($staff))
+            <a href="{{route('users.show', ['user' => $staff->user->id])}}" class="text-2xl mb-5">{{ $staff->user->first_name.' '.$staff->user->last_name }} ({{$staff->user->rating->mapToString()}})</a>
         @else
             <h2 class="text-2xl mb-5">Vacant</h2>
         @endunless

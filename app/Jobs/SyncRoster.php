@@ -31,6 +31,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     }
 
     private function updateRoster() {
+        $this->clearUserRoles();
+
         $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
@@ -49,11 +51,52 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             ])->get();
 
             foreach ($testUsers as $user) {
-                $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+                $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
                 $user->rostered = true;
                 $user->save();
             }
         };
+    }
+
+    private function clearUserRoles() {
+        $users = User::all();
+
+        foreach ($users as $user) {
+            $user->removeRole('staff', 'admin', 'training', 'events', 'facilities', 'instructor');
+        }
+    }
+
+    private function assignRoles() {
+        $staffMembers = Staff::all();
+
+        foreach ($staffMembers as $staff) {
+            $user = $staff->user;
+
+            switch ($staff->title_short) {
+                case 'ATM':
+                case 'DATM':
+                    $user?->assignRole('admin', 'training', 'instructor', 'facilities', 'events', 'staff');
+                    break;
+                case 'TA':
+                    $user?->assignRole('admin', 'training', 'staff');
+                    break;
+                case 'WM':
+                    $user?->assignRole('staff', 'admin');
+                    break;
+                case 'EC':
+                    $user?->assignRole('events', 'staff');
+                    break;
+                case 'FE':
+                    $user?->assignRole('facilities', 'staff');
+                    break;
+                case 'INS':
+                    $user?->assignRole('instructor', 'training', 'staff');
+                    break;
+                case 'MTR':
+                    $user?->assignRole('training', 'staff');
+                    break;
+            }
+        }
     }
 
     private function updateStaffMembers() {
@@ -66,6 +109,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         $infoDTO = new VatusaFacilityInfoDTO($facilityInfo['data']);
 
         Staff::fromFacilityInfoDTO($infoDTO);
+
+        $this->assignRoles();
     }
 
     /**
