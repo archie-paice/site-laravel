@@ -3,8 +3,7 @@
 @section('title', 'Edit Event')
 
 @section('body')
-    <div class="card card-body bg-base-300">
-        <form method="POST" action="{{ route('events.update', ['event' => $event->id]) }}" class="flex flex-col">
+        <form method="POST" action="{{ route('manage-events.update', ['event' => $event->id]) }}" class="flex flex-col gap-5">
             @csrf
             @method('PUT')
             <div class="collapse bg-base-100 border border-base-300">
@@ -88,6 +87,5 @@
             </div>
             <button class="btn" type="submit">Update Event</button>
         </form>
-    </div>
 
 @endsection

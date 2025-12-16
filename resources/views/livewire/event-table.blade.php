@@ -20,7 +20,7 @@
                 @foreach ($events as $event)
                     <tr>
                         <td class='border-r-1 border-base-300'>
-                            <a href={{ route('events.show', ['event' => $event->id]) }}
+                            <a href={{ route('manage-events.show', ['event' => $event->id]) }}
                                 class='text-base-content no-underline'>{{ $event->name }}</a>
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $event->type }}</td>
@@ -29,10 +29,10 @@
                         <td class='border-r-1 border-base-300'>{{ $event->hidden ? 'Yes' : 'No' }}</td>
                         <td class='border-r-1 border-base-300'>
                             <button class="btn btn-primary">Manage</button>
-                            <a href="{{ route('events.edit', ['event' => $event->id]) }}" class="btn btn-accent">
+                            <a href="{{ route('manage-events.edit', ['event' => $event->id]) }}" class="btn btn-accent">
                                 Edit
                             </a>
-                            <form action="{{ route('events.destroy', ['event' => $event->id]) }}" method="POST"
+                            <form action="{{ route('manage-events.destroy', ['event' => $event->id]) }}" method="POST"
                                 class="inline">
                                 @csrf
                                 @method('DELETE')

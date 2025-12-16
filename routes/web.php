@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\EventFieldController;
+use App\Http\Controllers\ManageEventController;
 
 Route::get('/', function () {
     return view('home');
@@ -21,13 +22,15 @@ Route::get('/auth/callback', VatsimOauthController::class . '@callback')->name('
 Route::get('/auth/logout', VatsimOauthController::class . '@logout')->name('auth.logout');
 
 Route::resource('users', UserController::class);
-Route::resource('admin', AdminController::class)->middleware('permission:view dashboard');
-Route::middleware('permission:view dashboard')->group(function () {
-    Route::resource('event-fields', EventFieldController::class);
-    Route::resource('position-presets', EventPositionPresetController::class);
-    Route::resource('events', EventController::class);
+Route::prefix('admin')->group(function () {
+    Route::resource('/', AdminController::class)->middleware('permission:view dashboard')->names('admin');
+    
+    Route::middleware('permission:manage events')->group(function () {
+        Route::resource('event-fields', EventFieldController::class)->names('event-fields');
+        Route::resource('position-presets', EventPositionPresetController::class)->names('position-presets');
+        Route::resource('events', ManageEventController::class)->names('manage-events');
+    });
 });
-
 
 
 Route::get('/roster', RosterController::class . '@index')->name('roster');

@@ -9,6 +9,6 @@ class EventFieldController extends Controller
 
     public function index()
     {
-        return view('admin.events.event-field.index');
+        return view('event-fields.index');
     }
 }

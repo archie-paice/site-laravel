@@ -4,18 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Event;
 use Illuminate\Http\Request;
-use Illuminate\Http\RedirectResponse;
 use App\Enums\EventType;
 use App\Models\FeaturedField;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rule;
 
-class EventController extends Controller
+class ManageEventController extends Controller
 {
     public function index()
     {
         $events = Event::all();
-        return view('events.index', ['events' => $events]);
+        return view('manage-events.index', ['events' => $events]);
     }
 
     public function create()
@@ -24,7 +23,7 @@ class EventController extends Controller
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
 
-        return view('events.create', [
+        return view('manage-events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
         ]);
@@ -58,7 +57,7 @@ class EventController extends Controller
         ]);
 
 
-        return redirect()->route('events.index')->with('success', 'Event created successfully!');
+        return redirect()->route('manage-events.index')->with('success', 'Event created successfully!');
     }
 
 
@@ -66,7 +65,7 @@ class EventController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        return view('events.show', ['event' => $event]);
+        return view('manage-events.show', ['event' => $event]);
     }
 
     public function edit($id)
@@ -75,7 +74,7 @@ class EventController extends Controller
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         
-        return view('events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
+        return view('manage-events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
     }
 
     public function update(Request $request, $id)
@@ -95,7 +94,7 @@ class EventController extends Controller
         $event = Event::find($id);
         $event->update($validated);
 
-        return redirect()->route('events.index')
+        return redirect()->route('manage-events.index')
             ->with('success', 'Post updated successfully.');
     }
 
@@ -103,13 +102,6 @@ class EventController extends Controller
     {
         $event = Event::find($id);
         $event->delete();
-        return redirect()->route('events.index')->with('success', 'Post deleted successfully');
+        return redirect()->route('manage-events.index')->with('success', 'Post deleted successfully');
     }
-
-
-    // TODO
-
-    // public function edit($id) {
-
-    // }
 }
