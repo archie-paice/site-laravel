@@ -48,7 +48,7 @@ Route::post('training-assignment/create', [TrainingAssignmentController::class, 
 
 Route::prefix('admin')->middleware('permission:view dashboard')->group(function() {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
-    Route::get('users', [UserManagementController::class, 'index'])->name('users.index');
+    Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
 
     Route::middleware('permission:manage statistics prefixes')->group(function() {
         Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
