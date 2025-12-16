@@ -5,7 +5,6 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\Training\SoloCertController;
@@ -22,6 +21,9 @@ use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\EventPositionPresetController;
+use App\Http\Controllers\EventFieldController;
+use App\Http\Controllers\ManageEventController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -30,6 +32,8 @@ Route::get('/auth/redirect', [VatsimOauthController::class, 'redirect'])->name('
 Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth.logout');
 
+Route::resource('users', UserController::class);
+    
 Route::resource('users', UserController::class, ['only' => ['edit', 'update']]);
 Route::prefix('users/{user}')->group(function() {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
@@ -61,6 +65,12 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignments.claim');
         Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignments.drop');
         Route::delete('assignments', [TrainingAssignmentController::class, 'destroy'])->name('training-assignments.destroy'); //id sent in payload
+    });
+
+    Route::middleware('permission:manage events')->group(function () {
+        Route::resource('event-fields', EventFieldController::class)->names('event-fields');
+        Route::resource('position-presets', EventPositionPresetController::class)->names('position-presets');
+        Route::resource('events', ManageEventController::class)->names('manage-events');
     });
 });
 
