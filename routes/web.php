@@ -75,7 +75,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     });
 });
 
-Route::get('/roster', [RosterController::class, 'index'])->name('roster');
+Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
 
 if (App::environment('development', 'local')) {
     Route::get('/sync', function() {
