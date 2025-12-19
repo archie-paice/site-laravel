@@ -42,6 +42,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
 
         for ($i = 0; $i < count($roster['data']); $i++) {
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
+            $vatusaUser->facility;
             User::updateFromVatusa($vatusaUser);
         }
 

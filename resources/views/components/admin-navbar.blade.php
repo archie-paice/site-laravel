@@ -4,16 +4,6 @@
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
-        <li>
-            <details>
-                <summary>Controllers</summary>
-                <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                    <li><a href={{ route('roster') }}>Roster</a></li>
-                    <li><a>Link 2</a></li>
-                </ul>
-            </details>
-        </li>
-
         @hasrole('training')
             <li>
                 <details>

@@ -52,7 +52,6 @@ class VatsimProvider extends AbstractProvider {
             'email' => $user['personal']['email'],
             'rating' => $user['vatsim']['rating']['id'],
             'division' => $user['vatsim']['division']['id'],
-            'facility' => $user['vatsim']['subdivision']['id']
         ]);
 
         return $newUser;
