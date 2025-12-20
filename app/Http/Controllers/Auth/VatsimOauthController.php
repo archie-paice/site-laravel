@@ -13,24 +13,23 @@ class VatsimOauthController extends Controller {
     public function callback() {
         $user = Socialite::driver('vatsim')->user();
 
-        $user = User::updateOrCreate([
-            'id' => $user->cid
-        ], [
+        User::upsert([
+            'id' => $user->cid,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
             'division' => $user->division,
             'facility' => $user->facility,
             'rating' => $user->rating
-        ]);
+        ], 'id');
     
-        Auth::login($user);
+        Auth::login(User::find($user->cid));
     
-        return redirect(route('home'));
+        return redirect()->back(fallback: route('home'));
     }
 
     public function logout() {
         Auth::logout();
-        return redirect(route('home'));
+        return redirect()->back(fallback: route('home'));
     }
 }

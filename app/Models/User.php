@@ -142,7 +142,7 @@ class User extends Authenticatable
     }
 
     public function staffRoles(): HasMany {
-        return $this->hasMany(Staff::class);
+        return $this->hasMany(Staff::class, 'user_id');
     }
 
     public function trainingAssignmentsAsStudent(): HasMany {

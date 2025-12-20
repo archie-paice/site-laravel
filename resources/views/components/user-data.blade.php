@@ -1,4 +1,4 @@
-<div class="w-max mb-5">
+<div class="w-max mb-5 flex items-center justify-start gap-2">
     @if ($user->rostered && strcasecmp($user->facility, 'ZJX') == 0)
         <h2 class='badge badge-lg badge-accent'>Home Controller</h2>
     @elseif ($user->rostered)
@@ -6,6 +6,15 @@
     @else
         <h2 class='text-lg'>Not Rostered</h2>
     @endif
+
+    @foreach($user->staffRoles as $position)
+        <h2 class='badge badge-lg badge-primary'>
+            @if(!$position->primary_contact && ($position->title_short != 'MTR' && $position->title_short != 'INS'))
+                Assistant
+            @endif
+            {{ $position->title_long }}
+        </h2>
+    @endforeach
 </div>
 
 <div class="grid grid-cols-2 gap-x-20 w-max">

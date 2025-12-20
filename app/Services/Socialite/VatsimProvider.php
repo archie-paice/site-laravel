@@ -44,6 +44,7 @@ class VatsimProvider extends AbstractProvider {
 
         $user = $user["data"]; // vatsim stored user data in an array called data
 
+        // This does not update the database, that is done in the VatsimOauthController using this object.
         $newUser = (new User());
         $newUser->map([
             'cid' => $user['cid'],
@@ -52,6 +53,7 @@ class VatsimProvider extends AbstractProvider {
             'email' => $user['personal']['email'],
             'rating' => $user['vatsim']['rating']['id'],
             'division' => $user['vatsim']['division']['id'],
+            'facility' => $user['vatsim']['subdivision']['id'],
         ]);
 
         return $newUser;
