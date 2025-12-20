@@ -15,11 +15,9 @@ class UserController extends Controller
 
     public function show(int $id) {
         $user = User::findOrFail($id);
-        $soloCerts = $user->soloCerts()->paginate(10, ['*'], 'soloCerts');
 
         return view('users.show', [
             'user' => $user,
-            'soloCerts' => $soloCerts ?? collect()
         ]);
     }
 

@@ -31,8 +31,6 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     }
 
     private function updateRoster() {
-        $this->clearUserRoles();
-
         $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
@@ -42,8 +40,9 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
 
         for ($i = 0; $i < count($roster['data']); $i++) {
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
-            $vatusaUser->facility;
+
             User::updateFromVatusa($vatusaUser);
+            echo "Updated user: " . $vatusaUser->cid . "\n";
         }
 
         if (App::environment('local', 'development')) {
@@ -54,6 +53,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             foreach ($testUsers as $user) {
                 $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
                 $user->rostered = true;
+                $user->division = 'USA';
+                $user->facility = 'ZJX';
                 $user->save();
             }
         };
@@ -101,11 +102,12 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     }
 
     private function updateStaffMembers() {
-        Staff::truncate();
-
         $facilityInfo = Http::get($this->FACILITY_INFO_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
+
+        $this->clearUserRoles();
+        Staff::truncate();
 
         $infoDTO = new VatusaFacilityInfoDTO($facilityInfo['data']);
 
