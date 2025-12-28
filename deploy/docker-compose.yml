@@ -33,7 +33,7 @@ services:
       image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       restart: unless-stopped
       # Wait for DB to accept connections, then run the queue worker
-      command: ["php", "artisan", "queue:work"]
+      command: ["php", "artisan", "queue:work", "--max-time=600"]
       env_file:
           -   ../.env
       networks:

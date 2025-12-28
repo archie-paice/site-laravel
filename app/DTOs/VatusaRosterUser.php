@@ -17,7 +17,6 @@ readonly class VatusaRosterUser {
     public ControllerRating $rating;
     public DateTime $createdAt;
     public DateTime $updatedAt;
-    public DateTime $lastCompetencyDate;
     public string|null $discordId;
     public bool $needsBasic;
     public bool $hasTransferOverride;
@@ -53,7 +52,6 @@ readonly class VatusaRosterUser {
             $this->preventStaffAssingnment = $data['flag_preventStaffAssign'] || false;
             $this->discordId = $data['discord_id'];
             $this->namePrivacy = $data['flag_nameprivacy'] || false;
-            $this->lastCompetencyDate = new DateTime($data['last_competency_date']);
             $this->isPromotionEligible = $data['promotion_eligible'] || false;
             $this->isTransferEligible = $data['transfer_eligible'] || false;
             $this->roles = $data['roles'];

@@ -7,13 +7,10 @@ use App\DTOs\VatusaFacilityInfoDTO;
 use App\DTOs\VatusaRosterUser;
 use App\Models\Staff;
 use App\Models\User;
-use DateTime;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Support\Facades\Http;
-
-use function Pest\Laravel\json;
+use Http;
 
 class SyncRoster implements ShouldQueue, ShouldBeUnique
 {
