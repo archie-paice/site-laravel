@@ -19,7 +19,7 @@ class VatsimOauthController extends Controller {
             'last_name' => $user->last_name,
             'email' => $user->email,
             'division' => $user->division,
-            'facility' => $user->facility,
+            'facility' => $user->facility ?? User::find($user->cid)?->facility,
             'rating' => $user->rating
         ], 'id');
     
