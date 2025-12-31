@@ -66,7 +66,7 @@ class SyncTrainingTickets implements ShouldQueue
                 'movements' => $ticket->movements,
                 'score' => $ticket->score,
                 'notes' => $ticket->notes,
-                'location' => $ticket->location])
+                'location' => $ticket->location]);
             }
         } catch (ConnectionException $e) {
             echo $e;
