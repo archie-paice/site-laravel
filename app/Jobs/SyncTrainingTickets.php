@@ -57,7 +57,16 @@ class SyncTrainingTickets implements ShouldQueue
                 $ticket->vatusa_synced = true;
                 $ticket->save();
             } else {
-                echo('Request Failed: '.$request);
+                echo('Request Failed: '.$request->body());
+                echo("\n");
+                print_r(['instructor_id' => $ticket->instructor_id,
+                'session_date' => (new DateTime($ticket->session_start))->format('Y-m-d H:i'),
+                'duration' => $ticket->duration,
+                'position' => $ticket->position,
+                'movements' => $ticket->movements,
+                'score' => $ticket->score,
+                'notes' => $ticket->notes,
+                'location' => $ticket->location])
             }
         } catch (ConnectionException $e) {
             echo $e;
