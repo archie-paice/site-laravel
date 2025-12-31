@@ -90,6 +90,7 @@ if (App::environment('development', 'local')) {
     });
 
     Route::get('/test-email', function() {
+        Mail::to('chrisjm66@gmail.com')->send(new Welcome(User::find(1697197)));
         return new TrainingAssignmentCreated(TrainingAssignment::find(1));
     });
 }
