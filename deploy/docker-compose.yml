@@ -33,7 +33,7 @@ services:
       image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       restart: unless-stopped
       # Wait for DB to accept connections, then run the queue worker
-      command: ["php", "artisan", "queue:work", "--max-time=600"]
+      command: sh -c "php artisan queue:work --max-time=600"
       env_file:
           -   ../.env
       networks:
@@ -47,7 +47,7 @@ services:
   scheduler:
       image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       restart: unless-stopped
-      command: ["php", "artisan", "schedule:work"]
+      command: php artisan schedule:work
       # Wait for DB to accept connections, then run the scheduler
       env_file:
           - ../.env
@@ -64,7 +64,7 @@ services:
       deploy:
           restart_policy:
               condition: on-failure
-      command: [ "php", "artisan", "migrate", "--seed", "--force" ]
+      command: php artisan migrate --force --seed
       env_file:
           - ../.env
       depends_on:
