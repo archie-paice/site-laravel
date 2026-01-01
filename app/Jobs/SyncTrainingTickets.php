@@ -58,6 +58,7 @@ class SyncTrainingTickets implements ShouldQueue
                 $ticket->save();
             } else {
                 echo('Request Failed: '.$request->body());
+                echo ('Request URL: '.$API_URL);
                 echo("\n");
                 print_r(['instructor_id' => $ticket->instructor_id,
                 'session_date' => (new DateTime($ticket->session_start))->format('Y-m-d H:i'),
