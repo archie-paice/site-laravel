@@ -58,4 +58,5 @@ WORKDIR /var/www/html
 COPY ./deploy/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["php", "artisan", "config:clear"]
+CMD ["/entrypoint.sh"]

@@ -23,8 +23,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
      */
     public function __construct()
     {
-        $this->ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/facility/' . config('app.vatusa_facility') . '/roster/both';
-        $this->FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/facility/' . config('app.vatusa_facility');
+        $this->ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility') . '/roster/both';
+        $this->FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility');
     }
 
     private function updateRoster() {
