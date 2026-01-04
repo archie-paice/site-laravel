@@ -55,8 +55,15 @@
                 </div>
                 <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
                     <li><a href={{ route('admin.index') }}>Dashboard</a></li>
-                        <li><a href={{ route('manage-users.index') }}>User Management</a></li>
-                        <li><a href={{ route('logs.index') }}>Audit Log</a></li>
+                    <li><a href={{ route('manage-users.index') }}>User Management</a></li>
+                    <li>
+                        <a href={{ route('visit.manage') }}>Visitor Requests 
+                            @if(\App\Models\VisitorRequest::where('status', \App\Enums\VisitRequestStatus::PENDING)->count() > 0)
+                                <span class='bg-primary text-primary-content rounded-full text-center w-max h-max p-2'>{{ \App\Models\VisitorRequest::where('status', \App\Enums\VisitRequestStatus::PENDING)->count() }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>
         @endhasrole

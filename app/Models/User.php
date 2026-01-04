@@ -165,6 +165,10 @@ class User extends Authenticatable
         return $this->hasMany(SoloCert::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
+    public function visitRequests(): HasMany {
+        return $this->hasMany(VisitorRequest::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

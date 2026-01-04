@@ -68,6 +68,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     # User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
+    Route::middleware('permission:manage visiting controllers')->group(function() {
+        Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
+        Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');
+        Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
+    });
 
     # Facilities Dept.
     Route::middleware('permission:manage statistics prefixes')->group(function() {
