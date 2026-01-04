@@ -41,20 +41,6 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             User::updateFromVatusa($vatusaUser);
             echo "Updated user: " . $vatusaUser->cid . "\n";
         }
-
-        if (App::environment('local', 'development')) {
-            $testUsers = User::where([
-                'first_name' => "Web"
-            ])->get();
-
-            foreach ($testUsers as $user) {
-                $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
-                $user->rostered = true;
-                $user->division = 'USA';
-                $user->facility = 'ZJX';
-                $user->save();
-            }
-        };
     }
 
     private function clearUserRoles() {
@@ -121,5 +107,19 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         $this->updateRoster();
 
         $this->updateStaffMembers();
+
+        if (App::environment() == 'development') {
+            $testUsers = User::where([
+                'first_name' => "Web"
+            ])->get();
+
+            foreach ($testUsers as $user) {
+                $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
+                $user->rostered = true;
+                $user->division = 'USA';
+                $user->facility = 'ZJX';
+                $user->save();
+            }
+        }
     }
 }
