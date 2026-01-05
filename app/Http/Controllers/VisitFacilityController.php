@@ -19,7 +19,11 @@ class VisitFacilityController extends Controller
 {
     public function index()
     {
-        $hasActiveVisitRequest = VisitorRequest::where('user_id', Auth::user()->id)->exists();
+        if (Auth::user()) {
+            $hasActiveVisitRequest = VisitorRequest::where('user_id', Auth::user()->id)->exists();
+        } else {
+            $hasActiveVisitRequest = false;
+        }
 
         return view('visit.index', compact('hasActiveVisitRequest'));
     }
