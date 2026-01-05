@@ -5,7 +5,7 @@
         </a>
     </div>
 
-    <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
+    <ul class='menu menu-horizontal items-center gap-x-5 justify-center flex-wrap md:flex-nowrap'>
         <div class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                 <span>Facility</span>

@@ -1,3 +1,8 @@
+@php
+    use \App\Models\VisitorRequest;
+    use \App\Enums\VisitRequestStatus;
+@endphp
+
 <div class="navbar bg-info text-primary-content z-10">
     <div class="flex-1 ml-5">
         <a href='{{ route('admin.index') }}' class='text-xl'>Admin Actions</a>
@@ -58,8 +63,8 @@
                     <li><a href={{ route('manage-users.index') }}>User Management</a></li>
                     <li>
                         <a href={{ route('visit.manage') }}>Visitor Requests 
-                            @if(\App\Models\VisitorRequest::where('status', \App\Enums\VisitRequestStatus::PENDING)->count() > 0)
-                                <span class='bg-primary text-primary-content rounded-full text-center w-max h-max p-2'>{{ \App\Models\VisitorRequest::where('status', \App\Enums\VisitRequestStatus::PENDING)->count() }}</span>
+                            @if(VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() > 0)
+                                <span class='badge badge-primary'>{{ VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() }}</span>
                             @endif
                         </a>
                     </li>

@@ -23,7 +23,7 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
     </head>
-    <body class='flex flex-col min-h-screen' data-theme='light'>
+    <body class='flex flex-col min-h-screen w-full overflow-x-hidden' data-theme='light'>
         <x-navbar/>
 
         @yield('secondary-navbar')

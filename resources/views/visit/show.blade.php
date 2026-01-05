@@ -1,3 +1,7 @@
+@php
+    use \App\Enums\VisitRequestStatus;
+@endphp
+
 @extends('layouts.admin')
 @section('title', 'Visitor Request - #'.$request->id)
 
@@ -9,11 +13,19 @@
             <br>
 
             <label for="status" class='label'>Status</label>
-            @if ($request->approved)
-                <span class="badge badge-success">Approved</span>
-            @else
-                <span class="badge badge-warning">Pending</span>
-            @endif
+            @switch($request->status)
+                @case(VisitRequestStatus::PENDING)
+                    <p class='badge badge-warning'>Pending</p>
+                    @break
+                @case(VisitRequestStatus::APPROVED)
+                    <p class='badge badge-success'>Approved</p>
+                    @break
+                @case(VisitRequestStatus::DENIED)
+                    <p class='badge badge-error'>Denied</p>
+                    @break
+                @default
+                    <p class='font-bold'>Unknown</p>
+            @endswitch
             <br>
             <label for="submitted" class='label'>Date Submitted</label>
             <p>{{ $request->created_at->format('Y-m-d') }}</p>

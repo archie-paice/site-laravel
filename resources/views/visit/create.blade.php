@@ -8,7 +8,7 @@
         @if ($checklist->error)
             <p class='text-lg'>It appears you are not a member of VATUSA. Please read <a class='link link-primary' href="https://www.vatusa.net/help/kb#q12">this FAQ</a> on how to join as an out-of-division controller.</p>
         @else
-            <table class='table w-max'>
+            <table class='table w-max table-auto overflow-x-scroll'>
                 <tr>
                     <td>You are not a member of vZJX</td>
                     <td>
@@ -30,7 +30,13 @@
                 <tr>
                     <td>You have an S3 rating or higher</td>
                     <td>
-                        <x-true-false-display :value="auth()->user()->rating->value >= \App\Enums\ControllerRating::S3->value"/>
+                        <x-true-false-display :value="(auth()->user()->rating->value >= \App\Enums\ControllerRating::S3->value)"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>It has been at least 60 days since visiting another facility</td>
+                    <td>
+                        <x-true-false-display :value="$checklist->visitingDaysMet"/>
                     </td>
                 </tr>
                 <tr>
@@ -50,6 +56,7 @@
 
             <p>For more detailed information, please check your <a class='link link-primary' href="https://www.vatusa.net/my/profile">VATUSA profile.</a></p>
 
+            
             @if (!$checklist->visitEligible || auth()->user()->rostered || $checklist->error)
                 <p class='text-lg text-error'>You are not eligible to submit a visiting request to the Virtual Jacksonville ARTCC (vZJX).</p>
             @else
@@ -58,9 +65,20 @@
         @endif
         
         @if ($checklist->visitEligible && !auth()->user()->rostered && !$checklist->error)
-            <form action="{{ route('visit.store') }}" method="post">
+            <form class='flex flex-col w-max gap-5 mt-5' action="{{ route('visit.store') }}" method="post">
                 @csrf
-                <input type="text" class='input' disabled value="CID: {{ auth()->user()->cid }}">
+                <div>
+                    <label for="cid">VATSIM CID</label>
+                    <br>
+                    <input type="text" class='input' disabled value="{{ auth()->user()->id }}">
+                </div>
+
+                <div>
+                    <label for="userNote">Why do you want to visit vZJX?</label>
+                    <br>
+                    <textarea id="userNote" name="userNote" class="textarea textarea-bordered w-120" rows="4"></textarea>
+                </div>
+                
                 <button type="submit" class="btn btn-primary">Submit Visiting Request</button>
             </form>
         @endif

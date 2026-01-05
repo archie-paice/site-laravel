@@ -16,6 +16,7 @@ class VisitingChecklistDTO
     {
         if (is_null($data)) {
             $this->error = true;
+            $this->visitEligible = false;
             return;
         }
 
@@ -23,7 +24,7 @@ class VisitingChecklistDTO
 
         $this->hasHomeFacility = $data['homecontroller'];
         $this->needsBasic = $data['needbasic'];
-        $this->visitingDays = $data['visitingDays'];
+        $this->visitingDays = $data['visitingDays'] ?? 0;
         $this->visitingDaysMet = $data['60days'];
         $this->ninetyDaysSincePromotion = $data['90days'];
         $this->fiftyHoursSincePromotion = $data['50hrs'];
