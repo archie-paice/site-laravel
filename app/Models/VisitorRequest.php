@@ -12,6 +12,7 @@ class VisitorRequest extends Model
         'status',
         'reason',
         'admin_notes',
+        'user_note'
     ];
 
     public function casts() {

@@ -39,8 +39,14 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
 
             User::updateFromVatusa($vatusaUser);
-            echo "Updated user: " . $vatusaUser->cid . "\n";
         }
+
+        // Clear hanging OIs
+        User::where([
+            'rostered' => false
+        ])->update([
+            'operating_initials' => null
+        ]);
     }
 
     private function clearUserRoles() {

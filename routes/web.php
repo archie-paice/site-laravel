@@ -72,6 +72,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
         Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');
         Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
+        Route::put('visit-requests/{visitRequest}/approve', [VisitFacilityController::class, 'approve'])->name('visit.approve');
+        Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])->name('visit.deny');
     });
 
     # Facilities Dept.
@@ -104,7 +106,14 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
 # Dev Only Routes
 if (App::environment('development', 'local')) {
+    # Test auth as any user
+    Route::get('/auth/{id}', function() {
+        Auth::loginUsingId(request()->route('id'));
+        return redirect()->route('home');
+    });
+
     Route::get('/sync', function() {
+        Log::info('balls');
         SyncRoster::dispatch();
         UpdateOnlineControllers::dispatch();
         return 'scheduled';

@@ -11,7 +11,9 @@
             <li class="mb-2">Wait 1-2 business days and enjoy controlling!</li>
         </ol>
 
-        @if (auth()->user() && !auth()->user()->rostered)
+        @if ($hasActiveVisitRequest)
+            <p class="btn btn-disabled">You have a pending visiting request. Please wait a few days for an update.</p>
+        @elseif(auth()->user() && !auth()->user()->rostered)
             <a href="{{ route('visit.create') }}" class="btn btn-primary">Submit a Visiting Request</a>       
         @elseif(auth()->user() && auth()->user()->rostered)
             <p class="btn btn-disabled">You are already rostered at vZJX. No need to submit a visiting request!</p>

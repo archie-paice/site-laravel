@@ -74,9 +74,9 @@
                 </div>
 
                 <div>
-                    <label for="userNote">Why do you want to visit vZJX?</label>
+                    <label for="personalNote">Why do you want to visit vZJX?</label>
                     <br>
-                    <textarea id="userNote" name="userNote" class="textarea textarea-bordered w-120" rows="4"></textarea>
+                    <textarea id="personalNote" name="personalNote" class="textarea textarea-bordered w-120" rows="4" maxlength='1000'></textarea>
                 </div>
                 
                 <button type="submit" class="btn btn-primary">Submit Visiting Request</button>
