@@ -27,4 +27,12 @@ class VisitorRequest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'name' => $this->user->name,
+            'reason' => $this->reason,
+        ];
+    }
 }

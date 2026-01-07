@@ -34,9 +34,15 @@ class VisitFacilityController extends Controller
         return view('visit.show', ['request' => $request]);
     }
 
-    public function manage()
+    public function manage(Request $request)
     {
-        $visitRequests = VisitorRequest::orderBy('created_at', 'desc')->paginate(25);
+        $request->validate([
+            'search' => 'nullable|string|max:255',
+        ]);
+
+        $query = $request->input('search');
+
+        $visitRequests = VisitorRequest::search($query)->orderBy('created_at', 'desc')->paginate(25);
         return view('visit.manage', ['visitRequests' => $visitRequests]);
     }
 
