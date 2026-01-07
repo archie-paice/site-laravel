@@ -2,6 +2,9 @@
     <label
         for="search"
         class="label">Search</label>
+
+    <input type="hidden" name="page" value="1">
+
     <input
         type="text"
         name="search"

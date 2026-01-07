@@ -24,18 +24,30 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\EventFieldController;
 use App\Http\Controllers\ManageEventController;
+use App\Http\Controllers\VisitFacilityController;
 use App\Mail\TrainingAssignmentCreated;
 
+# Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+# Roster
+Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
+
+# Visit
+Route::get('/visit', [VisitFacilityController::class, 'index'])->name('visit.index');
+Route::get('/visit/create', [VisitFacilityController::class, 'create'])->middleware('auth')->name('visit.create');
+Route::post('/visit', [VisitFacilityController::class, 'store'])->middleware('auth')->name('visit.store');
 
 # Oauth
 Route::get('/auth/redirect', [VatsimOauthController::class, 'redirect'])->name('auth.redirect');
+Route::get('/login', function() {
+    return redirect('auth.redirect', 301);
+})->name('login');
 Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth.logout');
 
-Route::resource('users', UserController::class);
-    
-Route::resource('users', UserController::class, ['only' => ['edit', 'update']]);
+# Users
+Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
 Route::prefix('users/{user}')->group(function() {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
@@ -43,22 +55,38 @@ Route::prefix('users/{user}')->group(function() {
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->name('users.show.solo-certs');
 });
 
+# Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
+# Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
 
+# Admin Routes
 Route::prefix('admin')->middleware('permission:view dashboard')->group(function() {
+    # Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
-    Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
 
+    # User Management
+    Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
+    Route::middleware('permission:manage visiting controllers')->group(function() {
+        Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
+        Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');
+        Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
+        Route::put('visit-requests/{visitRequest}/approve', [VisitFacilityController::class, 'approve'])->name('visit.approve');
+        Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])->name('visit.deny');
+    });
+
+    # Facilities Dept.
     Route::middleware('permission:manage statistics prefixes')->group(function() {
         Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
     });
 
+    # Logs
     Route::middleware('permission:view audit logs')->group(function() {
         Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
     });
 
+    # Training Dept.
     Route::prefix('/training')->middleware('role:training')->group(function() {
         Route::resource('tickets', TrainingTicketController::class)->names('training-tickets');
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
@@ -68,6 +96,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::delete('assignments', [TrainingAssignmentController::class, 'destroy'])->name('training-assignments.destroy'); //id sent in payload
     });
 
+    # Events Dept.
     Route::middleware('permission:manage events')->group(function () {
         Route::resource('event-fields', EventFieldController::class)->names('event-fields');
         Route::resource('position-presets', EventPositionPresetController::class)->names('position-presets');
@@ -75,10 +104,16 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     });
 });
 
-Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
-
+# Dev Only Routes
 if (App::environment('development', 'local')) {
+    # Test auth as any user
+    Route::get('/auth/{id}', function() {
+        Auth::loginUsingId(request()->route('id'));
+        return redirect()->route('home');
+    });
+
     Route::get('/sync', function() {
+        Log::info('balls');
         SyncRoster::dispatch();
         UpdateOnlineControllers::dispatch();
         return 'scheduled';

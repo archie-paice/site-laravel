@@ -5,13 +5,14 @@
         </a>
     </div>
 
-    <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
+    <ul class='menu menu-horizontal items-center gap-x-5 justify-center flex-wrap md:flex-nowrap'>
         <div class="dropdown dropdown-end">
             <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
-                <span>Controllers</span>
+                <span>Facility</span>
                 <x-dropdown-icon/>
             </div>
             <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
                 <li><a href="{{ route('roster.index') }}">Roster</a></li>
                 <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
             </ul>
