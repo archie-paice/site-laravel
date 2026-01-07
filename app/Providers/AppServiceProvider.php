@@ -6,6 +6,7 @@ use App\Services\Socialite\VatsimProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Contracts\Factory;
+use Http;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +38,12 @@ class AppServiceProvider extends ServiceProvider
             $config = $app['config']['services.vatsim'];
             return $socialite->buildProvider(VatsimProvider::class, $config);
         });
+
+        Http::globalOptions([
+            'headers' => [
+                'Connection' => 'close',
+                'User-Agent' => 'ZJX-website/1.0',
+            ],
+        ]);
     }
 }
