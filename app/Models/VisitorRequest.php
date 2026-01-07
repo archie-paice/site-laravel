@@ -4,9 +4,12 @@ namespace App\Models;
 
 use App\Enums\VisitRequestStatus;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class VisitorRequest extends Model
 {
+    use Searchable;
+    
     protected $fillable = [
         'user_id',
         'status',
