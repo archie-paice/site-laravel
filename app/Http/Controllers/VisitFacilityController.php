@@ -54,6 +54,7 @@ class VisitFacilityController extends Controller
 
         $cid = strval(Auth::user()->id);
         $checklist = $visitingChecklistService->getChecklistItems($cid);
+        
         return view('visit.create', ['checklist' => $checklist]);
     }
 
@@ -73,6 +74,7 @@ class VisitFacilityController extends Controller
         ]);
 
         Mail::to($visitRequest->user->email)->bcc(['atm@zjxartcc.org', 'datm@zjxartcc.org'])->queue(new VisitorRequestReceived($visitRequest));
+        Log::info('New visit request submitted for user '.$visitRequest->user_id.' by '.Auth::user()->id);
         return redirect()->route('visit.index')->with('success', 'Visit request submitted successfully.');
     }
 

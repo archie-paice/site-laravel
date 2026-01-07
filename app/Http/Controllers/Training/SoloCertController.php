@@ -14,6 +14,7 @@ use App\Models\User;
 use App\Services\VatusaSoloCertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class SoloCertController extends Controller
@@ -70,6 +71,13 @@ class SoloCertController extends Controller
 
         CreateVatusaSoloCert::dispatch($soloCert);
         Mail::to($soloCert->user)->bcc([$soloCert->issuedBy, config('app.vatusa_facility').'-ta@vatusa.net'])->queue(new SoloCertIssued($soloCert));
+        
+        Log::info('Solo cert issued', [
+            'solo_cert_id' => $soloCert->id,
+            'issued_by' => Auth::user()->id,
+            'user_id' => $validated['userId'],
+            'position' => $validated['position'],
+        ]);
 
         return redirect(route('solo-certs.index'))->with('success', 'Solo certification created successfully.');
     }

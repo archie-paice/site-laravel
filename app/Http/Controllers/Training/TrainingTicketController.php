@@ -9,6 +9,7 @@ use App\Models\TrainingTicket;
 use App\Models\User;
 use Auth;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class TrainingTicketController extends Controller
@@ -79,6 +80,11 @@ class TrainingTicketController extends Controller
         $ticket->save();
 
         Mail::to($ticket->student->email)->bcc($ticket->instructor->email)->queue(new TrainingTicketCreated($ticket));
+        Log::info('Training ticket created', [
+            'ticket_id' => $ticket->id,
+            'instructor_id' => $ticket->instructor_id,
+            'student_id' => $ticket->user_id,
+        ]);
         SyncTrainingTickets::dispatch();
         
         return redirect(route('training-tickets.show', [$ticket]))

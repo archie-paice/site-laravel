@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\TrainingTicket;
 use DateTime;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Http\Client\ConnectionException;
@@ -51,26 +52,7 @@ class SyncTrainingTickets implements ShouldQueue
                 'notes' => $ticket->notes,
                 'location' => $ticket->location,
             ]);
-
-            if ($request->ok()) {
-                echo $request->body();
-                $ticket->vatusa_synced = true;
-                $ticket->save();
-            } else {
-                echo('Request Failed: '.$request->body());
-                echo ('Request URL: '.$API_URL);
-                echo("\n");
-                print_r(['instructor_id' => $ticket->instructor_id,
-                'session_date' => (new DateTime($ticket->session_start))->format('Y-m-d H:i'),
-                'duration' => $ticket->duration,
-                'position' => $ticket->position,
-                'movements' => $ticket->movements,
-                'score' => $ticket->score,
-                'notes' => $ticket->notes,
-                'location' => $ticket->location]);
-            }
-        } catch (ConnectionException $e) {
-            echo $e;
+        } catch (Exception $e) {
             Log::error($e->getMessage());
         }
     }
