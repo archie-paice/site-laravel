@@ -26,8 +26,10 @@
             </div>
         </div>
 
+        @auth
         <div class="card bg-base-100 w-xl shadow-sm">
             @livewire('event-registration', ['event' => $event])
         </div>
+        @endauth
     </div>
 @endsection

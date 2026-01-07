@@ -28,7 +28,8 @@
 
         @role('events')
             <x-card-component title="Events Quick Links">
-                <a class='btn btn-primary mt-5' href="{{ route('training-assignments.index') }}">horse tinder idk</a>
+                <a class='btn btn-primary mt-5' href="{{ route('admin.events.index') }}">Manage Events</a>
+                <a class='btn btn-primary' href="{{ route('admin.events.position-presets.index') }}">Position Presets</a>
             </x-card-component>
         @endrole
     </div>

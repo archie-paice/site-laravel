@@ -4,7 +4,7 @@
 
 @section('body')
     <x-card-component>
-        <form method="POST" action="{{ route('position-presets.update', ['position_preset' => $position->id]) }}"
+        <form method="POST" action="{{ route('admin.events.position-presets.update', ['position_preset' => $position->id]) }}"
             class="flex flex-col">
             @csrf
             @method('PUT')

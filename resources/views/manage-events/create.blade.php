@@ -3,7 +3,7 @@
 @section('title', 'Create Event')
 
 @section('body')
-    <form method="POST" action="{{ route('manage-events.store') }}" class="flex flex-col gap-5">
+    <form method="POST" action="{{ route('admin.events.store') }}" class="flex flex-col gap-5">
         @csrf
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />

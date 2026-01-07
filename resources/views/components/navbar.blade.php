@@ -12,7 +12,7 @@
                 <x-dropdown-icon/>
             </div>
             <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                <li><a href="{{ route('roster.index') }}">Roster</a></li>
+                <li><a href="{{ route('events.index') }}">Upcoming Events + Staffing</a></li>
             </ul>
         </div>
         <div class="dropdown dropdown-end">

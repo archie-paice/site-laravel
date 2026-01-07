@@ -19,12 +19,12 @@
                         <td class='border-r-1 border-base-300'>{{ $position->name }}</td>
                         <td class='border-r-1 border-base-300'>{{ implode(', ', $position->positions ?? []) }}</td>
                         <td>
-                            <a href="{{ route('position-presets.edit', ['position_preset' => $position->id]) }}"
+                            <a href="{{ route('admin.events.position-presets.edit', ['position_preset' => $position->id]) }}"
                                 class="btn btn-accent">
                                 Edit
                             </a>
 
-                            <form action="{{ route('position-presets.destroy', ['position_preset' => $position->id]) }}" method="POST"
+                            <form action="{{ route('admin.events.position-presets.destroy', ['position_preset' => $position->id]) }}" method="POST"
                                 class="inline">
                                 @csrf
                                 @method('DELETE')

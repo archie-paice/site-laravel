@@ -3,7 +3,7 @@
 @section('title', 'Edit Event')
 
 @section('body')
-    <form method="POST" action="{{ route('manage-events.update', ['event' => $event->id]) }}" class="flex flex-col gap-5">
+    <form method="POST" action="{{ route('admin.events.update', ['event' => $event->id]) }}" class="flex flex-col gap-5">
         @csrf
         @method('PUT')
         <div class="collapse bg-base-100 border border-base-300">
