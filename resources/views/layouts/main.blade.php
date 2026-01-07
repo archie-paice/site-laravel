@@ -17,7 +17,7 @@
         <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
         @livewireStyles
-        @livewireScripts
+        
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -89,5 +89,6 @@
                 <p class="text-md">vZJX is a subdivision of VATUSA and VATNA on the VATSIM network.</p>
             </footer>
         </div>
+        @livewireScripts
     </body>
 </html>

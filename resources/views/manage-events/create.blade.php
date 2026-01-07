@@ -47,10 +47,29 @@
 
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Banner Image or URL</div>
-            <div class="collapse-content text-sm">Click the "Sign Up" button in the top right corner and follow the
-                registration process.</div>
+            <div class="collapse-title font-semibold">Banner URL</div>
+            <div class="collapse-content text-sm">
+                <label for="image_url" class="label">Banner URL</label>
+                <input name="image_url" type="url" placeholder="image.jpg" class="input" />
+            </div>
         </div>
+
+        <div class="collapse bg-base-100 border border-base-300">
+            <input type="radio" name="my-accordion-1" checked="checked" />
+            <div class="collapse-title font-semibold">Position Preset</div>
+            <div class="collapse-content text-sm">
+                <select name="presetPositions" class="select">
+                    <option disabled selected>Select preset</option>
+
+                    @foreach ($presetPositions as $p)
+                        <option value="{{ $p }}">
+                            {{ str_replace('_', ' ', $p) }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
 
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />
@@ -60,9 +79,6 @@
                 <input name="featured_fields" type="text" required placeholder="Eg. KMCO, KJAX, KDAB, KORL" class="input" />
             </div>
         </div>
-
-
-
 
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />

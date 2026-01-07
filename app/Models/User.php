@@ -181,4 +181,10 @@ class User extends Authenticatable
             'facility' => $this->facility
         ];
     }
+
+    public function events() {
+        return $this->belongsToMany(Event::class, 'event_positions')
+                    ->withPivot('requested_position', 'start', 'end', 'note', 'position_status')
+                    ->withTimestamps();
+    }
 }

@@ -25,6 +25,8 @@ use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\EventFieldController;
 use App\Http\Controllers\ManageEventController;
 use App\Mail\TrainingAssignmentCreated;
+use App\EventPositionAssignmentController;
+use App\Http\Controllers\EventPositionController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -46,6 +48,7 @@ Route::prefix('users/{user}')->group(function() {
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
+Route::post('/events/{event}/request-position', [EventPositionController::class, 'store'])->middleware('auth')->name('events.request-position.store');
 
 Route::prefix('admin')->middleware('permission:view dashboard')->group(function() {
     Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
