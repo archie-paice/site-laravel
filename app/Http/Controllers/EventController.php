@@ -6,15 +6,22 @@ use App\Models\Event;
 use Illuminate\Http\Request;
 use App\Enums\EventType;
 use App\Models\FeaturedField;
+use App\Models\EventPositionPreset;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rule;
 
-class ManageEventController extends Controller
+class EventController extends Controller
 {
-    public function index()
+    public function manage()
     {
         $events = Event::all();
         return view('manage-events.index', ['events' => $events]);
+    }
+
+    public function index() {
+        // perform some sort of calculation here to determine the next 3 upcoming events and then pass them to the view
+        $events = Event::where('start', '>=', now())->orderBy('start', 'asc')->take(3)->get();
+        return view('events.index', ['events' => $events]);
     }
 
     public function create()
@@ -22,10 +29,12 @@ class ManageEventController extends Controller
         $event = new Event();
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
+        $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
 
         return view('manage-events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
+            'presetPositions' => $presetPositions,
         ]);
     }
 
@@ -38,11 +47,17 @@ class ManageEventController extends Controller
             'end' => 'required|date',
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
+            'image_url' => ['nullable', 'url'],
+            'presetPositions' => 'nullable|string',
         ]);
 
+        $presetName = $validated['presetPositions'] ?? null;
+        $presetPositions = EventPositionPreset::where('name', $presetName)->first();
+        $presetPositions = $presetPositions?->positions;
+
         // for validated:
-         //   'featured_fields' => ['array'],
-          //  'featured_fields.*' => ['string', Rule::in($featuredFields)],
+        //   'featured_fields' => ['array'],
+        //  'featured_fields.*' => ['string', Rule::in($featuredFields)],
 
         $featuredFields = explode(', ', $validated['featured_fields']);
         $featuredFields = array_map('trim', $featuredFields);
@@ -54,10 +69,12 @@ class ManageEventController extends Controller
             'end' => $validated['end'],
             'type' => $validated['type'],
             'featured_fields' => $featuredFields,
+            'presetPositions' => $presetPositions,
+            'image_url' => $validated['image_url'] ?? null,
         ]);
 
 
-        return redirect()->route('manage-events.index')->with('success', 'Event created successfully!');
+        return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
     }
 
 
@@ -65,7 +82,7 @@ class ManageEventController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        return view('manage-events.show', ['event' => $event]);
+        return view('events.show', ['event' => $event]);
     }
 
     public function edit($id)
@@ -73,7 +90,7 @@ class ManageEventController extends Controller
         $event = Event::find($id);
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
-        
+
         return view('manage-events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
     }
 
@@ -94,7 +111,7 @@ class ManageEventController extends Controller
         $event = Event::find($id);
         $event->update($validated);
 
-        return redirect()->route('manage-events.index')
+        return redirect()->route('admin.events.index')
             ->with('success', 'Post updated successfully.');
     }
 
@@ -102,6 +119,6 @@ class ManageEventController extends Controller
     {
         $event = Event::find($id);
         $event->delete();
-        return redirect()->route('manage-events.index')->with('success', 'Post deleted successfully');
+        return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully');
     }
 }

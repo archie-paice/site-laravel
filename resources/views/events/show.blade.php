@@ -3,9 +3,11 @@
 @section('body')
     <div class="flex flex-col justify-center items-center gap-6">
         <div class="card card-dash bg-base-100 w-xl shadow-sm">
+            @if ($event->image_url)
             <figure>
-                <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp" alt="Shoes" />
+                <img src="{{ $event->image_url }}" alt="Shoes" />
             </figure>
+            @endif
             <div class="card-body bg-neutral">
                 <h1 class="card-title">
                     {{ $event->name }}
@@ -24,14 +26,10 @@
             </div>
         </div>
 
+        @auth
         <div class="card bg-base-100 w-xl shadow-sm">
-            <div class="card-body bg-neutral">
-                <h2 class="card-title">Request Position</h2>
-                <p>A card component has a figure, a body part, and inside body there are title and actions parts</p>
-                <div class="card-actions justify-end">
-                    <button class="btn btn-primary">Buy Now</button>
-                </div>
-            </div>
+            @livewire('event-registration', ['event' => $event])
         </div>
+        @endauth
     </div>
 @endsection

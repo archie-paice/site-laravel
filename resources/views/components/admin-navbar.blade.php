@@ -37,19 +37,18 @@
 
 
         @hasrole('events')
-            <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
-                    <span>Events Admin</span>
-                    <x-dropdown-icon/>
-                </div>
-                <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                    <li><a href={{ route('manage-events.index') }}>Events</a></li>
-                    <li><a href="{{ route('position-presets.index') }}">Position Presets</a></li>
-                    <li><a href="{{ route('event-fields.index') }}">Event Field Presets</a></li>
-                    <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
-                    <li><a href={{ route('admin.index') }}>Logs</a></li>
-                </ul>
-            </div>
+            <li>
+                <details>
+                    <summary>Events Administration</summary>
+                    <ul class="bg-base-100 text-base-content rounded-t-none p-2">
+                        <li><a href={{ route('admin.events.index') }}>Events</a></li>
+                        <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
+                        <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
+                        <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
+                        <li><a href={{ route('admin.index') }}>Logs</a></li>
+                    </ul>
+                </details>
+            </li>
         @endhasrole
 
         @hasrole('admin')

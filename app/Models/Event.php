@@ -18,6 +18,8 @@ class Event extends Model
         'type',
         'featured_fields',
         'hidden',
+        'image_url',
+        'presetPositions',
     ];
 
     protected $casts = [
@@ -26,6 +28,11 @@ class Event extends Model
         'end' => 'datetime',
         'featured_fields' => 'array',
         'hidden' => 'boolean',
+        'presetPositions' => 'array',
     ];
+
+    public function positionRequests() {
+        return $this->hasMany(EventPosition::class);
+    }
 }
 

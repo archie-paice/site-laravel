@@ -7,5 +7,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class FeaturedField extends Model
 {
-    protected $fillable = ['name'];
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+    ];
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_featured_fields', 'featured_field_id', 'event_id')
+                    ->withTimestamps();
+    }
 }
