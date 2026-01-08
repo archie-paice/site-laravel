@@ -60,4 +60,5 @@ services:
 
 networks:
   laravel:
+    enable_ipv6: false
     driver: bridge
