@@ -12,9 +12,9 @@ class PermissionSeeder extends Seeder
     private array $permissions = [
         'core' => ['edit own profile'],
         'staff' => ['view dashboard'],
-        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs'],
+        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers' ],
         'events' => ['manage events', 'assign event positions', 'publish events'],
-        'facilities' => ['manage roster', 'edit certifications', 'assign positions', 'manage visiting controllers'],
+        'facilities' => ['edit certifications', 'assign positions', 'manage statistics prefixes'],
         'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs' ],
         'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students']
     ];

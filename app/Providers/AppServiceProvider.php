@@ -6,6 +6,7 @@ use App\Services\Socialite\VatsimProvider;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Socialite\Contracts\Factory;
+use Http;
 
 class AppServiceProvider extends ServiceProvider
 {

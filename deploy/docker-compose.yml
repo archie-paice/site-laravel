@@ -10,7 +10,6 @@ services:
       context: ../
       dockerfile: ./deploy/Dockerfile
     volumes:
-      # Persist runtime uploads/storage separately
       - storage_data:/var/www/html/storage
     env_file:
         - ../.env
@@ -32,7 +31,6 @@ services:
   queue:
       image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       restart: unless-stopped
-      # Wait for DB to accept connections, then run the queue worker
       command: sh -c "php artisan queue:work --max-time=600"
       env_file:
           -   ../.env
@@ -48,7 +46,6 @@ services:
       image: ghcr.io/zjx-artcc/site-laravel:${IMAGE_TAG:-master}
       restart: unless-stopped
       command: php artisan schedule:work
-      # Wait for DB to accept connections, then run the scheduler
       env_file:
           - ../.env
       networks:
@@ -74,7 +71,7 @@ services:
           - laravel
 
   db:
-      image: postgres:16  # <--- FIXED: Pinned version to prevent "latest" breaking changes
+      image: postgres:16
       restart: always
       env_file:
           - ../.env
@@ -95,7 +92,6 @@ services:
 
   nginx:
     image: nginx:alpine
-    # Use docker config instead of bind-mounting the host nginx.conf
     configs:
         - source: nginx_conf
           target: /etc/nginx/conf.d/default.conf
@@ -118,7 +114,6 @@ volumes:
     db_data:
     storage_data:
 
-# Add a Compose config to inject nginx.conf into the nginx container (no host bind)
 configs:
   nginx_conf:
     file: ./nginx.conf

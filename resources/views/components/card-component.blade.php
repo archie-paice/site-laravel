@@ -3,7 +3,7 @@
         <h1 class="card-title text-2xl">{{ $title }}</h1>
     @endunless
 
-    <div class="card-body p-0">
-    {{  $slot }}
+    <div @class('card-body p-0')>
+        {{  $slot }}
     </div>
 </div>

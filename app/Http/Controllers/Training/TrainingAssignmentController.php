@@ -4,10 +4,14 @@ namespace App\Http\Controllers\Training;
 
 use App\Enums\TrainingType;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendTrainingRequestToWebhook;
+use App\Mail\TrainingAssignmentCreated;
+use App\Mail\TrainingAssignmentUpdated;
 use App\Models\Staff;
 use App\Models\TrainingAssignment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
 class TrainingAssignmentController extends Controller
@@ -62,13 +66,14 @@ class TrainingAssignmentController extends Controller
             return redirect()->back()->withErrors( 'Not an active controller.');
         }
 
-        TrainingAssignment::create([
+        $trainingAssignment = TrainingAssignment::create([
             'training_type' => $validated['trainingType'],
             'user_id' => Auth::user()->id,
             'instructor_id' => null,
         ]);
 
-        
+        SendTrainingRequestToWebhook::dispatch($trainingAssignment);
+        Mail::to(Auth::user()->email)->queue(new TrainingAssignmentCreated($trainingAssignment));
         return redirect()->back()->with('success', 'Training requested successfully');
     }
 
@@ -108,6 +113,11 @@ class TrainingAssignmentController extends Controller
         if ($validated['notifyUser'] ?? false) {
             Mail::to($trainingAssignment->student->email)->bcc($trainingAssignment->instructor ?? null)->queue(new \App\Mail\TrainingAssignmentUpdated($trainingAssignment));
         }
+
+        Log::info('Training assignment updated', [
+            'assignment_id' => $trainingAssignment->id,
+            'updated_by' => $user->id,
+        ]);
 
         return redirect()->back()->with('success', 'Training request updated successfully');
     }

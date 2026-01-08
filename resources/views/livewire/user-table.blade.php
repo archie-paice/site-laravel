@@ -1,12 +1,8 @@
 <div x-data="{ search: @entangle('search').live }">
-    <input 
-    type='text' 
-    x-model.debounce.300ms="search" 
-    class='input input-md mb-5' 
-    placeholder='Search (Name, CID)'/>
+    <x-search/>
 
     @unless(sizeof($users) == 0)
-        <table class='table table-zebra table-md w-max border-2 rounded-md border-base-300'>
+        <table class='table table-zebra table-md w-max border-2 rounded-md border-base-300 mt-5'>
             <thead>
                 <tr class='text-xl font-bold'>
                     <th>ZJX Roster</th>

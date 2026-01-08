@@ -6,6 +6,7 @@ use App\Models\SoloCert;
 use Http;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Log;
 
 class CreateVatusaSoloCert implements ShouldQueue
 {
@@ -31,5 +32,11 @@ class CreateVatusaSoloCert implements ShouldQueue
             'position' => $this->soloCert->position,
             'expDate' => $this->soloCert->expires->format('Y-m-d')
         ]);
+
+        if ($request->failed()) {
+            Log::error('Failed to push solo cert to VATUSA for user '.$this->soloCert->user_id.'. Response: '.$request->body());
+        } else {
+            Log::info('Successfully pushed solo cert to VATUSA for user '.$this->soloCert->user_id);
+        }
     }
 }

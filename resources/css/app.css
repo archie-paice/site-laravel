@@ -59,7 +59,7 @@
 
     /* Success: Made slightly deeper for better contrast */
     --color-success: oklch(70% 0.16 150);
-    --color-success-content: oklch(20% 0.05 150); /* Dark text */
+    --color-success-content: #ffffff; /* Dark text */
 
     /* Warning: Kept your original yellow */
     --color-warning: oklch(82% 0.189 84.429);

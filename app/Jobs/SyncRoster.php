@@ -11,6 +11,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Http;
+use Illuminate\Support\Facades\Log;
 
 class SyncRoster implements ShouldQueue, ShouldBeUnique
 {
@@ -32,29 +33,21 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             'apikey' => config('app.vatusa_api_key')
         ]);
 
-        $roster = json_decode($rosterData, true);
+        $roster = $rosterData->json();
         User::where(['rostered' => true])->update(['rostered' => false]);
 
         for ($i = 0; $i < count($roster['data']); $i++) {
             $vatusaUser = new VatusaRosterUser($roster['data'][$i]);
 
             User::updateFromVatusa($vatusaUser);
-            echo "Updated user: " . $vatusaUser->cid . "\n";
         }
 
-        if (App::environment('local', 'development')) {
-            $testUsers = User::where([
-                'first_name' => "Web"
-            ])->get();
-
-            foreach ($testUsers as $user) {
-                $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
-                $user->rostered = true;
-                $user->division = 'USA';
-                $user->facility = 'ZJX';
-                $user->save();
-            }
-        };
+        // Clear hanging OIs
+        User::where([
+            'rostered' => false
+        ])->update([
+            'operating_initials' => null
+        ]);
     }
 
     private function clearUserRoles() {
@@ -106,7 +99,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         $this->clearUserRoles();
         Staff::truncate();
 
-        $infoDTO = new VatusaFacilityInfoDTO($facilityInfo['data']);
+        $infoDTO = new VatusaFacilityInfoDTO($facilityInfo->json()['data']);
 
         Staff::fromFacilityInfoDTO($infoDTO);
 
@@ -118,8 +111,29 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
      */
     public function handle(): void
     {
-        $this->updateRoster();
+        try {
+            $this->updateRoster();
 
-        $this->updateStaffMembers();
+            $this->updateStaffMembers();
+
+            if (App::environment() == 'development') {
+                $testUsers = User::where([
+                    'first_name' => "Web"
+                ])->get();
+
+                foreach ($testUsers as $user) {
+                    $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
+                    $user->rostered = true;
+                    $user->division = 'USA';
+                    $user->facility = 'ZJX';
+                    $user->save();
+                }
+            }
+
+            Log::info('Roster sync completed successfully.');
+        } catch (\Exception $e) {
+            // Log error
+            Log::error('Error syncing roster: '.$e->getMessage());
+        }
     }
 }
