@@ -27,7 +27,6 @@
             <div class="collapse-content text-sm">
                 <select name="type" class="select">
                     <option disabled selected>Select type</option>
-
                     @foreach ($types as $t)
                         <option value="{{ $t->name }}">
                             {{ str_replace('_', ' ', $t->name) }}
@@ -60,7 +59,7 @@
             <div class="collapse-content text-sm">
                 <select name="presetPositions" class="select">
                     <option disabled selected>Select preset</option>
-
+                    <option value="">No preset</option>
                     @foreach ($presetPositions as $p)
                         <option value="{{ $p }}">
                             {{ str_replace('_', ' ', $p) }}

@@ -48,11 +48,12 @@ class EventController extends Controller
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
             'image_url' => ['nullable', 'url'],
-            'presetPositions' => 'required|string',
+            'presetPositions' => 'nullable|string',
         ]);
 
-        $presetPositions = EventPositionPreset::where('name', $validated['presetPositions'])->firstOrFail();
-        $presetPositions = $presetPositions->positions;
+        $presetName = $validated['presetPositions'] ?? null;
+        $presetPositions = EventPositionPreset::where('name', $presetName)->first();
+        $presetPositions = $presetPositions?->positions;
 
         // for validated:
         //   'featured_fields' => ['array'],
