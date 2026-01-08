@@ -6,6 +6,7 @@ use App\Enums\TrainingType;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendTrainingRequestToWebhook;
 use App\Mail\TrainingAssignmentCreated;
+use App\Mail\TrainingAssignmentUpdated;
 use App\Models\Staff;
 use App\Models\TrainingAssignment;
 use Illuminate\Http\Request;

@@ -97,7 +97,7 @@ class SoloCertController extends Controller
         ])->get();
 
         foreach ($relaventAssignments as $relaventAssignment) {
-            $relaventAssignment->status = TRAININGStatus::ACTIVE;
+            $relaventAssignment->status = TrainingStatus::ACTIVE;
             $relaventAssignment->save();
         }
 

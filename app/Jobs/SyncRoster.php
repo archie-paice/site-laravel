@@ -33,7 +33,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             'apikey' => config('app.vatusa_api_key')
         ]);
 
-        $roster = json_decode($rosterData, true);
+        $roster = $rosterData->json();
         User::where(['rostered' => true])->update(['rostered' => false]);
 
         for ($i = 0; $i < count($roster['data']); $i++) {
@@ -99,7 +99,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         $this->clearUserRoles();
         Staff::truncate();
 
-        $infoDTO = new VatusaFacilityInfoDTO($facilityInfo['data']);
+        $infoDTO = new VatusaFacilityInfoDTO($facilityInfo->json()['data']);
 
         Staff::fromFacilityInfoDTO($infoDTO);
 
