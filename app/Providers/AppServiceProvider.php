@@ -38,12 +38,5 @@ class AppServiceProvider extends ServiceProvider
             $config = $app['config']['services.vatsim'];
             return $socialite->buildProvider(VatsimProvider::class, $config);
         });
-
-        Http::globalOptions([
-            'headers' => [
-                'Connection' => 'close',
-                'User-Agent' => 'ZJX-website/1.0',
-            ],
-        ]);
     }
 }
