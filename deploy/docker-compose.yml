@@ -113,6 +113,12 @@ services:
 networks:
   laravel:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 172.30.0.0/16
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
 
 volumes:
     db_data:
