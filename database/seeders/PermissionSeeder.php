@@ -13,7 +13,7 @@ class PermissionSeeder extends Seeder
         'core' => ['edit own profile'],
         'staff' => ['view dashboard'],
         'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs'],
-        'events' => ['create events', 'edit events', 'delete events', 'assign event positions', 'publish events'],
+        'events' => ['manage events', 'assign event positions', 'publish events'],
         'facilities' => ['manage roster', 'edit certifications', 'assign positions', 'manage visiting controllers'],
         'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs' ],
         'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students']

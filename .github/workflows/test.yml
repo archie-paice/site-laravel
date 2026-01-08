@@ -1,0 +1,43 @@
+name: Run Tests in Docker
+
+on:
+  pull_request:
+    branches: [ "main", "develop" ]
+  workflow_dispatch:
+
+jobs:
+  test-in-docker:
+    # Works on 'ubuntu-latest' OR 'self-hosted'
+    runs-on: ubuntu-latest 
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Create the .env file for Docker Compose
+      # Even though we are testing, Docker Compose needs this file to 
+      # populate the variables in your YAML (like ${DB_USERNAME})
+      - name: Setup Test Environment
+        run: |
+             echo "${{ secrets.TESTING_ENV_FILE }}" > .env
+
+      # 2. Build the Stack (CRITICAL: Enable Dev Tools)
+      # We pass INSTALL_DEV=true so Composer includes PHPUnit/Pest
+      - name: Build Containers
+        run: |
+          docker compose -p test -f deploy/docker-compose-test.yml --env-file .env build \
+            --build-arg INSTALL_DEV=true
+
+      # 3. Start the Stack
+      - name: Start Services
+        run: docker compose -p test --env-file .env -f deploy/docker-compose-test.yml up -d
+
+      # 5. Run the Tests INSIDE the container
+      - name: Execute Tests
+        run: |
+          docker compose -p test --env-file .env -f deploy/docker-compose-test.yml exec -T laravel ./vendor/bin/pest
+
+      # 6. Cleanup
+      # Always run this to remove the containers and the testing volume
+      - name: Teardown
+        if: always()
+        run: docker compose -p test --env-file .env -f deploy/docker-compose-test.yml down -v

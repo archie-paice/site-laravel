@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('facility', 3)->nullable();
             $table->dateTime('joined_at')->nullable();
             $table->string('discord_id')->nullable();
-            $table->string('operating_initials')->nullable()->unique();
+            $table->string('profile_image_route')->default('images/default_profile.jpg');
+            $table->text('biography')->nullable();
+            $table->string('operating_initials', 2)->nullable()->unique()->default(null);
         });
     }
 

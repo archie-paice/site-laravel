@@ -1,5 +1,7 @@
 <?php
 
+namespace App\View\Components;
+
 use Illuminate\Console\View\Components\Component;
 
 class CardComponent extends Component {

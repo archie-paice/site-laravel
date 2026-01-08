@@ -4,22 +4,14 @@
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
-        <li>
-            <details>
-                <summary>Controllers</summary>
-                <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                    <li><a href={{ route('roster') }}>Roster</a></li>
-                    <li><a>Link 2</a></li>
-                </ul>
-            </details>
-        </li>
-
         @hasrole('training')
             <li>
                 <details>
                     <summary>Training Management</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('admin.index') }}>Admin Dashboard</a></li>
+                        <li><a href={{ route('training-tickets.index') }}>Training Tickets</a></li>
+                        <li><a href={{ route('training-assignments.index') }}>Training Assignments</a></li>
+                        <li><a href={{ route('solo-certs.index') }}>Solo Certs</a></li>
                     </ul>
                 </details>
             </li>
@@ -30,7 +22,7 @@
                 <details>
                     <summary>Data Management</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('admin.index') }}>Admin Dashboard</a></li>
+                        <li><a href={{ route('statistics-prefixes.index') }}>Statistics Prefixes</a></li>
                     </ul>
                 </details>
             </li>
@@ -40,9 +32,13 @@
         @hasrole('events')
             <li>
                 <details>
-                    <summary>Event Management</summary>
+                    <summary>Events Administration</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
-                        <li><a href={{ route('admin.index') }}>Admin Dashboard</a></li>
+                        <li><a href={{ route('admin.events.index') }}>Events</a></li>
+                        <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
+                        <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
+                        <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
+                        <li><a href={{ route('admin.index') }}>Logs</a></li>
                     </ul>
                 </details>
             </li>
@@ -54,7 +50,8 @@
                     <summary>Facility Admin</summary>
                     <ul class="bg-base-100 text-base-content rounded-t-none p-2">
                         <li><a href={{ route('admin.index') }}>Dashboard</a></li>
-                        <li><a href={{ route('users.index') }}>User Management</a></li>
+                        <li><a href={{ route('manage-users.index') }}>User Management</a></li>
+                        <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                     </ul>
                 </details>
             </li>
