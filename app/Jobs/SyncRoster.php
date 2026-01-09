@@ -133,7 +133,10 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             Log::info('Roster sync completed successfully.');
         } catch (\Exception $e) {
             // Log error
-            Log::error('Error syncing roster:\n'.$e->getTraceAsString());
+            Log::error('Error syncing roster:\n'.$e->getTraceAsString(), [
+                'url' => $this->ROSTER_API_ENDPOINT,
+                'environment' => App::environment()
+            ]);
         }
     }
 }
