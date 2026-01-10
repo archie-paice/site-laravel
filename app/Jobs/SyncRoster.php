@@ -16,20 +16,18 @@ use Illuminate\Support\Facades\Log;
 class SyncRoster implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
-    private readonly string $ROSTER_API_ENDPOINT;
-    private readonly string $FACILITY_INFO_ENDPOINT;
 
     /**
      * Create a new job instance.
      */
     public function __construct()
     {
-        $this->ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility') . '/roster/both';
-        $this->FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility');
     }
 
     private function updateRoster() {
-        $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
+        $ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility') . '/roster/both';
+
+        $rosterData = Http::get($ROSTER_API_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
 
@@ -92,7 +90,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     }
 
     private function updateStaffMembers() {
-        $facilityInfo = Http::get($this->FACILITY_INFO_ENDPOINT, [
+        $FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility');
+        $facilityInfo = Http::get($FACILITY_INFO_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
 
@@ -134,7 +133,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         } catch (\Exception $e) {
             // Log error
             Log::error('Error syncing roster:\n'.$e->getTraceAsString(), [
-                'url' => $this->ROSTER_API_ENDPOINT,
+                'url' => config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility'),
                 'environment' => App::environment()
             ]);
         }
