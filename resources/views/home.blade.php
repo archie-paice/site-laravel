@@ -10,21 +10,22 @@
 
 @section('body-nopad')
         <div class='relative w-full h-full flex flex-col -top-20 justify-center items-center'>
-            <video autoplay class='w-full h-full absolute object-cover'
+            <!--<video autoplay class='w-full h-full absolute object-cover'
             muted
             loop
             playbackRate='2'
             controls='false'
             disablePictureInPicture
             src={{ asset('images/ZJX_home.mp4') }}>
-            </video>
+            </video>-->
+            <img src="{{ asset('images/bg.jpg') }}" class="w-full h-full absolute object-cover"/>
 
             <div class='font-bold text-accent-content text-center z-10 w-max h-max relative p-10 flex justify-center flex-col items-center'>
                 <div class="absolute opacity-25 rounded-2xl glass h-full w-full">
 
                 </div>
-                <h1 class='text-transparent text-2xl lg:text-7xl z-20 mix-blend-color bg-gradient-to-br stretch from-secondary to-sky-300 bg-clip-text bg-repeat-round'>Virtual Jacksonville ARTCC</h1>
-                <h2 class='text-transparent text-xl lg:text-4xl z-20 mix-blend-color bg-gradient-to-br stretch from-sky-300 to-gray-200 bg-clip-text bg-repeat-round'>Pride of VATUSA South</h2>
+                <h1 class='text-transparent text-2xl lg:text-7xl z-20 mix-blend-color bg-gradient-to-br stretch from-amber-400 to-sky-500 bg-clip-text bg-repeat-round'>Virtual Jacksonville ARTCC</h1>
+                <h2 class='text-transparent text-xl lg:text-4xl z-20 mix-blend-color bg-gradient-to-br stretch from-sky-500 to-gray-200 bg-clip-text bg-repeat-round'>Pride of VATUSA South</h2>
             </div>
         </div>
 @endsection
