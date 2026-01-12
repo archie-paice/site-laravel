@@ -45,7 +45,7 @@ RUN chown -R www-data:www-data /var/www/html/ \
 # stage 2: production stage
 FROM php:8.4-fpm-alpine
 
-RUN apk add --no-cache libpq-dev \
+RUN apk add --no-cache ca-certificates curl libcurl libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql
 
 # copy files from the build stage

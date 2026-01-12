@@ -38,9 +38,5 @@ class AppServiceProvider extends ServiceProvider
             $config = $app['config']['services.vatsim'];
             return $socialite->buildProvider(VatsimProvider::class, $config);
         });
-
-        Http::globalOptions([
-            'force_ip_resolve' => 'v4',
-        ]);
     }
 }
