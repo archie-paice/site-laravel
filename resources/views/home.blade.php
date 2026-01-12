@@ -23,8 +23,8 @@
                 <div class="absolute opacity-25 rounded-2xl glass h-full w-full">
 
                 </div>
-                <h1 class='text-transparent text-7xl z-20 mix-blend-color bg-gradient-to-br stretch from-secondary to-sky-300 bg-clip-text bg-repeat-round'>Virtual Jacksonville ARTCC</h1>
-                <h2 class='text-transparent text-4xl z-20 mix-blend-color bg-gradient-to-br stretch from-sky-300 to-gray-200 bg-clip-text bg-repeat-round'>Pride of VATUSA South</h2>
+                <h1 class='text-transparent text-2xl lg:text-7xl z-20 mix-blend-color bg-gradient-to-br stretch from-secondary to-sky-300 bg-clip-text bg-repeat-round'>Virtual Jacksonville ARTCC</h1>
+                <h2 class='text-transparent text-xl lg:text-4xl z-20 mix-blend-color bg-gradient-to-br stretch from-sky-300 to-gray-200 bg-clip-text bg-repeat-round'>Pride of VATUSA South</h2>
             </div>
         </div>
 @endsection
