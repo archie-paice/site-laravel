@@ -31,6 +31,10 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             'apikey' => config('app.vatusa_api_key')
         ]);
 
+        if ($rosterData->failed()) {
+            throw new \Exception('Failed to fetch roster data: ' . $rosterData->status() . ' - ' . $rosterData->body());
+        }
+
         $roster = $rosterData->json();
         User::where(['rostered' => true])->update(['rostered' => false]);
 
@@ -95,6 +99,10 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             'apikey' => config('app.vatusa_api_key')
         ]);
 
+        if ($facilityInfo->failed()) {
+            throw new \Exception('Failed to fetch facility info: ' . $facilityInfo->status() . ' - ' . $facilityInfo->body());
+        }
+
         $this->clearUserRoles();
         Staff::truncate();
 
@@ -132,9 +140,10 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             Log::info('Roster sync completed successfully.');
         } catch (\Exception $e) {
             // Log error
-            Log::error('Error syncing roster:\n'.$e->getTraceAsString(), [
+            Log::error('Error syncing roster: '.$e->getMessage().'\n'.$e->getTraceAsString(), [
                 'url' => config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility'),
-                'environment' => App::environment()
+                'environment' => App::environment(),
+                'exception' => get_class($e)
             ]);
         }
     }

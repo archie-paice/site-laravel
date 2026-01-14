@@ -24,4 +24,9 @@ class CertificationFacility extends Model
     {
         return $this->hasMany(CertificationLevel::class, 'facility_id');
     }
+
+    public function defaultCertificationLevel()
+    {
+        return $this->hasOne(CertificationLevel::class, 'default_certification_level_id');
+    }
 }

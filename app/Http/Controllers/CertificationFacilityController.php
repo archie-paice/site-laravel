@@ -10,7 +10,16 @@ class CertificationFacilityController extends Controller
     public function index()
     {
         $certificationFacilities = CertificationFacility::all();
-        return view('certification-facilities.index', compact('certificationFacilities'));
+        return view('certification-facilities.index', [
+            'certificationFacilities' => $certificationFacilities
+        ]);
+    }
+
+    public function show(int $id) {
+        $facility = CertificationFacility::findOrFail($id);
+        return view('certification-facilities.show', [
+            'facility' => $facility
+        ]);
     }
 
     public function store(Request $request)
@@ -20,7 +29,7 @@ class CertificationFacilityController extends Controller
             'identifier' => 'required|string|max:10|unique:certification_facilities,identifier',
         ]);
 
-        $certificationFacility = CertificationFacility::create($validated);
+        CertificationFacility::create($validated);
 
         return redirect()->route('certification-facilities.index')->with('success', 'Certification Facility created successfully.');
     }

@@ -27,6 +27,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\VisitFacilityController;
 use App\Mail\TrainingAssignmentCreated;
 use App\Http\Controllers\CertificationFacilityController;
+use App\Http\Controllers\CertificationLevelController;
 use App\Livewire\EventRegistration;
 
 # Homepage
@@ -86,9 +87,17 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Facilities Dept.
     Route::prefix('data')->group(function() {
         Route::middleware('permission:manage statistics prefixes')->resource('statistics-prefixes', StatisticsPrefixesController::class);
-        Route::get('certification-facilities', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
-        Route::post('certification-facilities', [CertificationFacilityController::class, 'store'])->name('certification-facilities.store');
-        Route::delete('certification-facilities/{facility}', [CertificationFacilityController::class, 'destroy'])->name('certification-facilities.destroy');
+
+        Route::middleware('permission:manage certification facilities')->prefix('certification-facilities')->group(function() {
+            Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
+            Route::post('/', [CertificationFacilityController::class, 'store'])->name('certification-facilities.store');
+
+            Route::prefix('/{facility}')->group(function() {
+                Route::get('/', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
+                Route::delete('/', [CertificationFacilityController::class, 'destroy'])->name('certification-facilities.destroy');
+                Route::post('/certification-levels', [CertificationLevelController::class, 'store'])->name('certification-levels.store');
+            });
+        });
     });
 
     # Logs

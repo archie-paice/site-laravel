@@ -12,7 +12,9 @@
             </tr>
             @foreach ($certificationFacilities as $facility)
                 <tr>
-                    <td>{{ $facility->name }}</td>
+                    <td>
+                        <a class='link link-primary' href="{{ route('certification-facilities.show', $facility->id) }}">{{ $facility->name }}</a>
+                    </td>
                     <td>{{ $facility->identifier }}</td>
                     <td>
                         <form method="POST" action="{{ route('certification-facilities.destroy', $facility->id) }}"
@@ -24,6 +26,12 @@
                     </td>
                 </tr>
             @endforeach
+
+            @if(count($certificationFacilities) == 0)
+                <tr>
+                    <td colspan="3">No certification facilities defined.</td>
+                </tr>
+            @endif
         </thead>
     </table>
 
