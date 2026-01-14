@@ -9,7 +9,7 @@
 @extends('layouts.main')
 
 @section('body-nopad')
-        <div class='relative w-full h-full flex flex-col -top-20 justify-center items-center'>
+        <div class='relative w-screen h-screen flex flex-col -top-20 justify-center items-center'>
             <!--<video autoplay class='w-full h-full absolute object-cover'
             muted
             loop

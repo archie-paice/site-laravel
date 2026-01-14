@@ -1,21 +1,9 @@
 {
   "name": "Laravel Dev Environment",
   
-  // CHANGED: Use the Dockerfile we just created instead of "image"
-  "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
-  },
-
-  "features": {
-    // Replaced with the official standard Postgres feature
-    "ghcr.io/devcontainers/features/postgres:1": {
-      "version": "16",
-      "username": "postgres",
-      "password": "postgres",
-      "dbName": "zjx_website"
-    }
-  },
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/site-laravel",
 
   "customizations": {
     "vscode": {
@@ -26,8 +14,6 @@
     }
   },
 
-  // This will now pass because 'zip' is installed in the Dockerfile
-  "postCreateCommand": "composer install && npm install && php artisan key:generate && php artisan migrate --seed",
 
-  "remoteUser": "root"
+  "postCreateCommand": "composer update && composer install && npm install && php artisan key:generate",
 }
