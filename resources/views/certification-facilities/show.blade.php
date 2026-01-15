@@ -16,26 +16,8 @@
                     <td>{{ $facility->identifier }}</td>
                 </tr>
             </table>
-            <table class='table table-compact w-full mt-5'>
-                <thead>
-                    <tr>
-                        <th>Certification Levels</th>
-                        <th>Priority</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                @if(count($facility->certificationLevels) == 0)
-                    <tr>
-                        <td colspan='1'>No certification levels defined.</td>
-                    </tr>
-                @endif
-                @foreach($facility->certificationLevels as $level)
-                    <tr>
-                        <td>{{ $level->name }} ({{ $level->identifier }})</td>
-                        <td>{{ $level->priority }}</td>
-                    </tr>
-                @endforeach
-            </table>
+            
+            @livewire('certification-levels-table', ['facilityId' => $facility->id], key($facility->id))
 
             <form 
             action="{{ route('certification-levels.store', $facility->id) }}" 

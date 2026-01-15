@@ -9,9 +9,9 @@ class CertificationLevelController extends Controller
 {
     public function store(Request $request, int $facilityId) {
         $validated = $request->validate([
-            'level' => 'required|string|max:255',
-            'name' => 'nullable|string',
-            'abbreviation' => 'nullable|string|max:3',
+            'level' => 'required|integer',
+            'name' => 'required|string',
+            'abbreviation' => 'required|string|max:3',
             'default' => 'nullable|boolean',
         ]);
 
@@ -19,10 +19,11 @@ class CertificationLevelController extends Controller
         $certificationLevel->facility_id = $facilityId;
         $certificationLevel->name = $validated['name'];
         $certificationLevel->abbreviation = $validated['abbreviation'] ?? null;
+        $certificationLevel->level = $validated['level'];
         $certificationLevel->save();
 
         // Update default certification level if none exists, or if user wants it to be default
-        if ($certificationLevel->facility->defaultCertificationLevel()->count() == 0 || ($validated['default'] ?? false)) {
+        if ($certificationLevel->facility->defaultCertificationLevel->count() == 0 || ($validated['default'] ?? false)) {
             $certificationLevel->facility->default_certification_level_id = $certificationLevel->id;
             $certificationLevel->facility->save();
         }
