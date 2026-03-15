@@ -80,7 +80,7 @@
 
                             @foreach($instructors as $mentor)
                                 
-                                    href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
+                                    <a href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
                                     class="text-lg hover:underline"
                                 >
                                     {{ $mentor->user->first_name . ' ' . $mentor->user->last_name }}
@@ -100,7 +100,7 @@
 
                             @foreach($mentors as $mentor)
                                 
-                                    href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
+                                    <a href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
                                     class="text-lg hover:underline"
                                 >
                                     {{ $mentor->user->first_name . ' ' . $mentor->user->last_name }}
