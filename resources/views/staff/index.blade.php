@@ -79,10 +79,7 @@
                             @endif
 
                             @foreach($instructors as $mentor)
-                                
-                                    <a href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
-                                    class="text-lg hover:underline"
-                                >
+                                <a href="{{ route('users.show', ['user' => $mentor->user->id]) }}" class="text-lg hover:underline">
                                     {{ $mentor->user->first_name . ' ' . $mentor->user->last_name }}
                                     ({{ $mentor->user->rating->mapToString() }})
                                 </a>
@@ -99,10 +96,7 @@
                             @endif
 
                             @foreach($mentors as $mentor)
-                                
-                                    <a href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
-                                    class="text-lg hover:underline"
-                                >
+                                <a href="{{ route('users.show', ['user' => $mentor->user->id]) }}" class="text-lg hover:underline">
                                     {{ $mentor->user->first_name . ' ' . $mentor->user->last_name }}
                                     ({{ $mentor->user->rating->mapToString() }})
                                 </a>
