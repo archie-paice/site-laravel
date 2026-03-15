@@ -28,7 +28,9 @@
                         <td class='border-r-1 border-base-300'>{{ $event->end }}</td>
                         <td class='border-r-1 border-base-300'>{{ $event->hidden ? 'Yes' : 'No' }}</td>
                         <td class='border-r-1 border-base-300'>
-                            <button class="btn btn-primary">Manage</button>
+                            <a href="{{ route('admin.events.edit', ['event' => $event->id]) }}" class="btn btn-primary">
+                                Manage
+                            </a>
                             <a href="{{ route('admin.events.edit', ['event' => $event->id]) }}" class="btn btn-accent">
                                 Edit
                             </a>

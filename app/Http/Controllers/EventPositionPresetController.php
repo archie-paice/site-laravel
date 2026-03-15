@@ -44,7 +44,7 @@ class EventPositionPresetController extends Controller
             'positions' => $positions,
         ]);
 
-        return redirect()->route('position-presets.index')
+        return redirect()->route('admin.events.position-presets.index')
             ->with('success', 'Preset created successfully.');
     }
 
@@ -84,7 +84,7 @@ class EventPositionPresetController extends Controller
             'positions' => $positions,
         ]);
 
-        return redirect()->route('position-presets.index')
+        return redirect()->route('admin.events.position-presets.index')
             ->with('success', 'Preset updated successfully.');
     }
 
@@ -95,6 +95,6 @@ class EventPositionPresetController extends Controller
     {
         $position = EventPositionPreset::find($id);
         $position->delete();
-        return redirect()->route('position-presets.index')->with('success', 'Preset deleted successfully');
+        return redirect()->route('admin.events.position-presets.index')->with('success', 'Preset deleted successfully');
     }
 }
