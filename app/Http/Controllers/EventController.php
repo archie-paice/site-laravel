@@ -94,6 +94,7 @@ class EventController extends Controller
         return view('manage-events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
     }
 
+
     public function update(Request $request, $id)
     {
         $featuredFields = FeaturedField::pluck('name')->toArray();
