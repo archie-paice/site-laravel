@@ -11,12 +11,8 @@ class CertificationLevel extends Model
         'certification_level',
         'certification_name',
         'abbreviation',
-        'is_default'
     ];
 
-    protected $casts = [
-        'is_default' => 'boolean',
-    ];
 
     public function facility() {
         return $this->belongsTo(CertificationFacility::class, 'facility_id');
