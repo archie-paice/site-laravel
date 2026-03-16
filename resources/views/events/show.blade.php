@@ -10,7 +10,7 @@
             @endif
             <div class="card-body bg-neutral">
                 <h1 class="card-title">
-                    {{ $event->name }}
+                    {{ $event->title }}
                     <div class="badge badge-secondary">{{ $event->type }}</div>
                 </h1>
                 <h2>
