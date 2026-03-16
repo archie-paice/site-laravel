@@ -8,8 +8,8 @@ class CertificationLevel extends Model
 {
     protected $fillable = [
         'facility_id',
-        'certification_level',
-        'certification_name',
+        'level',
+        'name',
         'abbreviation',
     ];
 

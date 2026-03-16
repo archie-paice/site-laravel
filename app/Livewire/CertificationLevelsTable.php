@@ -3,40 +3,41 @@
 namespace App\Livewire;
 
 use App\Models\CertificationFacility;
-use App\Models\CertificationLevel;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class CertificationLevelsTable extends Component
 {
     public CertificationFacility $facility;
-    public bool $editMode = false;
+    public bool $facilityEditMode = false;
 
-    public function mount($facilityId)
+    public function mount(int $facilityId): void
     {
         $this->facility = CertificationFacility::with('certificationLevels')
             ->findOrFail($facilityId);
     }
 
-    public function onEditClick() {
-        $this->editMode = true;
+    #[On('certification-level-saved')]
+    public function handleSaved(): void
+    {
+        $this->refreshLevels();
     }
 
-    public function onDeleteClick($level) {
-        CertificationLevel::destroy($level);
-        return redirect()->back()->with('success', 'Certification level deleted successfully.');
+    #[On('certification-level-deleted')]
+    public function handleDeleted(): void
+    {
+        $this->refreshLevels();
     }
 
-    public function onSaveClick($level) {
-        $certificationLevel = CertificationLevel::findOrFail($level);
-        $certificationLevel->name = request()->input('name');
-        $certificationLevel->abbreviation = request()->input('abbreviation');
-        $certificationLevel->save();
-        $this->editMode = false;
+    public function refreshLevels(): void
+    {
+        $this->facility->refresh();
     }
+
     public function render()
     {
         $this->facility->load([
-            'certificationLevels' => fn ($query) => $query->orderBy('level'),
+            'certificationLevels' => fn ($query) => $query->orderBy('level', 'desc'),
         ]);
 
         return view('livewire.certification-levels-table', [

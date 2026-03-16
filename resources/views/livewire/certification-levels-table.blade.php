@@ -14,8 +14,6 @@
     @endif
 
     @foreach($facility->certificationLevels as $level)
-        <tr>
-            @livewire('certification-level-row', ['certificationLevel' => $level], key($level->id))
-        </tr>
+        @livewire('certification-level-row', ['certificationLevel' => $level], key($level->id))
     @endforeach
 </table>
