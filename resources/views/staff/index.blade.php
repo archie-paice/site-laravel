@@ -79,7 +79,7 @@
                             @endif
 
                             @foreach($instructors as $mentor)
-                                
+
                                     href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
                                     class="text-lg hover:underline"
                                 >
@@ -99,7 +99,7 @@
                             @endif
 
                             @foreach($mentors as $mentor)
-                                
+
                                     href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
                                     class="text-lg hover:underline"
                                 >
@@ -115,7 +115,7 @@
         </div>
 
     </div>
-@endsection@extends('layouts.main')
+@endsection
 
 @section('title', 'ARTCC Staff')
 
@@ -196,7 +196,7 @@
                             @endif
 
                             @foreach($instructors as $mentor)
-                                
+                                <a
                                     href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
                                     class="text-lg hover:underline"
                                 >
@@ -216,7 +216,7 @@
                             @endif
 
                             @foreach($mentors as $mentor)
-                                
+                            <a
                                     href="{{ route('users.show', ['user' => $mentor->user->id]) }}"
                                     class="text-lg hover:underline"
                                 >
