@@ -20,8 +20,8 @@
                 @foreach ($events as $event)
                     <tr>
                         <td class='border-r-1 border-base-300'>
-                            <a href={{ route('events.show', ['event' => $event->id]) }}
-                                class='text-base-content no-underline'>{{ $event->name }}</a>
+                            <a href='{{ route('events.show', ['event' => $event->id]) }}'
+                                class='text-base-content no-underline'>{{ $event->title }}</a>
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $event->type }}</td>
                         <td class='border-r-1 border-base-300'>{{ $event->start }}</td>

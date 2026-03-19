@@ -3,7 +3,7 @@
 @section('title', 'Create Event')
 
 @section('body')
-    <form method="POST" action="{{ route('admin.events.store') }}" class="flex flex-col gap-5">
+    <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data" class="flex flex-col gap-5">
         @csrf
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />
@@ -46,10 +46,9 @@
 
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Banner URL</div>
-            <div class="collapse-content text-sm">
-                <label for="image_url" class="label">Banner URL</label>
-                <input name="image_url" type="url" placeholder="image.jpg" class="input" />
+            <div class="collapse-title font-semibold">Event Banner</div>
+            <div class="collapse-content text-sm items-center">
+                <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
             </div>
         </div>
 

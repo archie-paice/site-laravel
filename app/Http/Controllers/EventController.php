@@ -47,17 +47,14 @@ class EventController extends Controller
             'end' => 'required|date',
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
-            'image_url' => ['nullable', 'url'],
             'presetPositions' => 'nullable|string',
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|required',
         ]);
 
         $presetName = $validated['presetPositions'] ?? null;
         $presetPositions = EventPositionPreset::where('name', $presetName)->first();
         $presetPositions = $presetPositions?->positions;
 
-        // for validated:
-        //   'featured_fields' => ['array'],
-        //  'featured_fields.*' => ['string', Rule::in($featuredFields)],
 
         $featuredFields = explode(', ', $validated['featured_fields']);
         $featuredFields = array_map('trim', $featuredFields);
@@ -70,8 +67,15 @@ class EventController extends Controller
             'type' => $validated['type'],
             'featured_fields' => $featuredFields,
             'presetPositions' => $presetPositions,
-            'image_url' => $validated['image_url'] ?? null,
+            'event_image_route' => null,
         ]);
+
+        if ($request->hasFile('image')) {
+            $imageName = 'event_'.$event->id.'.'.$request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('event', $imageName, 'public');
+            $event->event_image_route = 'storage/'.$path;
+            $event->save();
+        }
 
 
         return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
@@ -107,6 +111,7 @@ class EventController extends Controller
             'type' => [new Enum(EventType::class)],
             'featured_fields' => ['array'],
             'featured_fields.*' => ['string', Rule::in($featuredFields)],
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|required',
         ]);
 
         $event = Event::find($id);

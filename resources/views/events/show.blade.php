@@ -3,9 +3,9 @@
 @section('body')
     <div class="flex flex-col justify-center items-center gap-6">
         <div class="card card-dash bg-base-100 w-xl shadow-sm">
-            @if ($event->image_url)
+            @if ($event->event_image_route)
             <figure>
-                <img src="{{ $event->image_url }}" alt="Shoes" />
+                <img class='' src="{{ asset($event->event_image_route) }}" alt=""/>
             </figure>
             @endif
             <div class="card-body bg-neutral">

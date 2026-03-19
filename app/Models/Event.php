@@ -18,8 +18,8 @@ class Event extends Model
         'type',
         'featured_fields',
         'hidden',
-        'image_url',
         'presetPositions',
+        'event_image_route',
     ];
 
     protected $casts = [
