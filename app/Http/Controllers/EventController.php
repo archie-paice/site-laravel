@@ -7,8 +7,10 @@ use Illuminate\Http\Request;
 use App\Enums\EventType;
 use App\Models\FeaturedField;
 use App\Models\EventPositionPreset;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
 use Illuminate\Validation\Rule;
+use function Psy\debug;
 
 class EventController extends Controller
 {
@@ -109,16 +111,40 @@ class EventController extends Controller
             'start' => 'required|date',
             'end' => 'required|date',
             'type' => [new Enum(EventType::class)],
-            'featured_fields' => ['array'],
-            'featured_fields.*' => ['string', Rule::in($featuredFields)],
-            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|required',
+            'featured_fields' => 'required|string',
         ]);
 
+        $featuredFields = explode(', ', $validated['featured_fields']);
+        $featuredFields = array_map('trim', $featuredFields);
+
+
         $event = Event::find($id);
-        $event->update($validated);
+        $oldImagePath = $event->event_image_route;
+
+        $event->title = $validated['name'];
+        $event->description = $validated['description'];
+        $event->start = $validated['start'];
+        $event->end = $validated['end'];
+        $event->type = $validated['type'];
+        $event->featured_fields = $featuredFields ?? [];
+
+        if ($request->hasFile('image')) {
+            $imageName = 'event_'.$event->id.'.'.$request->file('image')->getClientOriginalExtension();
+            $path = $request->file('image')->storeAs('event', $imageName, 'public');
+
+            $event->event_image_route = 'storage/'.$path;
+
+            // For the sake of storage, delete the old image
+            if ($oldImagePath && $oldImagePath !== $event->event_image_route) {
+                $cleanPath = str_replace('storage/', '', $oldImagePath);
+                Storage::disk('public')->delete($cleanPath);
+            }
+        }
+
+        $event->save();
 
         return redirect()->route('admin.events.index')
-            ->with('success', 'Post updated successfully.');
+            ->with('success', 'Event updated successfully.');
     }
 
     public function destroy($id)

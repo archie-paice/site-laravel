@@ -3,7 +3,7 @@
 @section('title', 'Edit Event')
 
 @section('body')
-    <form method="POST" action="{{ route('admin.events.update', ['event' => $event->id]) }}" class="flex flex-col gap-5">
+    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.events.update', ['event' => $event->id]) }}" class="flex flex-col gap-5">
         @csrf
         @method('PUT')
         <div class="collapse bg-base-100 border border-base-300">
@@ -11,7 +11,7 @@
             <div class="collapse-title font-semibold">Basic Information</div>
             <div class="collapse-content text-sm">
                 <label for="name" class="label">Event Name</label>
-                <input name="name" value="{{ old('name', $event->name) }}" required type="text"
+                <input name="name" value="{{ old('name', $event->title) }}" required type="text"
                     placeholder="Event Name" class="input" />
 
                 <br />
@@ -51,10 +51,9 @@
 
         <div class="collapse bg-base-100 border border-base-300">
             <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Banner Image or URL</div>
+            <div class="collapse-title font-semibold">Banner Image</div>
             <div class="collapse-content text-sm">
-                <label for="image_url" class="label">Banner URL</label>
-                <input name="image_url" type="url" placeholder="image.jpg" value="{{ old('image_url', $event->image_url) }}" class="input"/>
+                <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
             </div>
         </div>
 
