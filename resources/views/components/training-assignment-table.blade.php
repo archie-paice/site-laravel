@@ -1,5 +1,6 @@
 @unless(sizeof($trainingAssignments) == 0)
-    <table class='table table-zebra table-md w-max border-2 border-base-300 mt-5'>
+    <div class="overflow-x-auto">
+    <table class='table table-zebra table-md border-2 border-base-300 mt-5'>
         <thead>
         <tr>
             <th>Student CID</th>
@@ -97,6 +98,7 @@
         @endforeach
         </tbody>
     </table>
+    </div>
 @else
     <h1>There are no training assignments.</h1>
 @endunless
