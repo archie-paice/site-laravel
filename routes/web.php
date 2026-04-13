@@ -29,6 +29,8 @@ use App\Http\Controllers\VisitFacilityController;
 use App\Mail\TrainingAssignmentCreated;
 use App\Http\Controllers\EventPositionController;
 use App\Livewire\EventRegistration;
+use App\Http\Controllers\PublicationsController;
+use App\Http\Controllers\AdminPublicationsController;
 
 # Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -61,6 +63,9 @@ Route::prefix('users/{user}')->group(function() {
 # Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
+# Publications & Downloads
+Route::get('/publications/downloads', [PublicationsController::class, 'index'])->name('publications.index');
+
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
 Route::prefix('events')->name('events.')->group(function () {
@@ -87,6 +92,16 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Facilities Dept.
     Route::middleware('permission:manage statistics prefixes')->group(function() {
         Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
+    });
+
+    # Publications Management (Facilities Dept.)
+    Route::middleware('role:facilities')->prefix('publications')->name('admin.publications.')->group(function () {
+        Route::get('/',            [AdminPublicationsController::class, 'index'])->name('index');
+        Route::get('/create',      [AdminPublicationsController::class, 'create'])->name('create');
+        Route::post('/',           [AdminPublicationsController::class, 'store'])->name('store');
+        Route::get('/{id}/edit',   [AdminPublicationsController::class, 'edit'])->name('edit');
+        Route::put('/{id}',        [AdminPublicationsController::class, 'update'])->name('update');
+        Route::delete('/{id}',     [AdminPublicationsController::class, 'destroy'])->name('destroy');
     });
 
     # Logs

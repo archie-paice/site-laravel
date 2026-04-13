@@ -32,6 +32,22 @@
             </ul>
         </div>
 
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
+                <span>Publications</span>
+                <x-dropdown-icon/>
+            </div>
+            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-64 p-2 shadow-sm">
+                <li><a href="{{ route('publications.index') }}">All Documents</a></li>
+                <li class="menu-title text-xs uppercase tracking-wide pt-2">Categories</li>
+                <li><a href="{{ route('publications.index') }}#sops">Standard Operating Procedures</a></li>
+                <li><a href="{{ route('publications.index') }}#loas">Letters of Agreement</a></li>
+                <li><a href="{{ route('publications.index') }}#training">Training Materials</a></li>
+                <li><a href="{{ route('publications.index') }}#references">Quick Reference Guides</a></li>
+                <li><a href="{{ route('publications.index') }}#maps">Facility Maps & Charts</a></li>
+            </ul>
+        </div>
+
         @hasrole('staff')
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
@@ -94,6 +110,14 @@
             <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
             <li><a href="{{ route('roster.index') }}">Roster</a></li>
             <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+
+            <li class="menu-title text-xs uppercase tracking-wide pt-2">Publications</li>
+            <li><a href="{{ route('publications.index') }}">All Documents</a></li>
+            <li><a href="{{ route('publications.index') }}#sops">SOPs</a></li>
+            <li><a href="{{ route('publications.index') }}#loas">Letters of Agreement</a></li>
+            <li><a href="{{ route('publications.index') }}#training">Training Materials</a></li>
+            <li><a href="{{ route('publications.index') }}#references">Quick Reference Guides</a></li>
+            <li><a href="{{ route('publications.index') }}#maps">Facility Maps & Charts</a></li>
 
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>
