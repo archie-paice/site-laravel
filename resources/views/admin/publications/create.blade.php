@@ -12,7 +12,7 @@
             Back to Documents
         </a>
 
-        <form method="POST" action="{{ route('admin.publications.store') }}" class="flex flex-col gap-5">
+        <form method="POST" action="{{ route('admin.publications.store') }}" enctype="multipart/form-data" class="flex flex-col gap-5">
             @csrf
 
             {{-- Document Details --}}
@@ -58,19 +58,19 @@
                 <div class="collapse-content flex flex-col gap-4">
 
                     <div>
-                        <label for="category" class="label">Category <span class="text-error">*</span></label>
-                        <select id="category"
-                                name="category"
+                        <label for="publication_category_id" class="label">Category <span class="text-error">*</span></label>
+                        <select id="publication_category_id"
+                                name="publication_category_id"
                                 required
-                                class="select select-bordered w-full @error('category') select-error @enderror">
-                            <option disabled {{ old('category') ? '' : 'selected' }}>Select a category</option>
-                            @foreach($categories as $slug => $label)
-                                <option value="{{ $slug }}" {{ old('category') === $slug ? 'selected' : '' }}>
-                                    {{ $label }}
+                                class="select select-bordered w-full @error('publication_category_id') select-error @enderror">
+                            <option value="" disabled {{ old('publication_category_id') ? '' : 'selected' }}>Select a category</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ (int) old('publication_category_id') === $category->id ? 'selected' : '' }}>
+                                    {{ $category->title }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('category')
+                        @error('publication_category_id')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -96,23 +96,22 @@
                 </div>
             </div>
 
-            {{-- File URL --}}
+            {{-- File Upload --}}
             <div class="collapse collapse-open bg-base-100 border border-base-300">
                 <input type="checkbox" checked />
-                <div class="collapse-title font-semibold">File URL</div>
+                <div class="collapse-title font-semibold">File Upload</div>
                 <div class="collapse-content flex flex-col gap-4">
 
                     <div>
-                        <label for="file_url" class="label">Document URL <span class="text-error">*</span></label>
-                        <input id="file_url"
-                               name="file_url"
-                               type="url"
+                        <label for="file" class="label">Document File <span class="text-error">*</span></label>
+                        <input id="file"
+                               name="file"
+                               type="file"
                                required
-                               placeholder="https://..."
-                               value="{{ old('file_url') }}"
-                               class="input input-bordered w-full @error('file_url') input-error @enderror" />
-                        <p class="text-xs text-base-content/50 mt-1">Direct link to the PDF or document file. Must be a publicly accessible URL.</p>
-                        @error('file_url')
+                               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.zip,.gz,.7z,.json,.xml,.txt"
+                               class="file-input file-input-bordered w-full @error('file') file-input-error @enderror" />
+                        <p class="text-xs text-base-content/50 mt-1">Accepted: PDF, Word, Excel, PowerPoint, PNG, JPG, ZIP, JSON, XML, TXT. Max 20 MB.</p>
+                        @error('file')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>

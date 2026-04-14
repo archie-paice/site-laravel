@@ -12,7 +12,7 @@
             Back to Documents
         </a>
 
-        <form method="POST" action="{{ route('admin.publications.update', $document['id']) }}" class="flex flex-col gap-5">
+        <form method="POST" action="{{ route('admin.publications.update', $document->id) }}" enctype="multipart/form-data" class="flex flex-col gap-5">
             @csrf
             @method('PUT')
 
@@ -29,7 +29,7 @@
                                type="text"
                                required
                                placeholder="e.g. ZJX ARTCC SOP"
-                               value="{{ old('name', $document['name']) }}"
+                               value="{{ old('name', $document->name) }}"
                                class="input input-bordered w-full @error('name') input-error @enderror" />
                         @error('name')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
@@ -43,7 +43,7 @@
                                   required
                                   rows="3"
                                   placeholder="Brief description of this document..."
-                                  class="textarea textarea-bordered w-full @error('description') textarea-error @enderror">{{ old('description', $document['description']) }}</textarea>
+                                  class="textarea textarea-bordered w-full @error('description') textarea-error @enderror">{{ old('description', $document->description) }}</textarea>
                         @error('description')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
@@ -59,20 +59,20 @@
                 <div class="collapse-content flex flex-col gap-4">
 
                     <div>
-                        <label for="category" class="label">Category <span class="text-error">*</span></label>
-                        <select id="category"
-                                name="category"
+                        <label for="publication_category_id" class="label">Category <span class="text-error">*</span></label>
+                        <select id="publication_category_id"
+                                name="publication_category_id"
                                 required
-                                class="select select-bordered w-full @error('category') select-error @enderror">
-                            <option disabled>Select a category</option>
-                            @foreach($categories as $slug => $label)
-                                <option value="{{ $slug }}"
-                                    {{ old('category', $document['category']) === $slug ? 'selected' : '' }}>
-                                    {{ $label }}
+                                class="select select-bordered w-full @error('publication_category_id') select-error @enderror">
+                            <option value="" disabled>Select a category</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ (int) old('publication_category_id', $document->publication_category_id) === $category->id ? 'selected' : '' }}>
+                                    {{ $category->title }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('category')
+                        @error('publication_category_id')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
@@ -84,7 +84,7 @@
                                type="text"
                                required
                                placeholder="e.g. v1.0"
-                               value="{{ old('version', $document['version']) }}"
+                               value="{{ old('version', $document->version) }}"
                                class="input input-bordered w-full @error('version') input-error @enderror" />
                         @error('version')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
@@ -94,7 +94,7 @@
                     <div>
                         <label class="label">Updated At (UTC)</label>
                         <div class="input input-bordered w-full flex items-center text-base-content/50 cursor-not-allowed select-none">
-                            {{ \Carbon\Carbon::parse($document['updated_at'])->utc()->format('D, d M Y H:i:s') }} GMT
+                            {{ $document->updated_at->utc()->format('D, d M Y H:i:s') }} GMT
                         </div>
                         <p class="text-xs text-base-content/50 mt-1">Automatically updated when changes are saved.</p>
                     </div>
@@ -102,35 +102,37 @@
                 </div>
             </div>
 
-            {{-- File URL --}}
+            {{-- File Upload --}}
             <div class="collapse collapse-open bg-base-100 border border-base-300">
                 <input type="checkbox" checked />
-                <div class="collapse-title font-semibold">File URL</div>
+                <div class="collapse-title font-semibold">File</div>
                 <div class="collapse-content flex flex-col gap-4">
 
                     <div>
-                        <label for="file_url" class="label">Document URL <span class="text-error">*</span></label>
-                        <input id="file_url"
-                               name="file_url"
-                               type="url"
-                               required
-                               placeholder="https://..."
-                               value="{{ old('file_url', $document['file_url']) }}"
-                               class="input input-bordered w-full @error('file_url') input-error @enderror" />
-                        <p class="text-xs text-base-content/50 mt-1">Direct link to the PDF or document file. Must be a publicly accessible URL.</p>
-                        @error('file_url')
+                        <label class="label">Current File</label>
+                        <div class="flex flex-wrap items-center gap-3">
+                            <a href="{{ $document->file_url }}" target="_blank" class="btn btn-outline btn-sm gap-1.5">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                                </svg>
+                                View Current File
+                            </a>
+                            <span class="text-sm text-base-content/60">{{ $document->original_filename }}</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="file" class="label">Replace File</label>
+                        <input id="file"
+                               name="file"
+                               type="file"
+                               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.zip,.gz,.7z,.json,.xml,.txt"
+                               class="file-input file-input-bordered w-full @error('file') file-input-error @enderror" />
+                        <p class="text-xs text-base-content/50 mt-1">Leave empty to keep the current file. Accepted: PDF, Word, Excel, PowerPoint, PNG, JPG, ZIP, JSON, XML, TXT. Max 20 MB.</p>
+                        @error('file')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
                     </div>
-
-                    @if($document['file_url'] && $document['file_url'] !== '#')
-                        <a href="{{ $document['file_url'] }}" target="_blank" class="btn btn-outline btn-sm w-fit gap-1.5">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                            View Current File
-                        </a>
-                    @endif
 
                 </div>
             </div>
@@ -150,9 +152,9 @@
                         <p class="font-medium">Delete this document</p>
                         <p class="text-sm text-base-content/60">Permanently removes this document from the publications list.</p>
                     </div>
-                    <form action="{{ route('admin.publications.destroy', $document['id']) }}"
+                    <form action="{{ route('admin.publications.destroy', $document->id) }}"
                           method="POST"
-                          onsubmit="return confirm('Delete \'{{ addslashes($document['name']) }}\'? This cannot be undone.')">
+                          onsubmit="return confirm('Delete \'{{ addslashes($document->name) }}\'? This cannot be undone.')">
                         @csrf
                         @method('DELETE')
                         <button type="submit" class="btn btn-error btn-sm shrink-0">Delete Document</button>

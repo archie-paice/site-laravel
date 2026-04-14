@@ -1,3 +1,7 @@
+@php
+    $publicationCategories = \App\Models\PublicationCategory::forNavbar();
+@endphp
+
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20 px-3 sm:px-5">
     {{-- Logo + Home --}}
     <div class="flex-1 min-w-0">
@@ -39,12 +43,12 @@
             </div>
             <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-64 p-2 shadow-sm">
                 <li><a href="{{ route('publications.index') }}">All Documents</a></li>
-                <li class="menu-title text-xs uppercase tracking-wide pt-2">Categories</li>
-                <li><a href="{{ route('publications.index') }}#sops">Standard Operating Procedures</a></li>
-                <li><a href="{{ route('publications.index') }}#loas">Letters of Agreement</a></li>
-                <li><a href="{{ route('publications.index') }}#training">Training Materials</a></li>
-                <li><a href="{{ route('publications.index') }}#references">Quick Reference Guides</a></li>
-                <li><a href="{{ route('publications.index') }}#maps">Facility Maps & Charts</a></li>
+                @if($publicationCategories->isNotEmpty())
+                    <li class="menu-title text-xs uppercase tracking-wide pt-2">Categories</li>
+                    @foreach($publicationCategories as $publicationCategory)
+                        <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
+                    @endforeach
+                @endif
             </ul>
         </div>
 
@@ -113,11 +117,9 @@
 
             <li class="menu-title text-xs uppercase tracking-wide pt-2">Publications</li>
             <li><a href="{{ route('publications.index') }}">All Documents</a></li>
-            <li><a href="{{ route('publications.index') }}#sops">SOPs</a></li>
-            <li><a href="{{ route('publications.index') }}#loas">Letters of Agreement</a></li>
-            <li><a href="{{ route('publications.index') }}#training">Training Materials</a></li>
-            <li><a href="{{ route('publications.index') }}#references">Quick Reference Guides</a></li>
-            <li><a href="{{ route('publications.index') }}#maps">Facility Maps & Charts</a></li>
+            @foreach($publicationCategories as $publicationCategory)
+                <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
+            @endforeach
 
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>

@@ -31,6 +31,7 @@ use App\Http\Controllers\EventPositionController;
 use App\Livewire\EventRegistration;
 use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\AdminPublicationsController;
+use App\Http\Controllers\AdminPublicationCategoriesController;
 
 # Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -99,6 +100,16 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::get('/',            [AdminPublicationsController::class, 'index'])->name('index');
         Route::get('/create',      [AdminPublicationsController::class, 'create'])->name('create');
         Route::post('/',           [AdminPublicationsController::class, 'store'])->name('store');
+
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/',            [AdminPublicationCategoriesController::class, 'index'])->name('index');
+            Route::get('/create',      [AdminPublicationCategoriesController::class, 'create'])->name('create');
+            Route::post('/',           [AdminPublicationCategoriesController::class, 'store'])->name('store');
+            Route::get('/{id}/edit',   [AdminPublicationCategoriesController::class, 'edit'])->name('edit');
+            Route::put('/{id}',        [AdminPublicationCategoriesController::class, 'update'])->name('update');
+            Route::delete('/{id}',     [AdminPublicationCategoriesController::class, 'destroy'])->name('destroy');
+        });
+
         Route::get('/{id}/edit',   [AdminPublicationsController::class, 'edit'])->name('edit');
         Route::put('/{id}',        [AdminPublicationsController::class, 'update'])->name('update');
         Route::delete('/{id}',     [AdminPublicationsController::class, 'destroy'])->name('destroy');
