@@ -1,8 +1,9 @@
-@extends('layouts.admin')
+@extends(Auth::user()->hasRole('training') ? 'layouts.admin' : 'layouts.main')
 
 @section('title', 'Training Ticket - #'.$trainingTicket->id)
 
 @section('body')
+    <a href="{{ Auth::user()->hasRole('training') ? route('training-tickets.index') : route('users.show.training-tickets', $trainingTicket->user_id) }}" class="btn btn-ghost mb-4">&larr; Back</a>
     <div class="card card-body bg-base-300 w-full max-w-3xl">
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
             <x-label label="Session Date" :value="$trainingTicket->session_start"/>
