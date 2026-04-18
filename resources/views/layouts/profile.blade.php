@@ -11,23 +11,23 @@
                     @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show')])
                     >General Info</a>
 
-                    @role('training')
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.training-tickets", $user) }}' 
+                    @if(Auth::id() == $user->id || Auth::user()->hasRole('training'))
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.training-tickets", $user) }}'
                     @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.training-tickets')])
                     >Training Tickets</a>
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.training-assignments", $user) }}' 
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.training-assignments", $user) }}'
                     @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.training-assignments')])
                     >Training Assignments</a>
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.solo-certs", $user) }}' 
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.solo-certs", $user) }}'
                     @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.solo-certs')])
                     >Solo Certs</a>
-                    @endrole
+                    @endif
                 </div>
                 
             </div>
