@@ -1,5 +1,6 @@
 @php
     $publicationCategories = \App\Models\PublicationCategory::forNavbar();
+    $mobilePublicationCategories = \App\Models\PublicationCategory::forMobileNav();
 @endphp
 
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20 px-3 sm:px-5">
@@ -117,7 +118,7 @@
 
             <li class="menu-title text-xs uppercase tracking-wide pt-2">Publications</li>
             <li><a href="{{ route('publications.index') }}">All Documents</a></li>
-            @foreach($publicationCategories as $publicationCategory)
+            @foreach($mobilePublicationCategories as $publicationCategory)
                 <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
             @endforeach
 

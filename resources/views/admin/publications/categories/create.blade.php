@@ -56,6 +56,16 @@
                         @error('display_order')<p class="text-error text-sm mt-1">{{ $message }}</p>@enderror
                     </div>
 
+                    <div class="flex items-center gap-3">
+                        <input id="show_in_nav"
+                               name="show_in_nav"
+                               type="checkbox"
+                               value="1"
+                               class="checkbox"
+                               {{ old('show_in_nav', true) ? 'checked' : '' }} />
+                        <label for="show_in_nav" class="label cursor-pointer">Show in mobile nav menu</label>
+                    </div>
+
                 </div>
             </div>
 

@@ -108,6 +108,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
             Route::get('/{id}/edit',   [AdminPublicationCategoriesController::class, 'edit'])->name('edit');
             Route::put('/{id}',        [AdminPublicationCategoriesController::class, 'update'])->name('update');
             Route::delete('/{id}',     [AdminPublicationCategoriesController::class, 'destroy'])->name('destroy');
+            Route::patch('/{id}/toggle-nav', [AdminPublicationCategoriesController::class, 'toggleNav'])->name('toggle-nav');
         });
 
         Route::get('/{id}/edit',   [AdminPublicationsController::class, 'edit'])->name('edit');

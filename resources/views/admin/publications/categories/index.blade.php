@@ -44,6 +44,10 @@
                                 <th>Title</th>
                                 <th>Documents</th>
                                 <th>Description</th>
+                                <th>
+                                    In Mobile Nav Menu
+                                    <p class="text-xs font-normal normal-case opacity-50 mt-0.5">Click to show/hide</p>
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -56,6 +60,18 @@
                                         <span class="badge badge-outline badge-sm">{{ $category->publications_count }}</span>
                                     </td>
                                     <td class="border-r border-base-300 text-sm max-w-xs">{{ $category->description }}</td>
+                                    <td class="border-r border-base-300">
+                                        <form action="{{ route('admin.publications.categories.toggle-nav', $category->id) }}"
+                                              method="POST" class="inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit"
+                                                    class="badge {{ $category->show_in_nav ? 'badge-success' : 'badge-ghost' }} badge-sm cursor-pointer border-0"
+                                                    title="{{ $category->show_in_nav ? 'Visible — click to hide' : 'Hidden — click to show' }}">
+                                                {{ $category->show_in_nav ? 'Visible' : 'Hidden' }}
+                                            </button>
+                                        </form>
+                                    </td>
                                     <td>
                                         <div class="flex flex-wrap gap-2">
                                             <a href="{{ route('admin.publications.categories.edit', $category->id) }}"

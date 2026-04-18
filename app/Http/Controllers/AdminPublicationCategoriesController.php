@@ -32,6 +32,8 @@ class AdminPublicationCategoriesController extends Controller
         $target = (int) $validated['display_order'];
         unset($validated['display_order']);
 
+        $validated['show_in_nav'] = $request->boolean('show_in_nav', true);
+
         $new = PublicationCategory::create(array_merge($validated, [
             'display_order' => PublicationCategory::count() + 1,
         ]));
@@ -57,6 +59,8 @@ class AdminPublicationCategoriesController extends Controller
         $target = (int) $validated['display_order'];
         unset($validated['display_order']);
 
+        $validated['show_in_nav'] = $request->boolean('show_in_nav');
+
         $category->update($validated);
 
         PublicationCategory::repositionAndNormalize($category->id, $target);
@@ -64,6 +68,16 @@ class AdminPublicationCategoriesController extends Controller
         return redirect()
             ->route('admin.publications.categories.index')
             ->with('success', 'Category updated successfully.');
+    }
+
+    public function toggleNav(int $id)
+    {
+        $category = PublicationCategory::findOrFail($id);
+        $category->update(['show_in_nav' => ! $category->show_in_nav]);
+
+        return redirect()
+            ->route('admin.publications.categories.index')
+            ->with('success', "'{$category->title}' navbar visibility updated.");
     }
 
     public function destroy(int $id)

@@ -16,7 +16,7 @@ class PublicationCategory extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['title', 'description', 'display_order'])
+            ->logOnly(['title', 'description', 'display_order', 'show_in_nav'])
             ->logOnlyDirty();
     }
 
@@ -27,6 +27,11 @@ class PublicationCategory extends Model
         'title',
         'description',
         'display_order',
+        'show_in_nav',
+    ];
+
+    protected $casts = [
+        'show_in_nav' => 'boolean',
     ];
 
     public function publications(): HasMany
@@ -34,10 +39,22 @@ class PublicationCategory extends Model
         return $this->hasMany(Publication::class);
     }
 
+    public const MOBILE_NAV_CACHE_KEY = 'navbar.publication_categories.mobile';
+
     public static function forNavbar()
     {
         return Cache::rememberForever(self::NAV_CACHE_KEY, function () {
             return self::orderBy('display_order')
+                ->orderBy('title')
+                ->get(['id', 'title']);
+        });
+    }
+
+    public static function forMobileNav()
+    {
+        return Cache::rememberForever(self::MOBILE_NAV_CACHE_KEY, function () {
+            return self::where('show_in_nav', true)
+                ->orderBy('display_order')
                 ->orderBy('title')
                 ->get(['id', 'title']);
         });
@@ -94,11 +111,15 @@ class PublicationCategory extends Model
         }
 
         Cache::forget(self::NAV_CACHE_KEY);
+        Cache::forget(self::MOBILE_NAV_CACHE_KEY);
     }
 
     protected static function booted(): void
     {
-        $flush = fn () => Cache::forget(self::NAV_CACHE_KEY);
+        $flush = function () {
+            Cache::forget(self::NAV_CACHE_KEY);
+            Cache::forget(self::MOBILE_NAV_CACHE_KEY);
+        };
 
         static::saved($flush);
         static::deleted($flush);
