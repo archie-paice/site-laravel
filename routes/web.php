@@ -1,34 +1,32 @@
 <?php
 
 use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\Events\EventController;
+use App\Http\Controllers\Events\EventFieldController;
+use App\Http\Controllers\Events\EventPositionPresetController;
+use App\Http\Controllers\Events\EventManagementController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\VisitFacilityController;
 use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
-use App\Mail\TrainingAssignmentUpdated;
+use App\Livewire\EventRegistration;
+use App\Mail\TrainingAssignmentCreated;
 use App\Mail\Welcome;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventPositionPresetController;
-use App\Http\Controllers\EventFieldController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\ManageEventController;
-use App\Http\Controllers\VisitFacilityController;
-use App\Mail\TrainingAssignmentCreated;
-use App\Http\Controllers\EventPositionController;
-use App\Livewire\EventRegistration;
 
 # Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -108,12 +106,12 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     Route::prefix('/events')->middleware('permission:manage events')->group(function () {
         Route::resource('event-fields', EventFieldController::class)->names('admin.events.event-fields');
         Route::resource('position-presets', EventPositionPresetController::class)->names('admin.events.position-presets');
-        Route::get('/', [EventController::class, 'manage'])->name('admin.events.index');
-        Route::get('create', [EventController::class, 'create'])->name('admin.events.create');
-        Route::post('/', [EventController::class, 'store'])->name('admin.events.store');
-        Route::get('{event}/edit', [EventController::class, 'edit'])->name('admin.events.edit');
-        Route::put('{event}', [EventController::class, 'update'])->name('admin.events.update');
-        Route::delete('{event}', [EventController::class, 'destroy'])->name('admin.events.destroy');
+        Route::get('/', [EventManagementController::class, 'index'])->name('admin.events.index');
+        Route::get('create', [EventManagementController::class, 'create'])->name('admin.events.create');
+        Route::post('/', [EventManagementController::class, 'store'])->name('admin.events.store');
+        Route::get('{event}/edit', [EventManagementController::class, 'edit'])->name('admin.events.edit');
+        Route::put('{event}', [EventManagementController::class, 'update'])->name('admin.events.update');
+        Route::delete('{event}', [EventManagementController::class, 'destroy'])->name('admin.events.destroy');
     });
 });
 

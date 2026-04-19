@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
-use Illuminate\Http\Request;
+namespace App\Http\Controllers\Events;
+use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventPosition;
+use Illuminate\Http\Request;
 
 class EventPositionAssignmentController extends Controller
 {

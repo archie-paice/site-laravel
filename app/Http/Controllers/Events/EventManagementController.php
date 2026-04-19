@@ -1,29 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Events;
 
-use App\Models\Event;
-use Illuminate\Http\Request;
 use App\Enums\EventType;
-use App\Models\FeaturedField;
+use App\Models\Event;
 use App\Models\EventPositionPreset;
+use App\Models\FeaturedField;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
-use Illuminate\Validation\Rule;
-use function Psy\debug;
 
-class EventController extends Controller
+class EventManagementController
 {
-    public function manage()
-    {
-        $events = Event::all();
-        return view('manage-events.index', ['events' => $events]);
-    }
 
     public function index() {
-        // perform some sort of calculation here to determine the next 3 upcoming events and then pass them to the view
-        $events = Event::where('start', '>=', now())->orderBy('start', 'asc')->take(3)->get();
-        return view('events.index', ['events' => $events]);
+        $events = Event::all();
+        return view('manage-events.index', ['events' => $events]);
     }
 
     public function create()
@@ -83,14 +75,6 @@ class EventController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
     }
 
-
-    public function show(string $id)
-    {
-        $event = Event::findOrFail($id);
-
-        return view('events.show', ['event' => $event]);
-    }
-
     public function edit($id)
     {
         $event = Event::find($id);
@@ -99,7 +83,6 @@ class EventController extends Controller
 
         return view('manage-events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
     }
-
 
     public function update(Request $request, $id)
     {
