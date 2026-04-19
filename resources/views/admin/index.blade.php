@@ -19,7 +19,13 @@
             </x-card-component>
         @endrole
 
-        @role('facilities')
+        @role('admin')
+        <x-card-component title="Web Quick Links">
+            <a class='btn btn-primary mt-5' href="{{ route('admin.contributors.index') }}">Manage Contributors</a>
+        </x-card-component>
+    @endrole
+
+    @role('facilities')
             <x-card-component title="Facilities Quick Links">
                 <a class='btn btn-primary mt-5' href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a>
                 <a class='btn btn-primary' href="{{ route('statistics-prefixes.index') }}">Document Management</a>

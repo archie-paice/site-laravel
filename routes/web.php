@@ -4,6 +4,8 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\Admin\ManualContributorController;
+use App\Http\Controllers\ContributorsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
@@ -32,6 +34,9 @@ use App\Livewire\EventRegistration;
 
 # Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+# Contributors
+Route::get('/contributors', [ContributorsController::class, 'index'])->name('contributors.index');
 
 # Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
@@ -82,6 +87,13 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
         Route::put('visit-requests/{visitRequest}/approve', [VisitFacilityController::class, 'approve'])->name('visit.approve');
         Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])->name('visit.deny');
+    });
+
+    # Contributors
+    Route::middleware('role:admin')->group(function() {
+        Route::get('contributors', [ManualContributorController::class, 'index'])->name('admin.contributors.index');
+        Route::post('contributors', [ManualContributorController::class, 'store'])->name('admin.contributors.store');
+        Route::delete('contributors/{contributor}', [ManualContributorController::class, 'destroy'])->name('admin.contributors.destroy');
     });
 
     # Facilities Dept.
