@@ -2,20 +2,24 @@
 
 namespace App\Livewire;
 use App\Models\Event;
+use App\Models\EventPosition;
 use Illuminate\Database\Eloquent\Collection;
 
 use Livewire\Component;
 
 class EventRegistrants extends Component
 {
-    private Collection $registrants;
+    public Collection $registrants;
+    public Event $event;
 
-    public function mount() {
-        $this->registrants = EventRegistrants::all();
+
+    public function mount(Event $event) {
+        $this->event = $event;
+        $this->registrants = EventPosition::with('user')->where('event_id', $event->id)->get();
     }
 
     public function render()
     {
-        return view('livewire.event-registrants', ['registrants' => $this->registrants]);
+        return view('livewire.event-registrants');
     }
 }

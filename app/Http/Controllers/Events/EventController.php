@@ -18,7 +18,7 @@ class EventController extends Controller
         $events = Event::where('start', '>=', now())->orderBy('start', 'asc')->take(3)->get();
         return view('events.index', ['events' => $events]);
     }
-    
+
     public function show(string $id)
     {
         $event = Event::findOrFail($id);

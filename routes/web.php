@@ -107,6 +107,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::resource('event-fields', EventFieldController::class)->names('admin.events.event-fields');
         Route::resource('position-presets', EventPositionPresetController::class)->names('admin.events.position-presets');
         Route::get('/', [EventManagementController::class, 'index'])->name('admin.events.index');
+        Route::get('{event}/manage', [EventManagementController::class, 'manage'])->name('admin.events.manage');
         Route::get('create', [EventManagementController::class, 'create'])->name('admin.events.create');
         Route::post('/', [EventManagementController::class, 'store'])->name('admin.events.store');
         Route::get('{event}/edit', [EventManagementController::class, 'edit'])->name('admin.events.edit');

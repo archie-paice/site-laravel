@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Events;
 
 use App\Enums\EventType;
+use App\Livewire\EventRegistrants;
 use App\Models\Event;
+use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
 use Illuminate\Http\Request;
@@ -15,7 +17,14 @@ class EventManagementController
 
     public function index() {
         $events = Event::all();
-        return view('manage-events.index', ['events' => $events]);
+        return view('events.admin', ['events' => $events]);
+    }
+
+    public function manage(string $id) {
+        $event = Event::findorFail($id);
+        $registrants = EventPosition::where('event_id', $event->id)->get();
+
+        return view ('events.manage', compact('event', 'registrants'));
     }
 
     public function create()
@@ -25,7 +34,7 @@ class EventManagementController
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
 
-        return view('manage-events.create', [
+        return view('events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
             'presetPositions' => $presetPositions,
@@ -81,7 +90,7 @@ class EventManagementController
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
 
-        return view('manage-events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
+        return view('events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
     }
 
     public function update(Request $request, $id)
