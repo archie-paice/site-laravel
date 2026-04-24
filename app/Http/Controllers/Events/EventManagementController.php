@@ -23,8 +23,14 @@ class EventManagementController
     public function manage(string $id) {
         $event = Event::findorFail($id);
         $registrants = EventPosition::where('event_id', $event->id)->get();
+        $mostRequestedPosition = $registrants
+            ->groupBy('requested_position')
+            ->map(fn($group) => $group->count())
+            ->sortDesc()
+            ->keys()
+            ->first();
 
-        return view ('events.manage', compact('event', 'registrants'));
+        return view ('events.manage', compact('event', 'registrants', 'mostRequestedPosition'));
     }
 
     public function create()
