@@ -1,3 +1,8 @@
+@php
+    $publicationCategories = \App\Models\PublicationCategory::forNavbar();
+    $mobilePublicationCategories = \App\Models\PublicationCategory::forMobileNav();
+@endphp
+
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20 px-3 sm:px-5">
     {{-- Logo + Home --}}
     <div class="flex-1 min-w-0">
@@ -29,6 +34,22 @@
                 <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
                 <li><a href="{{ route('roster.index') }}">Roster</a></li>
                 <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+            </ul>
+        </div>
+
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
+                <span>Publications</span>
+                <x-dropdown-icon/>
+            </div>
+            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-64 p-2 shadow-sm">
+                <li><a href="{{ route('publications.index') }}">All Documents</a></li>
+                @if($publicationCategories->isNotEmpty())
+                    <li class="menu-title text-xs uppercase tracking-wide pt-2">Categories</li>
+                    @foreach($publicationCategories as $publicationCategory)
+                        <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
+                    @endforeach
+                @endif
             </ul>
         </div>
 
@@ -94,6 +115,12 @@
             <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
             <li><a href="{{ route('roster.index') }}">Roster</a></li>
             <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+
+            <li class="menu-title text-xs uppercase tracking-wide pt-2">Publications</li>
+            <li><a href="{{ route('publications.index') }}">All Documents</a></li>
+            @foreach($mobilePublicationCategories as $publicationCategory)
+                <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
+            @endforeach
 
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>

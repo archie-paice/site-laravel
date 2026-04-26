@@ -22,7 +22,7 @@
         @role('facilities')
             <x-card-component title="Facilities Quick Links">
                 <a class='btn btn-primary mt-5' href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a>
-                <a class='btn btn-primary' href="{{ route('statistics-prefixes.index') }}">Document Management</a>
+                <a class='btn btn-primary' href="{{ route('admin.publications.index') }}">Document Management</a>
             </x-card-component>
         @endrole
 
