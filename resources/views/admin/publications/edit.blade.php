@@ -128,7 +128,7 @@
                                type="file"
                                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.zip,.gz,.7z,.json,.xml,.txt"
                                class="file-input file-input-bordered w-full @error('file') file-input-error @enderror" />
-                        <p class="text-xs text-base-content/50 mt-1">Leave empty to keep the current file. Accepted: PDF, Word, Excel, PowerPoint, PNG, JPG, ZIP, JSON, XML, TXT. Max 20 MB.</p>
+                        <p class="text-xs text-base-content/50 mt-1">Leave empty to keep the current file. Accepted: PDF, Word, Excel, PowerPoint, PNG, JPG, ZIP, JSON, XML, TXT. Max 10 MB.</p>
                         @error('file')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
