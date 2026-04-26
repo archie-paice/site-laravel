@@ -25,10 +25,11 @@
                 <span>Controllers</span>
                 <x-dropdown-icon/>
             </div>
-            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-sm">
+            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-sm">
                 <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
                 <li><a href="{{ route('roster.index') }}">Roster</a></li>
                 <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+                <li><a href="{{ route('statistics.index') }}">Statistics</a></li>
             </ul>
         </div>
 
@@ -94,6 +95,7 @@
             <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
             <li><a href="{{ route('roster.index') }}">Roster</a></li>
             <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+            <li><a href="{{ route('statistics.index') }}">Statistics</a></li>
 
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>

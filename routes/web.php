@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;
@@ -60,6 +61,9 @@ Route::prefix('users/{user}')->group(function() {
 
 # Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
+
+# Controller Statistics
+Route::get('controllers/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');

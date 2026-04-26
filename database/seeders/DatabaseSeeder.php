@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
     /**
      * Seed the application's database.
      */
-    public function run(PermissionSeeder $permissionSeeder, UserSeeder $userSeeder, StatisticsPrefixesSeeder $statisticsPrefixes): void
+    public function run(PermissionSeeder $permissionSeeder, UserSeeder $userSeeder, StatisticsPrefixesSeeder $statisticsPrefixes, StatsSyncSeeder $statsSyncSeeder): void
     {
         $permissionSeeder->run();
         $userSeeder->run();
@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
 
         if (App::environment() === 'development') {
             SyncRoster::dispatch();
+            $statsSyncSeeder->run();
         }
     }
 }
