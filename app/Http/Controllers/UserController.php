@@ -28,7 +28,7 @@ class UserController extends Controller
         if ($authenticatedUser->id != $user->id && !$authenticatedUser->hasPermissionTo('manage users')) {
             return response('Unauthorized', 403);
         }
-        
+
         return view('users.edit', ['user'=> $user]);
     }
 
@@ -50,7 +50,7 @@ class UserController extends Controller
         if ($request->hasFile('image')) {
             $imageName = 'profile_'.$user->id.'.'.$request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('profile', $imageName, 'public');
-    
+
             $user->profile_image_route = 'storage/'.$path;
         }
 
@@ -97,6 +97,20 @@ class UserController extends Controller
         return view('users.training-tickets', [
             'user' => $user,
             'trainingTickets' => $trainingTickets
+        ]);
+    }
+
+    public function registeredEvents(int $id) {
+        $user = User::findorFail($id);
+
+        $registeredEvents = $user->events()
+            ->withPivot('requested_position', 'start', 'end', 'position_status')
+            ->paginate(25, ['*'], 'eventsPage');
+
+        return view('users.registered-events', [
+            'user' => $user,
+            'userId' => $user->id,
+            'registeredEvents' => $registeredEvents,
         ]);
     }
 

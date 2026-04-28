@@ -14,7 +14,7 @@
                     <div class="badge badge-secondary">{{ $event->type }}</div>
                 </h1>
                 <h2>
-                    {{ $event->start }} - {{ $event->end }}
+                    {{ $event->getFormattedRangeAttribute() }}
                 </h2>
                 @if ($event->featured_fields)
                     <p>{{ implode(', ', $event->featured_fields) }}</p>

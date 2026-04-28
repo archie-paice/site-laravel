@@ -34,5 +34,9 @@ class Event extends Model
     public function positionRequests() {
         return $this->hasMany(EventPosition::class);
     }
+
+    public function getFormattedRangeAttribute() {
+        return $this->start?->utc()->format('m/d/Y H:i:s') . 'z - ' . $this->end?->utc()->format('m/d/Y H:i:s') . 'z';
+    }
 }
 

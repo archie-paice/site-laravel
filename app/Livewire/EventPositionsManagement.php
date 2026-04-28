@@ -24,12 +24,32 @@ class EventPositionsManagement extends Component
 
     public function save()
     {
-        $positions = collect(explode(',', $this->positions))
+        $newPositions = collect(explode(',', $this->positions))
             ->map(fn ($position) => strtoupper(trim($position)))
             ->filter()
             ->unique()
-            ->values()
-            ->toArray();
+            ->values();
+
+        $oldPositions = collect($this->event->presetPositions ?? []);
+        $removedPositions = $oldPositions->diff($newPositions);
+
+        $assignedRemovedPositions = EventPosition::where('event_id', $this->event->id)
+            ->whereIn('assigned_position', $removedPositions)
+            ->whereNotNull('assigned_position')
+            ->pluck('assigned_position')
+            ->unique()
+            ->values();
+
+        if ($assignedRemovedPositions->isNotEmpty()) {
+            $this->addError(
+                'positions',
+                'Cannot remove assigned position(s): ' . $assignedRemovedPositions->implode(', ')
+            );
+
+            return;
+        }
+
+        $positions = $newPositions->toArray();
 
         $this->event->update([
             'presetPositions' => $positions,

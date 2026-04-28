@@ -188,7 +188,7 @@ class User extends Authenticatable
 
     public function events() {
         return $this->belongsToMany(Event::class, 'event_positions')
-                    ->withPivot('requested_position', 'start', 'end', 'note', 'position_status')
+                    ->withPivot('requested_position', 'start', 'end', 'notes', 'position_status', 'position_status')
                     ->withTimestamps();
     }
 }

@@ -52,6 +52,7 @@ Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'upd
 Route::prefix('users/{user}')->group(function() {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
+    Route::get('registered-events', [UserController::class, 'registeredEvents'])->name('users.show.registered-events');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->name('users.show.solo-certs');
 });

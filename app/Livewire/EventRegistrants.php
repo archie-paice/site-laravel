@@ -4,6 +4,7 @@ namespace App\Livewire;
 use App\Models\Event;
 use App\Models\EventPosition;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Validation\ValidationException;
 
 use Livewire\Component;
 
@@ -12,11 +13,64 @@ class EventRegistrants extends Component
     public Collection $registrants;
     public Event $event;
     public array $positions = [];
+    public array $assignments = [];
+    public ?int $currentRegistrantId = null;
+
+    public bool $success = false;
 
     public function mount(Event $event) {
         $this->event = $event;
         $this->registrants = EventPosition::with('user')->where('event_id', $event->id)->get();
         $this->positions = $event->presetPositions ?? [];
+
+        foreach ($this->registrants as $registrant) {
+            $this->assignments[$registrant->id] = [
+                'assigned_start' => $registrant->assigned_start,
+                'assigned_end' => $registrant->assigned_end,
+                'assigned_position' => $registrant->assigned_position,
+            ];
+        }
+    }
+
+    public function dismissErrors() {
+        $this->resetValidation();
+        $this->currentRegistrantId = null;
+    }
+
+    public function save($id) {
+        $this->currentRegistrantId = $id;
+
+        $this->validate([
+            "assignments.$id.assigned_start" => ['required', 'date'],
+            "assignments.$id.assigned_end" => ['required', 'date', "after:assignments.$id.assigned_start"],
+            "assignments.$id.assigned_position" => ['required', 'string'],
+        ], [
+            "assignments.$id.assigned_start.required" => 'Assigned start is required.',
+            "assignments.$id.assigned_start.date" => 'Assigned start must be a valid date.',
+
+            "assignments.$id.assigned_end.required" => 'Assigned end is required.',
+            "assignments.$id.assigned_end.date" => 'Assigned end must be a valid date.',
+            "assignments.$id.assigned_end.after" => 'Assigned end must be after assigned start.',
+
+            "assignments.$id.assigned_position.required" => 'Assigned position is required.',
+        ]);
+
+
+
+        $data = $this->assignments[$id] ?? [] ?? null;
+
+        if (!$data) return;
+
+        $registrant = EventPosition::findOrFail($id);
+
+        $registrant->assigned_start = $data['assigned_start'] ?? null;
+        $registrant->assigned_end = $data['assigned_end'] ?? null;
+        $registrant->assigned_position = $data['assigned_position'] ?? null;
+        $registrant->position_status = 'assigned';
+
+        $registrant->save();
+
+        $this->success = true;
     }
 
     public function render()
