@@ -1,19 +1,21 @@
 {
-  "name": "Laravel Dev Environment",
-  
+  "name": "zjx-laravel-dev",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspaces/site-laravel",
-
+  "workspaceFolder": "/workspaces/zjx-laravel",
+  "remoteUser": "vscode",
+  "updateRemoteUserUID": true,
+  "forwardPorts": [8000, 5173, 5432],
+  "shutdownAction": "stopCompose",
+  "postCreateCommand": "composer install && npm install",
   "customizations": {
     "vscode": {
       "extensions": [
         "bmewburn.vscode-intelephense-client",
-        "mikestead.dotenv"
+        "xdebug.php-debug",
+        "esbenp.prettier-vscode",
+        "Vue.volar"
       ]
     }
-  },
-
-
-  "postCreateCommand": "composer update && composer install && npm install && php artisan key:generate",
+  }
 }

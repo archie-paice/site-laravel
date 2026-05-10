@@ -1,35 +1,23 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: ..
       dockerfile: .devcontainer/Dockerfile
     volumes:
-      - ..:/workspaces/site-laravel:cached
+      - ..:/workspaces/zjx-laravel:cached,z
     command: sleep infinity
     depends_on:
-      - postgres
-    environment:
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_DATABASE: zjx_website
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
-    ports:
-      - "5173:5173"
+      - db
 
-  postgres:
-    image: postgres:16-alpine
+  db:
+    image: postgres:18
     restart: unless-stopped
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: zjx_website
+      POSTGRES_DB: laravel
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: laravel
     volumes:
-      - postgres-data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
+      - pgdata:/var/lib/postgresql/data
 
 volumes:
-  postgres-data:
+  pgdata:
