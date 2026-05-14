@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SyncStatsimSessions;
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
 use App\Models\User;
@@ -10,14 +11,42 @@ use Illuminate\Support\Carbon;
 
 class StatisticsController extends Controller
 {
+    public function sync(Request $request)
+    {
+        $request->validate([
+            'from_year'  => 'required|integer|min:2000|max:2100',
+            'from_month' => 'required|integer|min:1|max:12',
+            'to_year'    => 'required|integer|min:2000|max:2100',
+            'to_month'   => 'required|integer|min:1|max:12',
+        ]);
+
+        $from = Carbon::create($request->from_year, $request->from_month, 1)->startOfMonth();
+        $to   = Carbon::create($request->to_year, $request->to_month, 1)->startOfMonth();
+
+        if ($from->greaterThan($to)) {
+            return back()->withErrors(['from' => 'Start date must be before or equal to end date.']);
+        }
+
+        $count = 0;
+        $cursor = $from->copy();
+        while ($cursor->lessThanOrEqualTo($to)) {
+            SyncStatsimSessions::dispatch($cursor->year, $cursor->month);
+            $cursor->addMonthNoOverflow();
+            $count++;
+        }
+
+        return back()->with('success', "Queued sync for {$count} month(s): {$from->format('M Y')} – {$to->format('M Y')}.");
+    }
+
     public function index(Request $request)
     {
         $now   = Carbon::now();
-        $year  = (int) $request->query('year', $now->year);
+        $yearParam = $request->query('year', $now->year);
+        $year  = ($yearParam === 'all' || (int) $yearParam === 0) ? 0 : (int) $yearParam;
         $month = $request->query('month', $now->month);
         $cid   = $request->query('cid');
 
-        if ($year < 2000 || $year > 2100) $year = $now->year;
+        if ($year !== 0 && ($year < 2000 || $year > 2100)) $year = $now->year;
         $month = ($month === 'all' || (int) $month === 0) ? 0 : (int) $month;
         if ($month !== 0 && ($month < 1 || $month > 12)) $month = $now->month;
 
@@ -44,12 +73,14 @@ class StatisticsController extends Controller
             $selectedController = User::find($cid);
 
             if ($selectedController) {
-                $controllerMonthly = ControllerMonthlyStat::where('user_id', $cid)
-                    ->where('year', $year)
+                $monthlyQuery = ControllerMonthlyStat::where('user_id', $cid);
+                if ($year !== 0) $monthlyQuery->where('year', $year);
+                $controllerMonthly = $monthlyQuery
+                    ->orderBy('year')
                     ->orderBy('month')
                     ->get();
 
-                if ($month !== 0) {
+                if ($month !== 0 && $year !== 0) {
                     $from = Carbon::create($year, $month, 1)->startOfMonth();
                     $to   = $from->copy()->endOfMonth();
                     $controllerSessions = ControllerSession::where('user_id', $cid)
@@ -61,9 +92,12 @@ class StatisticsController extends Controller
         }
 
         // Leaderboard (only shown when no controller selected)
+        $leaderboardQuery = ControllerMonthlyStat::with('user');
+        if ($year !== 0) $leaderboardQuery->where('year', $year);
+        if ($month !== 0) $leaderboardQuery->where('month', $month);
+
         if ($month === 0) {
-            $rows = ControllerMonthlyStat::with('user')
-                ->where('year', $year)
+            $rows = $leaderboardQuery
                 ->get()
                 ->filter(fn($s) => $s->user !== null)
                 ->groupBy('user_id')
@@ -79,9 +113,7 @@ class StatisticsController extends Controller
                 ->sortByDesc(fn($s) => $s->totalHours())
                 ->values();
         } else {
-            $rows = ControllerMonthlyStat::with('user')
-                ->where('year', $year)
-                ->where('month', $month)
+            $rows = $leaderboardQuery
                 ->get()
                 ->filter(fn($s) => $s->user !== null)
                 ->sortByDesc(fn($s) => $s->totalHours())
