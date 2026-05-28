@@ -38,5 +38,10 @@ class Event extends Model
     public function getFormattedRangeAttribute() {
         return $this->start?->utc()->format('m/d/Y H:i:s') . 'z - ' . $this->end?->utc()->format('m/d/Y H:i:s') . 'z';
     }
+
+    public function getFormattedTimeAttribute() {
+        return $this->start?->utc()->format('H:i:s') . 'z - ' . $this->end?->utc()->format('H:i:s') . 'z';
+
+    }
 }
 

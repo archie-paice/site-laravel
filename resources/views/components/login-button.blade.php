@@ -1,3 +1,3 @@
-<a class='btn btn-info' href={{ route('auth.redirect') }}>
+<a class='btn btn-warning' href={{ route('auth.redirect') }}>
     Login With VATSIM
 </a>

@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '@fortawesome/fontawesome-free/css/all.min.css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -10,6 +11,8 @@
 @plugin "daisyui" {
     themes: light --default;
 }
+
+
 
 @plugin "daisyui/theme" {
     name: "light"; /* Renamed to reflect the update */
@@ -28,7 +31,7 @@
       New contrast with white text is 5.0:1 (passes WCAG AA).
     */
     /* --color-primary: oklch(0.6098 0.1327 240.88); */ /* Original */
-    --color-primary: oklch(55% 0.15 240.88);
+    --color-primary: oklch(0.426 0.139 255);
     --color-primary-content: #ffffff;
 
     /* Secondary: Changed from a harsh yellow-green to a complementary

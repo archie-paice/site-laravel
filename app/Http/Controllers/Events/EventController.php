@@ -14,7 +14,6 @@ use Illuminate\Validation\Rules\Enum;
 class EventController extends Controller
 {
     public function index() {
-        // perform some sort of calculation here to determine the next 3 upcoming events and then pass them to the view
         $events = Event::where('start', '>=', now())->orderBy('start', 'asc')->take(3)->get();
         return view('events.index', ['events' => $events]);
     }
