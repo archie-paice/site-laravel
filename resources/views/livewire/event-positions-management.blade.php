@@ -18,6 +18,22 @@
                 Save Positions
             </button>
 
+            @error('positions')
+            <div role="alert" class="alert alert-error alert-horizontal mt-2">
+                <span>{{ $message }}</span>
+
+                <div>
+                    <button
+                        type="button"
+                        wire:click="dismissPositionsError"
+                        class="btn btn-sm"
+                    >
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+            @enderror
+
             @if($updated)
                 <div role="alert" class="alert alert-warning alert-horizontal mt-2">
                     <span>Positions Successfully Updated</span>

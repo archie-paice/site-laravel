@@ -104,7 +104,7 @@ class UserController extends Controller
         $user = User::findorFail($id);
 
         $registeredEvents = $user->events()
-            ->withPivot('requested_position', 'start', 'end', 'position_status')
+            ->withPivot('requested_position', 'start', 'end', 'position_status', 'assigned_position', 'assigned_start', 'assigned_end')
             ->paginate(25, ['*'], 'eventsPage');
 
         return view('users.registered-events', [

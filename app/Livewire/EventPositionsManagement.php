@@ -46,8 +46,13 @@ class EventPositionsManagement extends Component
                 'Cannot remove assigned position(s): ' . $assignedRemovedPositions->implode(', ')
             );
 
+            $this->positions = $oldPositions->implode(', ');
+
+            $this->updated = false;
+
             return;
         }
+
 
         $positions = $newPositions->toArray();
 
@@ -60,5 +65,10 @@ class EventPositionsManagement extends Component
         $this->updated = true;
 
         session()->flash('success', 'Positions updated.');
+    }
+
+    public function dismissPositionsError()
+    {
+        $this->resetErrorBag('positions');
     }
 }

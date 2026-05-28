@@ -3,6 +3,7 @@
 @section('title', 'Create Event')
 
 @section('body')
+
     <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data" class="flex flex-col gap-5">
         @csrf
         <div class="collapse bg-base-100 border border-base-300">
@@ -10,14 +11,14 @@
             <div class="collapse-title font-semibold">Basic Information</div>
             <div class="collapse-content text-sm">
                 <label for="title" class="label">Event Name</label>
-                <input name="title" required type="text" placeholder="Event Name" class="input" />
+                <input name="title" required type="text" placeholder="Event Name" class="input" value="{{ old('title') }}" />
 
                 <br />
                 <label for="start" class="label">Event Start</label>
-                <input type="datetime-local" name="start" class="input" required>
+                <input type="datetime-local" name="start"  class="input" required value="{{ old('start') }}">
 
                 <label for="end" class="label">Event End</label>
-                <input type="datetime-local" name="end" class="input" required>
+                <input type="datetime-local" name="end" class="input" required value="{{ old('end') }}">
             </div>
         </div>
 
@@ -26,9 +27,13 @@
             <div class="collapse-title font-semibold">Event Type</div>
             <div class="collapse-content text-sm">
                 <select name="type" class="select">
-                    <option disabled selected>Select type</option>
+                    <option disabled>Select type</option>
+
                     @foreach ($types as $t)
-                        <option value="{{ $t->name }}">
+                        <option
+                            value="{{ $t->name }}"
+                            {{ old('type') == $t->name ? 'selected' : '' }}
+                        >
                             {{ str_replace('_', ' ', $t->name) }}
                         </option>
                     @endforeach
@@ -40,7 +45,7 @@
             <input type="radio" name="my-accordion-1" checked="checked" />
             <div class="collapse-title font-semibold">Description</div>
             <div class="collapse-content text-sm">
-                <textarea name="description" required class="textarea" placeholder="Event description..."></textarea>
+                <textarea name="description" required class="textarea" placeholder="Event description..." >{{ old('description') }}</textarea>
             </div>
         </div>
 
@@ -57,10 +62,17 @@
             <div class="collapse-title font-semibold">Position Preset</div>
             <div class="collapse-content text-sm">
                 <select name="presetPositions" class="select">
-                    <option disabled selected>Select preset</option>
-                    <option value="">No preset</option>
+                    <option disabled>Select preset</option>
+
+                    <option value="" {{ old('presetPositions') == '' ? 'selected' : '' }}>
+                        No preset
+                    </option>
+
                     @foreach ($presetPositions as $p)
-                        <option value="{{ $p }}">
+                        <option
+                            value="{{ $p }}"
+                            {{ old('presetPositions') == $p ? 'selected' : '' }}
+                        >
                             {{ str_replace('_', ' ', $p) }}
                         </option>
                     @endforeach
@@ -74,7 +86,7 @@
             <div class="collapse-title font-semibold">Featured Fields</div>
             <div class="collapse-content text-sm">
                 <label for="featured_fields" class="label">Featured Fields (ICAO or IATA fields only, separated by commas)</label>
-                <input name="featured_fields" type="text" required placeholder="Eg. KMCO, KJAX, KDAB, KORL" class="input" />
+                <input name="featured_fields" type="text" required placeholder="Eg. KMCO, KJAX, KDAB, KORL" class="input" value="{{ old('featured_fields') }}" />
             </div>
         </div>
 

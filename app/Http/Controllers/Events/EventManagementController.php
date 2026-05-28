@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
@@ -52,8 +53,16 @@ class EventManagementController
         $validated = $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
-            'start' => 'required|date',
-            'end' => 'required|date',
+            'start' => 'required|date|before:end',
+            'end' => ['required', 'date', 'after:start',
+                function ($attribute, $value, $fail) use ($request) {
+                    $start = Carbon::parse($request->start);
+                    $end = Carbon::parse($value);
+
+                    if ($start->diffInMinutes($end) < 60) {
+                        $fail('The end time must be at least 1 hour after the start time.');
+                    }
+                },],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
             'presetPositions' => 'nullable|string',
@@ -104,12 +113,22 @@ class EventManagementController
         $featuredFields = FeaturedField::pluck('name')->toArray();
 
         $validated = $request->validate([
-            'name' => 'required|string',
+            'title' => 'required|string',
             'description' => 'required|string',
-            'start' => 'required|date',
-            'end' => 'required|date',
+            'start' => 'required|date|before:end',
+            'end' => ['required', 'date', 'after:start',
+                function ($attribute, $value, $fail) use ($request) {
+                    $start = Carbon::parse($request->start);
+                    $end = Carbon::parse($value);
+
+                    if ($start->diffInMinutes($end) < 60) {
+                        $fail('The end time must be at least 1 hour after the start time.');
+                    }
+                },],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
+            'presetPositions' => 'nullable|string',
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|required',
         ]);
 
         $featuredFields = explode(', ', $validated['featured_fields']);

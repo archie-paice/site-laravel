@@ -12,24 +12,45 @@
         <th>Event</th>
         <th>Position Requested</th>
         <th>Time Requested</th>
-        <th>Status</th>
+        <th>Final Assignment</th>
+        <th>Final Start</th>
+        <th>Final End</th>
     </tr>
     </thead>
     <tbody>
     @unless(sizeof($registeredEvents) == 0)
         @foreach ($registeredEvents as $registration)
-            <tr>
 
-                <td>{{ $registration->title }}</td>
+            <tr>
+                @if($registration->published)
+                    <td>
+                        <a href="{{ route('events.show', $registration) }}" class="link link-primary">
+                            {{ $registration->title }}
+                        </a>
+                    </td>
 
                 <td>
                     {{ $registration->pivot->requested_position}}
                 </td>
 
-
                 <td>{{ $registration->getFormattedRangeAttribute()}}</td>
-                <td>{{ $registration->pivot->position_status }}</td>
+                <td>{{ $registration->pivot->assigned_position}}</td>
+                    <td>{{ $registration->pivot->assigned_start}}</td>
+                    <td>{{ $registration->pivot->assigned_end}}</td>
+                @else
+                    <td>
+                        <a href="{{ route('events.show', $registration) }}" class="link link-primary">
+                            {{ $registration->title }}
+                        </a>
+                    </td>
+                    <td>
+                        {{ $registration->pivot->requested_position}}
+                    </td>
+                    <td>{{ $registration->getFormattedRangeAttribute()}}</td>
+                    <td>Position not yet published</td>
+                @endif
             </tr>
+
         @endforeach
     @endunless
     </tbody>
