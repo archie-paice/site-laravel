@@ -66,7 +66,7 @@
                             @endif
                         </a>
                     </li>
-                    <li><a href="#">News Management</a></li>
+                    <li><a href="{{ route('admin.news.index') }}">News Management</a></li>
                     <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>

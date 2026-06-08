@@ -127,8 +127,15 @@
         <div class="bg-base-100 rounded-xl shadow-xl p-6 w-full max-w-2xl border border-base-300">
             <div class="flex justify-between">
                 <h1 class="font-bold">Upcoming Events</h1>
+                @if(!$events->isEmpty())
                 <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">View All Events</a></h1>
+                @endif
             </div>
+
+            @if($events->isEmpty())
+                <h1 class="text-2xl">No upcoming events.</h1>
+
+            @else
 
             @foreach($events as $event)
 
@@ -161,6 +168,45 @@
                 </div>
             </div>
             @endforeach
+            @endif
+
+        </div>
+
+        <div class="bg-base-100 rounded-xl shadow-xl p-6 w-full max-w-2xl border border-base-300">
+            <div class="flex justify-between">
+                <h1 class="font-bold">News</h1>
+            </div>
+
+            @foreach($news as $n)
+
+                <div class="flex flex-col my-5">
+                    <div class="bg-base-100 rounded-3xl shadow-xl border border-base-300/50 overflow-hidden">
+                        <div class="flex items-center">
+
+                            <!-- Date side -->
+                            <div class="bg-primary/10 text-primary rounded-full w-14 h-14 flex items-center justify-center text-2xl ml-5">
+                                <i class="fa-solid fa-bullhorn"></i>
+                            </div>
+
+
+                            <!-- Event info -->
+                            <div class="p-5 flex-1">
+
+                                <h3 class="font-bold text-lg">
+                                    {{ $n->title }}
+                                </h3>
+                                <p class="text-sm text-base-content/60 mt-2">
+                                    {{ $n->content }}
+                                </p>
+                                <p class="text-sm text-base-content/60 mt-2">
+                                    {{ $n->published_at->format('M') }} {{ $n->published_at->format('d') }}, {{ $n->published_at->format('Y') }}
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            @endforeach
 
         </div>
 
@@ -182,11 +228,6 @@
 
 
 
-        <x-card-component title="News">
-            <ul>
-                <li class="text-lg">11-25-2025 Jud Lopez promoted to C1</li>
-            </ul>
-        </x-card-component>
 
         @if(count($soloCerts) > 0)
             <x-card-component title="Solo Certs">

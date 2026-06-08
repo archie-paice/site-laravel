@@ -8,11 +8,13 @@ use App\Http\Controllers\Events\EventFieldController;
 use App\Http\Controllers\Events\EventPositionPresetController;
 use App\Http\Controllers\Events\EventManagementController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\News\NewsController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
+use App\Http\Controllers\Training\TrainingDashController;
 use App\Http\Controllers\Training\TrainingTicketController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
@@ -73,6 +75,16 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
 
+
+    # News
+    Route::prefix('/news')->group(function() {
+        Route::get('/', [NewsController::class, 'index'])->name('admin.news.index');
+        Route::get('create', [NewsController::class, 'create'])->name('admin.news.create');
+        Route::post('/', [NewsController::class, 'store'])->name('admin.news.store');
+
+    });
+
+
     # User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
     Route::middleware('permission:manage visiting controllers')->group(function() {
@@ -95,6 +107,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     # Training Dept.
     Route::prefix('/training')->middleware('role:training')->group(function() {
+        Route::get('/', [TrainingDashController::class, 'index'])->name('admin.training.index');
         Route::resource('tickets', TrainingTicketController::class)->names('training-tickets');
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
         Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'update', 'destroy', 'store']])->names('solo-certs');

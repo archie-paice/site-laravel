@@ -9,6 +9,10 @@ class News extends Model
     protected $fillable = [
         'title',
         'content',
-        'date',
+        'published_at',
+    ];
+
+    protected $casts = [
+        'published_at' => 'datetime',
     ];
 }
