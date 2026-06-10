@@ -4,6 +4,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
@@ -61,6 +62,10 @@ Route::prefix('users/{user}')->group(function() {
 # Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
+# Feedback
+Route::get('/feedback', [FeedbackController::class, 'index'])->middleware('auth')->name('feedback.index');
+Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('auth')->name('feedback.store');
+
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
 Route::prefix('events')->name('events.')->group(function () {
@@ -76,6 +81,15 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     # User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
+
+    # Feedback
+    Route::middleware('role:admin')->group(function() {
+        Route::get('feedback', [FeedbackController::class, 'manage'])->name('admin.feedback.index');
+        Route::get('feedback/{feedback}', [FeedbackController::class, 'show'])->name('admin.feedback.show');
+        Route::put('feedback/{feedback}/stash', [FeedbackController::class, 'stash'])->name('admin.feedback.stash');
+        Route::put('feedback/{feedback}/unstash', [FeedbackController::class, 'unstash'])->name('admin.feedback.unstash');
+        Route::put('feedback/{feedback}/release', [FeedbackController::class, 'release'])->name('admin.feedback.release');
+    });
     Route::middleware('permission:manage visiting controllers')->group(function() {
         Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
         Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');

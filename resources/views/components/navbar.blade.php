@@ -28,6 +28,8 @@
             </ul>
         </div>
 
+        <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
+
         @hasrole('staff')
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
@@ -51,6 +53,7 @@
 
                     @hasrole('admin')
                         <li><a href={{ route('admin.index') }}>Admin</a></li>
+                        <li><a href="{{ route('admin.feedback.index') }}">Feedback Management</a></li>
                     @endhasrole
                 </ul>
             </div>

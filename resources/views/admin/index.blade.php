@@ -32,5 +32,11 @@
                 <a class='btn btn-primary' href="{{ route('admin.events.position-presets.index') }}">Position Presets</a>
             </x-card-component>
         @endrole
+
+        @role('admin')
+            <x-card-component title="Admin Quick Links">
+                <a class='btn btn-primary mt-5' href="{{ route('admin.feedback.index') }}">Manage Feedback</a>
+            </x-card-component>
+        @endrole
     </div>
 @endsection
