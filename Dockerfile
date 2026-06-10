@@ -50,13 +50,12 @@ RUN apk add --no-cache libpq-dev \
 
 # copy files from the build stage
 COPY --from=build /var/www/html /var/www/html
-COPY ./deploy/nginx.conf /etc/nginx/http.d/default.conf
-COPY ./deploy/php.ini "$PHP_INI_DIR/conf.d/app.ini"
 
 WORKDIR /var/www/html
 
-COPY ./deploy/entrypoint.sh /entrypoint.sh
+COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-CMD ["php", "artisan", "config:clear"]
+RUN ["php", "artisan", "config:clear"]
+EXPOSE 8080
 CMD ["/entrypoint.sh"]

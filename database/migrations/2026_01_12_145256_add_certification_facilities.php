@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->json('presetPositions');
+        Schema::create('certification_facilities', function (Blueprint $table) {
+            $table->id();
+            $table->string('identifier')->unique();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dropColumn('presetPositions');
-        });
+        Schema::dropIfExists('certification_facilities');
     }
 };

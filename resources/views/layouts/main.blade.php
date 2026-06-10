@@ -17,7 +17,7 @@
         <script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.8/dist/htmx.min.js"></script>
         <link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
         @livewireStyles
-        
+
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
             @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -67,6 +67,14 @@
                     @auth
                         <h1 class="mt-5">AUTHENTICATED USER: <strong>{{Auth::user()->id}} - {{Auth::user()->name}}</strong></h1>
                         <h1>SESSION: <strong>{{Auth::getSession()->getId()}} - {{Auth::getSession()->getName()}}</strong></h1>
+                        <span>
+                            <h1>PERMISSIONS:</h1>
+                            <p>
+                                @foreach(Auth::user()->getAllPermissions() as $perm)
+                                    {{$perm->name}} //
+                                @endforeach
+                            </p>
+                        </span>
                     @endauth
 
                     @guest
