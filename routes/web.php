@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AtcBookingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticsPrefixesController;
@@ -32,6 +33,9 @@ use App\Livewire\EventRegistration;
 
 # Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+# ATC Bookings
+Route::post('/bookings', [AtcBookingController::class, 'store'])->middleware('auth')->name('bookings.store');
 
 # Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');

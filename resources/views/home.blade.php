@@ -51,6 +51,69 @@
 
         </x-card-component>
 
+        <x-card-component title="Controller Schedule">
+            <livewire:controller-schedule />
+
+            @auth
+                <dialog id="booking_modal" class="modal">
+                    <div class="modal-box">
+                        <h3 class="text-xl font-bold mb-4">Book a Session</h3>
+
+                        <form method="POST" action="{{ route('bookings.store') }}" class="flex flex-col gap-y-3">
+                            @csrf
+
+                            <label class="flex flex-col">
+                                <span class="label-text font-semibold mb-1">Controller</span>
+                                <input type="text" class="input input-bordered w-full bg-base-300 text-base-content/60"
+                                       value="{{ auth()->user()->name }} - {{ auth()->user()->id }}" disabled>
+                            </label>
+
+                            <label class="flex flex-col">
+                                <span class="label-text font-semibold mb-1">Position</span>
+                                <input type="text" name="position" class="input input-bordered w-full"
+                                       placeholder="e.g. JAX_CTR" value="{{ old('position') }}" required>
+                            </label>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <label class="flex flex-col">
+                                    <span class="label-text font-semibold mb-1">Start (zulu)</span>
+                                    <input type="datetime-local" name="start" class="input input-bordered w-full"
+                                           value="{{ old('start') }}" required>
+                                </label>
+
+                                <label class="flex flex-col">
+                                    <span class="label-text font-semibold mb-1">End (zulu)</span>
+                                    <input type="datetime-local" name="end" class="input input-bordered w-full"
+                                           value="{{ old('end') }}" required>
+                                </label>
+                            </div>
+
+                            <label class="flex flex-col">
+                                <span class="label-text font-semibold mb-1">Description (optional)</span>
+                                <textarea name="description" rows="3" class="textarea textarea-bordered w-full resize-none"
+                                          placeholder="e.g. Working the FNO arrival push">{{ old('description') }}</textarea>
+                            </label>
+
+                            <div class="modal-action">
+                                <button type="submit" class="btn btn-primary">Book</button>
+                                <button type="button" class="btn btn-ghost" onclick="booking_modal.close()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <form method="dialog" class="modal-backdrop">
+                        <button>close</button>
+                    </form>
+                </dialog>
+
+                @if ($errors->any())
+                    <script>
+                        document.addEventListener('DOMContentLoaded', () => booking_modal.showModal());
+                    </script>
+                @endif
+            @endauth
+        </x-card-component>
+
         <x-card-component title="News">
             <ul>
                 <li class="text-lg">11-25-2025 Jud Lopez promoted to C1</li>
