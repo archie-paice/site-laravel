@@ -22,11 +22,11 @@
         <h1 class="text-lg">No bookings on this date</h1>
     @endunless
 
-    @auth
+    @haspermission('create atc booking')
         <button type="button" class="btn btn-primary btn-sm w-max mt-4" onclick="booking_modal.showModal()">
             Book a Session
         </button>
-    @endauth
+    @endhaspermission
 
     {{-- Edit / delete modal --}}
     @if ($editingId)

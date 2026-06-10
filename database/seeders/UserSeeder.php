@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core', 'rostered');
 
             $user = User::firstOrCreate([
                 'id' => 10000009,
@@ -44,7 +44,7 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+            $user->assignRole('core');
         };
     }
 }

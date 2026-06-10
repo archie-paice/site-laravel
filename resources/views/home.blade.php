@@ -54,7 +54,7 @@
         <x-card-component title="Controller Schedule">
             <livewire:controller-schedule />
 
-            @auth
+            @haspermission('create atc booking')
                 <dialog id="booking_modal" class="modal">
                     <div class="modal-box">
                         <h3 class="text-xl font-bold mb-4">Book a Session</h3>
@@ -111,7 +111,7 @@
                         document.addEventListener('DOMContentLoaded', () => booking_modal.showModal());
                     </script>
                 @endif
-            @endauth
+            @endhaspermission
         </x-card-component>
 
         <x-card-component title="News">
