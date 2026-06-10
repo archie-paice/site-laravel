@@ -16,11 +16,12 @@ env:
 
 jobs:
   build:
-    environment: production
     runs-on: ubuntu-latest
     permissions:
       contents: read
       packages: write
+    env:
+      IMAGE_TAG: ${{ github.event.inputs.image_tag || secrets.IMAGE_TAG }}
     steps:
       - uses: actions/checkout@v4
 
