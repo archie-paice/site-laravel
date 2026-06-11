@@ -33,7 +33,7 @@ jobs:
       # 4. Wait for Database and Run Migrations
       - name: Setup Database
         run: |
-          docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel php artisan migrate --force
+          docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel php artisan migrate --seed --force
 
       # 5. Run the Tests INSIDE the container
       - name: Execute Tests
