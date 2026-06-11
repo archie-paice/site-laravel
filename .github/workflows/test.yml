@@ -30,10 +30,6 @@ jobs:
       - name: Start Services
         run: docker compose -p test --env-file .env -f tests/docker-compose.yml up -d
 
-      - name: Generate App Key
-        run: |
-          docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel php artisan key:generate
-
       - name: Initialize database
         run: |
           docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel php artisan migrate --seed --force
