@@ -5,6 +5,8 @@ services:
       dockerfile: Dockerfile
       args:
         INSTALL_DEV: 'true'
+    env_file:
+      - ../.env
     environment:
       - DB_CONNECTION=pgsql
       - DB_HOST=postgres
