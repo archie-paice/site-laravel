@@ -10,8 +10,8 @@ test('admin page returns 403 if not authorized', function () {
 });
 
 test('allows staff to view page', function () {
-    $user = User::factory()->create();
     $this->seed(PermissionSeeder::class);
+    $user = User::factory()->create();
     $user->assignRole('staff');
 
     $this->actingAs($user);
@@ -21,8 +21,8 @@ test('allows staff to view page', function () {
 });
 
 test('authenticated but unauthorized users thrown 403', function () {
-    $user = User::factory()->create();
     $this->seed(PermissionSeeder::class);
+    $user = User::factory()->create();
     $user->assignRole('core');
 
     $this->actingAs($user);
