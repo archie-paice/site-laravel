@@ -3,6 +3,10 @@
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 
+beforeEach(function () {
+    $this->seed(PermissionSeeder::class);
+});
+
 test('admin page returns 403 if not authorized', function () {
     $response = $this->get(route('admin.index'));
 
