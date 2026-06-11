@@ -49,14 +49,17 @@ jobs:
       environment: staging
 
       steps:
-        - name: Deploy to production host
+        - name: Deploy to staging host
           uses: appleboy/ssh-action@v1.2.0
           with:
             host: ${{ secrets.SSH_HOSTNAME }}
             username: containermanager
             key: ${{ secrets.SERVER_SSH_KEY }}
             script: |
-              cd infrastructure/production
+              cd infrastructure/staging
+              cat > .env << 'EOF'
+              ${{ secrets.ENV_FILE }}
+              EOF
               docker compose pull
               docker compose up -d
 

@@ -57,5 +57,8 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd infrastructure/production
+            cat > .env << 'EOF'
+            ${{ secrets.ENV_FILE }}
+            EOF
             docker compose pull
             docker compose up -d

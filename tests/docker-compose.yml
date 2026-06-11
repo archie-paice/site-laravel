@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  laravel:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        INSTALL_DEV: 'true'
+    env_file:
+      - .env
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_DATABASE=${DB_DATABASE:-laravel_test}
+      - DB_USERNAME=${DB_USERNAME:-laravel}
+      - DB_PASSWORD=${DB_PASSWORD:-laravel}
+      - APP_ENV=testing
+      - APP_DEBUG=true
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - test-network
+
+  postgres:
+    image: postgres:18-alpine
+    environment:
+      - POSTGRES_DB=${DB_DATABASE:-laravel_test}
+      - POSTGRES_USER=${DB_USERNAME:-laravel}
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-laravel}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-laravel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - test-network
+
+networks:
+  test-network:
+    driver: bridge
