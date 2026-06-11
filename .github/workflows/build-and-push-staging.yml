@@ -42,3 +42,21 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+  
+  deploy:
+      runs-on: primary-server
+      needs: build
+      environment: staging
+
+      steps:
+        - name: Deploy to production host
+          uses: appleboy/ssh-action@v1.2.0
+          with:
+            host: ${{ secrets.SSH_HOSTNAME }}
+            username: containermanager
+            key: ${{ secrets.SERVER_SSH_KEY }}
+            script: |
+              cd infrastructure/production
+              docker compose pull
+              docker compose up -d
+
