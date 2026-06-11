@@ -30,12 +30,15 @@ jobs:
       - name: Start Services
         run: docker compose -p test --env-file .env -f tests/docker-compose.yml up -d
 
-      # 4. Wait for Database and Run Migrations
-      - name: Setup Database
+      - name: Generate App Key
+        run: |
+          docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel php artisan key:generate
+
+      - name: Initialize database
         run: |
           docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel php artisan migrate --seed --force
 
-      # 5. Run the Tests INSIDE the container
+              # 5. Run the Tests INSIDE the container
       - name: Execute Tests
         run: |
           docker compose -p test --env-file .env -f tests/docker-compose.yml exec -T laravel ./vendor/bin/pest
