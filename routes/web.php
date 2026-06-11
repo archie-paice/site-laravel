@@ -97,6 +97,10 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Facilities Dept.
     Route::middleware('permission:manage statistics prefixes')->group(function() {
         Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
+    });
+
+    # Senior Staff / Web Team
+    Route::middleware('role:admin')->group(function() {
         Route::post('statistics/sync', [StatisticsController::class, 'sync'])->name('statistics.sync');
     });
 

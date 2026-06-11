@@ -35,8 +35,6 @@
                 <li><a href="{{ route('roster.index') }}">Roster</a></li>
                 <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
                 <li><a href="{{ route('statistics.index') }}">Statistics</a></li>
-                <li><a href="https://docs.google.com/spreadsheets/d/1qCbtxKFFDbw-mgrPj1b_I71AI3aQXQN-ER0olcFCEtk/edit?gid=1029729582#gid=1029729582" target="_blank" rel="noopener">+1 Cheetus</a></li>
-                <li><a href="https://www.faa.gov/documentLibrary/media/Order/7110.65BB_Bsc_w_Chg_1_dtd_8-7-25.pdf" target="_blank" rel="noopener">ORDER JO 7110.65BB</a></li>
             </ul>
         </div>
 
@@ -119,8 +117,6 @@
             <li><a href="{{ route('roster.index') }}">Roster</a></li>
             <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
             <li><a href="{{ route('statistics.index') }}">Statistics</a></li>
-            <li><a href="https://docs.google.com/spreadsheets/d/1qCbtxKFFDbw-mgrPj1b_I71AI3aQXQN-ER0olcFCEtk/edit?gid=1029729582#gid=1029729582" target="_blank" rel="noopener">+1 Cheetus</a></li>
-            <li><a href="https://www.faa.gov/documentLibrary/media/Order/7110.65BB_Bsc_w_Chg_1_dtd_8-7-25.pdf" target="_blank" rel="noopener">ORDER JO 7110.65BB</a></li>
 
             <li class="menu-title text-xs uppercase tracking-wide pt-2">Publications</li>
             <li><a href="{{ route('publications.index') }}">All Documents</a></li>
@@ -174,11 +170,12 @@
             <form method="dialog">
                 <button class="btn btn-error">Cancel</button>
             </form>
-            <a x-bind:href="confirmed ? '{{ route('auth.redirect') }}' : '#'"
-               x-bind:class="confirmed ? 'btn btn-success' : 'btn btn-success btn-disabled'"
-               x-bind:aria-disabled="!confirmed">
+            <button type="button"
+                    x-bind:disabled="!confirmed"
+                    x-bind:class="confirmed ? 'btn btn-success' : 'btn btn-success btn-disabled'"
+                    @click="window.location.href='{{ route('auth.redirect') }}'">
                 Continue with Login
-            </a>
+            </button>
         </div>
     </div>
     <form method="dialog" class="modal-backdrop">
