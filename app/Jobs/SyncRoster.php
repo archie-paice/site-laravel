@@ -52,15 +52,11 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         $this->updatePermissions();
     }
 
-    // Keep the 'rostered' role in sync with the roster flag. The role and its
-    // permissions are defined by PermissionSeeder.
     private function updatePermissions() {
-        // Grant the role to everyone currently on the roster.
         foreach (User::where('rostered', true)->get() as $user) {
             $user->assignRole('rostered');
         }
 
-        // Remove it from anyone no longer on the roster.
         foreach (User::where('rostered', false)->role('rostered')->get() as $user) {
             $user->removeRole('rostered');
         }
