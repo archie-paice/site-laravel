@@ -11,7 +11,13 @@ class AtcBookingController extends Controller
         $validated = $request->validate([
             'position' => ['required', 'string', 'max:255'],
             'start' => ['required', 'date'],
-            'end' => ['required', 'date', 'after:start'],
+            'end' => ['required', 'date', 'after:start', function ($attribute, $value, $fail) use ($request) {
+                $start = strtotime((string) $request->input('start'));
+                $end = strtotime((string) $value);
+                if ($start !== false && $end !== false && $end - $start > 5 * 60 * 60) {
+                    $fail('Booking exceeds five hours.');
+                }
+            }],
             'description' => ['nullable', 'string', 'max:1000'],
         ]);
 

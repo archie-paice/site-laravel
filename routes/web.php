@@ -35,7 +35,7 @@ use App\Livewire\EventRegistration;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 # ATC Bookings
-Route::post('/bookings', [AtcBookingController::class, 'store'])->middleware('auth', 'permission:create atc booking')->name('bookings.store');
+Route::post('/bookings', [AtcBookingController::class, 'store'])->middleware('permission:create atc booking')->name('bookings.store');
 
 # Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');

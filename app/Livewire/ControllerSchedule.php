@@ -61,7 +61,13 @@ class ControllerSchedule extends Component
         $validated = $this->validate([
             'editPosition' => ['required', 'string', 'max:255'],
             'editStart' => ['required', 'date'],
-            'editEnd' => ['required', 'date', 'after:editStart'],
+            'editEnd' => ['required', 'date', 'after:editStart', function ($attribute, $value, $fail) {
+                $start = strtotime((string) $this->editStart);
+                $end = strtotime((string) $value);
+                if ($start !== false && $end !== false && $end - $start > 5 * 60 * 60) {
+                    $fail('Booking exceeds five hours.');
+                }
+            }],
             'editDescription' => ['nullable', 'string', 'max:1000'],
         ]);
 

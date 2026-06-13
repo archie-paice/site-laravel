@@ -30,8 +30,9 @@
 
     {{-- Edit / delete modal --}}
     @if ($editingId)
-        <div class="modal modal-open">
-            <div class="modal-box">
+        <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 p-4"
+             wire:click.self="cancelEdit">
+            <div class="bg-base-100 rounded-box shadow-xl w-full max-w-lg p-6 max-h-screen overflow-y-auto">
                 <h3 class="text-xl font-bold mb-4">Edit Session</h3>
 
                 <div class="flex flex-col gap-y-3">
@@ -62,7 +63,7 @@
                     </label>
                 </div>
 
-                <div class="modal-action justify-between">
+                <div class="mt-6 flex items-center justify-between">
                     <button type="button" wire:click="delete" wire:confirm="Delete this session? This cannot be undone."
                             class="btn btn-error">Delete</button>
 

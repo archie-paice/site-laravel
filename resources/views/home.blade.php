@@ -59,7 +59,15 @@
                     <div class="modal-box">
                         <h3 class="text-xl font-bold mb-4">Book a Session</h3>
 
-                        <form method="POST" action="{{ route('bookings.store') }}" class="flex flex-col gap-y-3">
+                        <form method="POST" action="{{ route('bookings.store') }}" class="flex flex-col gap-y-3"
+                              x-data="{
+                                  start: '{{ old('start') }}',
+                                  end: '{{ old('end') }}',
+                                  get exceeds() {
+                                      return this.start && this.end
+                                          && (new Date(this.end) - new Date(this.start)) > 5 * 60 * 60 * 1000;
+                                  }
+                              }">
                             @csrf
 
                             <label class="flex flex-col">
@@ -78,15 +86,19 @@
                                 <label class="flex flex-col">
                                     <span class="label-text font-semibold mb-1">Start (zulu)</span>
                                     <input type="datetime-local" name="start" class="input input-bordered w-full"
-                                           value="{{ old('start') }}" required>
+                                           x-model="start" required>
                                 </label>
 
                                 <label class="flex flex-col">
                                     <span class="label-text font-semibold mb-1">End (zulu)</span>
                                     <input type="datetime-local" name="end" class="input input-bordered w-full"
-                                           value="{{ old('end') }}" required>
+                                           x-model="end" required>
                                 </label>
                             </div>
+
+                            <p class="text-sm"
+                               :class="exceeds ? 'text-error font-semibold' : 'opacity-70'"
+                               x-text="exceeds ? 'Booking exceeds five hours' : 'Bookings must not exceed five hours'"></p>
 
                             <label class="flex flex-col">
                                 <span class="label-text font-semibold mb-1">Description (optional)</span>
@@ -95,7 +107,7 @@
                             </label>
 
                             <div class="modal-action">
-                                <button type="submit" class="btn btn-primary">Book</button>
+                                <button type="submit" class="btn btn-primary" :disabled="exceeds">Book</button>
                                 <button type="button" class="btn btn-ghost" onclick="booking_modal.close()">Cancel</button>
                             </div>
                         </form>

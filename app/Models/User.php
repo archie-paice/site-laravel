@@ -73,17 +73,6 @@ class User extends Authenticatable
         static::created(function ($user) {
             $user->assignRole('core'); // default role
         });
-
-        // Keep the 'rostered' role (which grants booking permissions) in
-        // lockstep with the rostered flag. Mass updates/upserts bypass model
-        // events, so SyncRoster re-syncs the role explicitly as well.
-        static::saved(function ($user) {
-            if ($user->rostered && !$user->hasRole('rostered')) {
-                $user->assignRole(Role::findOrCreate('rostered'));
-            } elseif (!$user->rostered && $user->hasRole('rostered')) {
-                $user->removeRole('rostered');
-            }
-        });
     }
 
     /**

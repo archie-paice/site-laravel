@@ -12,7 +12,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Http;
 use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Models\Role;
 
 class SyncRoster implements ShouldQueue, ShouldBeUnique
 {
@@ -50,12 +49,21 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             'operating_initials' => null
         ]);
 
-        // Keep the 'rostered' role (and its permissions) in sync with the roster.
-        // findOrCreate keeps a missing role (e.g. unseeded database) from
-        // aborting the whole sync; PermissionSeeder attaches its permissions.
-        Role::findOrCreate('rostered');
-        User::where('rostered', true)->get()->each(fn($user) => $user->assignRole('rostered'));
-        User::where('rostered', false)->role('rostered')->get()->each(fn($user) => $user->removeRole('rostered'));
+        $this->updatePermissions();
+    }
+
+    // Keep the 'rostered' role in sync with the roster flag. The role and its
+    // permissions are defined by PermissionSeeder.
+    private function updatePermissions() {
+        // Grant the role to everyone currently on the roster.
+        foreach (User::where('rostered', true)->get() as $user) {
+            $user->assignRole('rostered');
+        }
+
+        // Remove it from anyone no longer on the roster.
+        foreach (User::where('rostered', false)->role('rostered')->get() as $user) {
+            $user->removeRole('rostered');
+        }
     }
 
     private function clearUserRoles() {
