@@ -69,6 +69,9 @@ Route::get('/publications/downloads', [PublicationsController::class, 'index'])-
 
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
+
+# Training ticket view (own or training staff)
+Route::get('training-tickets/{ticket}', [TrainingTicketController::class, 'show'])->middleware('auth')->name('training-tickets.show');
 Route::prefix('events')->name('events.')->group(function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
     Route::get('{event}', [EventController::class, 'show'])->name('show');
@@ -123,7 +126,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     # Training Dept.
     Route::prefix('/training')->middleware('role:training')->group(function() {
-        Route::resource('tickets', TrainingTicketController::class)->names('training-tickets');
+        Route::resource('tickets', TrainingTicketController::class, ['except' => ['show']])->names('training-tickets');
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
         Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'update', 'destroy', 'store']])->names('solo-certs');
         Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignments.claim');
