@@ -14,7 +14,7 @@ class HomeController extends Controller
 {
     public function index() {
 
-        $events = Event::where('start', '>=', now())->orderBy('start')->take(3)->get();
+        $events = Event::where('start', '>=', now())->where('hidden', false)->orderBy('start', 'asc')->take(4)->get();
         $news = News::where('published_at', '<=', now())->orderBy('published_at', 'desc')->take(3)->get();
 
         return view('home', [

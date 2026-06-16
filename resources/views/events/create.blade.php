@@ -6,28 +6,46 @@
 
     <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data" class="flex flex-col gap-5">
         @csrf
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Basic Information</div>
-            <div class="collapse-content text-sm">
-                <label for="title" class="label">Event Name</label>
-                <input name="title" required type="text" placeholder="Event Name" class="input" value="{{ old('title') }}" />
+        <div class="card bg-base-100 border border-base-300">
+            <div class="card-body">
+                <h2 class="card-title">Basic Information</h2>
 
-                <br />
-                <label for="start" class="label">Event Start</label>
-                <input type="datetime-local" name="start"  class="input" required value="{{ old('start') }}">
+                <label class="label">Event Name</label>
+                <input
+                    name="title"
+                    type="text"
+                    class="input input-bordered w-full"
+                    required
+                    value="{{ old('title') }}"
+                />
 
-                <label for="end" class="label">Event End</label>
-                <input type="datetime-local" name="end" class="input" required value="{{ old('end') }}">
-            </div>
-        </div>
+                <label class="label">Event Start</label>
+                <input
+                    type="datetime-local"
+                    name="start"
+                    class="input input-bordered w-full"
+                    required
+                    value="{{ old('start') }}"
+                />
 
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Event Type</div>
-            <div class="collapse-content text-sm">
-                <select name="type" class="select">
-                    <option disabled>Select type</option>
+                <label class="label">Event End</label>
+                <input
+                    type="datetime-local"
+                    name="end"
+                    class="input input-bordered w-full"
+                    required
+                    value="{{ old('end') }}"
+                />
+
+                <div class="divider"></div>
+
+                <h2 class="card-title">Event Type</h2>
+
+                <select
+                    name="type"
+                    class="select select-bordered w-full"
+                >
+                    <option disabled selected>Select type</option>
 
                     @foreach ($types as $t)
                         <option
@@ -38,29 +56,18 @@
                         </option>
                     @endforeach
                 </select>
-            </div>
-        </div>
 
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Description</div>
-            <div class="collapse-content text-sm">
+                <div class="divider"></div>
+                <h2 class="card-title">Description</h2>
+
                 <textarea name="description" required class="textarea" placeholder="Event description..." >{{ old('description') }}</textarea>
-            </div>
-        </div>
 
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Event Banner</div>
-            <div class="collapse-content text-sm items-center">
+                <div class="divider"></div>
+                <h2 class="card-title">Event Banner</h2>
                 <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
-            </div>
-        </div>
 
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Position Preset</div>
-            <div class="collapse-content text-sm">
+                <div class="divider"></div>
+                <h2 class="card-title">Position Preset</h2>
                 <select name="presetPositions" class="select">
                     <option disabled>Select preset</option>
 
@@ -77,16 +84,12 @@
                         </option>
                     @endforeach
                 </select>
-            </div>
-        </div>
 
-
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Featured Fields</div>
-            <div class="collapse-content text-sm">
-                <label for="featured_fields" class="label">Featured Fields (ICAO or IATA fields only, separated by commas)</label>
+                <div class="divider"></div>
+                <h2 class="card-title">Featured Fields</h2>
+                <label for="featured_fields" class="label">ICAO or IATA fields only, separated by commas</label>
                 <input name="featured_fields" type="text" required placeholder="Eg. KMCO, KJAX, KDAB, KORL" class="input" value="{{ old('featured_fields') }}" />
+
             </div>
         </div>
 

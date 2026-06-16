@@ -11,12 +11,10 @@
         <div class="hero-content w-full max-w-none justify-start px-10">
             <div class="max-w-3xl text-left text-white">
                 <h1 class="mb-5 text-xl font-bold text-warning">Virtual Jacksonville ARTCC </h1>
-                <h1 class="mb-5 text-5xl font-bold">Connecting Controllers.</h1>
-                <h1 class="mb-5 text-5xl font-bold">Elevating Excellence.</h1>
+                <h1 class="mb-5 text-5xl font-bold">Elevating Virtual Excellence.</h1>
 
                 <p class="mb-5">
-                    The vZJX VATSIM Division is dedicated to providing exceptional air traffic control services in a realistic, professional,
-                    and welcoming virtual environment.
+                    The Virtual Jacksonville Air Route Traffic Control Community is dedicated to providing exceptional services to all its esteemed guests and controllers.
                 </p>
 
                 <div class="">
@@ -30,9 +28,9 @@
 @endsection
 
 @section('body')
-    <div class="grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 mx-auto">
+    <div class="grid lg:grid-cols-2 md:grid-cols-2 grid-cols-1 mx-auto gap-4">
 
-        <div class="bg-base-100 rounded-xl shadow-md p-6 w-full max-w-md border border-base-300 hover:shadow-2xl transition-all duration-300">
+        <div class="bg-base-100 rounded-xl shadow-sm p-6 w-full max-w-md border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
 
             <!-- Icon -->
             <div class="bg-primary text-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl mb-5">
@@ -51,11 +49,11 @@
             </p>
 
             <!-- Button -->
-            <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">Join Us</a></h1>
+            <h1 class="font-bold text-primary"><a href="https://discord.gg/bHDwSQn9fh">Join Our Discord</a></h1>
 
         </div>
 
-        <div class="bg-base-100 rounded-xl shadow-md p-6 w-full max-w-md border border-base-300 hover:shadow-2xl transition-all duration-300">
+        <div class="bg-base-100 rounded-xl shadow-sm p-6 w-full max-w-md border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
 
             <!-- Icon -->
             <div class="bg-primary text-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl mb-5">
@@ -77,7 +75,7 @@
 
         </div>
 
-        <div class="bg-base-100 rounded-xl shadow-md p-6 w-full max-w-md border border-base-300 hover:shadow-2xl transition-all duration-300">
+        <div class="bg-base-100 rounded-xl shadow-sm p-6 w-full max-w-md border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
 
             <!-- Icon -->
             <div class="bg-primary text-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl mb-5">
@@ -86,7 +84,7 @@
 
             <!-- Title -->
             <h2 class="text-2xl font-bold mb-3">
-                Resources
+                FAQs
             </h2>
 
             <!-- Description -->
@@ -95,45 +93,22 @@
             </p>
 
             <!-- Button -->
-            <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">Browse Resources</a></h1>
-
-        </div>
-
-        <div class="bg-base-100 rounded-xl shadow-md p-6 w-full max-w-md border border-base-300 hover:shadow-2xl transition-all duration-300">
-
-            <!-- Icon -->
-            <div class="bg-primary text-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl mb-5">
-                <i class="fa-solid fa-headset"></i>
-            </div>
-
-            <!-- Title -->
-            <h2 class="text-2xl font-bold mb-3">
-                Controllers
-            </h2>
-
-            <!-- Description -->
-            <p class="text-base-content/70 leading-relaxed mb-6">
-                Information and tools for active controllers in the vZJX division.
-            </p>
-
-            <!-- Button -->
-            <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">Controller Resources</a></h1>
+            <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">Read FAQs</a></h1>
 
         </div>
     </div>
 
 
     <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 pt-5">
-        <div class="bg-base-100 rounded-xl shadow-xl p-6 w-full max-w-2xl border border-base-300">
+        <x-card-component-2 title="Upcoming Events">
             <div class="flex justify-between">
-                <h1 class="font-bold">Upcoming Events</h1>
                 @if(!$events->isEmpty())
                 <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">View All Events</a></h1>
                 @endif
             </div>
 
             @if($events->isEmpty())
-                <h1 class="text-2xl">No upcoming events.</h1>
+                <h1 class="text-lg">No upcoming events.</h1>
 
             @else
 
@@ -170,12 +145,13 @@
             @endforeach
             @endif
 
-        </div>
+        </x-card-component-2>
 
-        <div class="bg-base-100 rounded-xl shadow-xl p-6 w-full max-w-2xl border border-base-300">
-            <div class="flex justify-between">
-                <h1 class="font-bold">News</h1>
-            </div>
+        <x-card-component-2 title="News">
+
+            @if($news->isEmpty())
+                <h1 class="text-lg">Nothing new has been announced.</h1>
+            @endif
 
             @foreach($news as $n)
 
@@ -208,9 +184,9 @@
                 </div>
             @endforeach
 
-        </div>
+        </x-card-component-2>
 
-        <x-card-component title="Online Controllers">
+        <x-card-component-2 title="Online Controllers">
 
             @unless(sizeof($onlineSessions) == 0)
                 @foreach ($onlineSessions as $session)
@@ -221,10 +197,10 @@
                     :onlineSince='new DateTime($session->start)'/>
                 @endforeach
             @else
-                <h1 class="text-lg">No controllers online</h1>
+                <h1 class="text-lg">No controllers online.</h1>
             @endunless
 
-        </x-card-component>
+        </x-card-component-2>
 
 
 
