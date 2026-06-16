@@ -4,6 +4,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
@@ -61,6 +62,9 @@ Route::prefix('users/{user}')->group(function() {
 # Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
+# FAQ (public)
+Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
 Route::prefix('events')->name('events.')->group(function () {
@@ -76,6 +80,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
 
     # User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
+
+    # FAQ Management (all ARTCC staff)
+    Route::middleware('permission:manage faqs')->group(function() {
+        Route::get('faqs', [FaqController::class, 'manage'])->name('admin.faqs.index');
+    });
     Route::middleware('permission:manage visiting controllers')->group(function() {
         Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
         Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');

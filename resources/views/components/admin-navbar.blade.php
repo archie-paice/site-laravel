@@ -9,6 +9,14 @@
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
+        @haspermission('manage faqs')
+            <div class="">
+                <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
+                    <a href="{{ route('admin.faqs.index') }}">FAQs</a>
+                </div>
+            </div>
+        @endhaspermission
+
         @hasrole('training')
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">

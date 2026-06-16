@@ -52,6 +52,15 @@
             </div>
         @endif
 
+        {{-- Flash messages dispatched from Livewire actions (no full page reload) --}}
+        <div x-data="{ show: false, message: '' }"
+             x-on:flash-message.window="message = $event.detail.message; show = true"
+             x-show='show' style="display: none"
+             class="alert alert-success alert-dismissible fade show" role="alert">
+            <span x-text="message"></span>
+            <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='show = false'>Close</button>
+        </div>
+
         @yield('body-nopad')
 
         <h1 class='font-bold text-2xl ml-5 mt-5'>@yield('title')</h1>
@@ -88,6 +97,7 @@
 
                 <div class="flex gap-x-10">
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">Join vZJX</a>
+                    <a class="link text-lg" href="{{ route('faq.index') }}">FAQ &amp; Help</a>
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">GitHub</a>
                     <a class="link text-lg" href="https://vatusa.net" target="_blank">VATUSA</a>
                     <a class="link text-lg" href="https://vatsim.net" target="_blank">VATSIM</a>

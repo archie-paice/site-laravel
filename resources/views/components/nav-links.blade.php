@@ -17,6 +17,7 @@
         <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
         <li><a href="{{ route('roster.index') }}">Roster</a></li>
         <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+        <li><a href="{{ route('faq.index') }}">FAQ &amp; Help</a></li>
     </ul>
 </div>
 
