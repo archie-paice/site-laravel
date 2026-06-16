@@ -8,58 +8,58 @@
         {{-- All Senior & Department Head Staff in one 6-card grid --}}
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
             <x-staff-card
-                position="Air Traffic Manager"
+                position="Air Traffic Manager (ATM)"
                 description="The Air Traffic Manager oversees day-to-day operations and collaborates with all staff members of the ARTCC."
                 :staff="$atm"
                 reportsTo="VATUSA"
             />
 
             <x-staff-card
-                position="Deputy Air Traffic Manager"
+                position="Deputy Air Traffic Manager (DATM)"
                 description="The Deputy Air Traffic Manager assists the Air Traffic Manager in overseeing the ARTCC. The Deputy Air Traffic Manager also oversees the Web, Events, and Facilities Department and assists as needed."
                 :staff="$datm"
                 reportsTo="Air Traffic Manager"
             />
 
             <x-staff-card
-                position="Training Administrator"
+                position="Training Administrator (TA)"
                 description="The Training Administrator is responsible for overseeing the training department of the ARTCC."
                 :staff="$ta"
                 reportsTo="Air Traffic Manager"
             />
 
             <x-staff-card
-                position="Events Coordinator"
+                position="Events Coordinator (EC)"
                 description="The Events Coordinator manages the planning and execution of events related to vZJX or our neighbors."
                 :staff="$ec"
                 reportsTo="Deputy Air Traffic Manager"
             >
                 <x-assistant-staff
-                    positionTitle="Assistant Events Coordinators"
+                    positionTitle="Assistant Events Coordinators (AECs)"
                     :staff="$eventsTeam"
                 />
             </x-staff-card>
 
             <x-staff-card
-                position="Facility Engineer"
+                position="Facility Engineer (FE)"
                 description="The Facility Engineer is responsible for managing all data related to the VATSIM network, such as standard operating procedures and radar maps."
                 :staff="$fe"
                 reportsTo="Deputy Air Traffic Manager"
             >
                 <x-assistant-staff
-                    positionTitle="Assistant Facility Engineers"
+                    positionTitle="Assistant Facility Engineers (AFEs)"
                     :staff="$facilitiesTeam"
                 />
             </x-staff-card>
 
             <x-staff-card
-                position="Webmaster"
+                position="Webmaster (WM)"
                 description="The Webmaster handles all management of data systems in the vZJX network, including the website, relational databases, email systems, and more."
                 :staff="$wm"
                 reportsTo="Deputy Air Traffic Manager"
             >
                 <x-assistant-staff
-                    positionTitle="Assistant Webmasters"
+                    positionTitle="Assistant Webmasters (AWMs)"
                     :staff="$webTeam"
                 />
             </x-staff-card>

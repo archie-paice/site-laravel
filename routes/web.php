@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;
@@ -64,6 +65,9 @@ Route::prefix('users/{user}')->group(function() {
 # Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
+# Controller Statistics
+Route::get('controllers/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
+
 # Publications & Downloads
 Route::get('/publications/downloads', [PublicationsController::class, 'index'])->name('publications.index');
 
@@ -96,6 +100,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Facilities Dept.
     Route::middleware('permission:manage statistics prefixes')->group(function() {
         Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
+    });
+
+    # Senior Staff / Web Team
+    Route::middleware('role:admin')->group(function() {
+        Route::post('statistics/sync', [StatisticsController::class, 'sync'])->name('statistics.sync');
     });
 
     # Publications Management (Facilities Dept.)

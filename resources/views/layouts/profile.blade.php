@@ -32,7 +32,7 @@
                 
             </div>
 
-            <div class='w-full max-w-4xl mx-auto bg-base-100 border-base-300 border-1 p-3 sm:p-4'>
+            <div class='w-full max-w-4xl mx-auto bg-base-100 border-base-300 border p-3 sm:p-4'>
                 @yield('profile-content')
             </div>
 @endsection

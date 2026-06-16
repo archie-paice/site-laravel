@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
         UserSeeder $userSeeder,
         StatisticsPrefixesSeeder $statisticsPrefixes,
         PublicationCategorySeeder $publicationCategorySeeder,
+        StatsSyncSeeder $statsSyncSeeder,
     ): void
     {
         $permissionSeeder->run();
@@ -25,6 +26,7 @@ class DatabaseSeeder extends Seeder
 
         if (App::environment() === 'development') {
             SyncRoster::dispatch();
+            $statsSyncSeeder->run();
         }
     }
 }
