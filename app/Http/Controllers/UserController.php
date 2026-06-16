@@ -97,6 +97,10 @@ class UserController extends Controller
     public function trainingAssignments(int $id) {
         $user = User::findOrFail($id);
 
+        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+            abort(403);
+        }
+
         if (!$user->rostered) {
             return redirect()->back()->with('error', 'Training assignments are only available for rostered users.');
         }
@@ -112,6 +116,10 @@ class UserController extends Controller
     public function trainingTickets(int $id) {
         $user = User::findOrFail($id);
 
+        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+            abort(403);
+        }
+
         if (!$user->rostered) {
             return redirect()->back()->with('error', 'Training tickets are only available for rostered users.');
         }
@@ -126,6 +134,11 @@ class UserController extends Controller
 
     public function soloCerts(int $id) {
         $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+            abort(403);
+        }
+
         if (!$user->rostered) {
             return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
         }
