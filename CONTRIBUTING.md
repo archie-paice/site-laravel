@@ -56,7 +56,10 @@ DB_USERNAME=<database-user>
 DB_PASSWORD=<database-password>
 ```
 
-### Environment Secrets
+Configure VATSIM OAuth test credentials:
+See the wiki at `https://vatsim.dev/services/connect/` in how to do this. Common issues with authentication are usually realted to the redirect URL not exactly matching the URL in your browser.
+
+### Other Environment Secrets
 
 Some features may require specific environment secrets or service credentials that are not included in the repository.
 
@@ -203,6 +206,8 @@ Please describe:
 * Any alternatives you considered.
 * Whether you are willing to help implement it.
 
+Please create an issue for any relavant features and discussion.
+
 ## Security Issues
 
 Please do not open a public issue for security vulnerabilities.
@@ -212,6 +217,8 @@ Instead, report security issues privately to:
 ```text
 zjx-wm@vatusa.net
 ```
+
+Please see SECURITY.md for more information.
 
 ## Code of Conduct
 
