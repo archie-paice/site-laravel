@@ -215,4 +215,10 @@
             </x-card-component>
         @endif
     </div>
+
+    <div class="mt-8">
+        <x-card-component title="Sector Map">
+            <livewire:sector-map />
+        </x-card-component>
+    </div>
 @endsection
