@@ -169,6 +169,7 @@ Explain why this change is needed.
 
 Describe how you tested the change.
 ```
+PR Authors are responsible for resolving merge conflicts. If something is ambiguous, please do not commit any changes and consult a PR reviewer with what was ambiguous for clarification.
 
 For user-facing changes, include screenshots or examples when helpful.
 
