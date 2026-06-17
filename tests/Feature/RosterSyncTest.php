@@ -47,6 +47,6 @@ test('given a vatusa user, when converted to a database user, then a database us
 });
 
 test('given the roster sync function exists, when the roster sync function is executed, then it executes without errors', function() {
-    SyncRoster::dispatch();
-
+    $syncJob = new SyncRoster();
+    $syncJob->handle();
 });
