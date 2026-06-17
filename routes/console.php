@@ -10,10 +10,6 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::call(callback: function () {
-    SyncRoster::dispatch();
-})->everyTwoHours();
+Schedule::job(new SyncRoster())->everyTwoHours();
 
-Schedule::call(callback: function () {
-    UpdateOnlineControllers::dispatch();
-})->everyMinute();
+Schedule::job(new UpdateOnlineControllers())->everyMinute();

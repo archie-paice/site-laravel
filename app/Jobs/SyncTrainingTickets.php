@@ -54,6 +54,37 @@ class SyncTrainingTickets implements ShouldQueue
             ]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
+            return;
         }
+
+        if (!isset($request) || !$request->successful()) {
+            Log::warning('Vatusa training record create failed', [
+                'status' => isset($request) ? $request->status() : null,
+                'body' => isset($request) ? $request->body() : null,
+                'ticket_id' => $ticket->id,
+            ]);
+            return;
+        }
+
+        $body = $request->json();
+
+        $vatusaId = null;
+        if (is_array($body)) {
+            if (isset($body['data']['id'])) {
+                $vatusaId = $body['data']['id'];
+            } elseif (isset($body['data']['recordID'])) {
+                $vatusaId = $body['data']['recordID'];
+            } elseif (isset($body['data']['record']['id'])) {
+                $vatusaId = $body['data']['record']['id'];
+            } elseif (isset($body['recordID'])) {
+                $vatusaId = $body['recordID'];
+            } elseif (isset($body['id'])) {
+                $vatusaId = $body['id'];
+            }
+        }
+
+        $ticket->vatusa_synced = true;
+        $ticket->vatusa_id = $vatusaId ? (string) $vatusaId : substr(preg_replace('/[^a-z0-9]/i', '', sha1($request->body() ?? (string) microtime(true))), 0, 12);
+        $ticket->save();
     }
 }

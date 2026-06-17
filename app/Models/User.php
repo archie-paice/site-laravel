@@ -176,6 +176,10 @@ class User extends Authenticatable
             ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
     }
 
+    public function certifications(): HasMany {
+        return $this->hasMany(UserCertification::class, 'user_id');
+    }
+    
     public function toSearchableArray(): array
     {
         return [
