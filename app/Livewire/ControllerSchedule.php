@@ -12,6 +12,10 @@ class ControllerSchedule extends Component
 
     public ?int $editingId = null;
 
+    public string $editUserName = '';
+
+    public ?int $editUserCid = null;
+
     public string $editPosition = '';
 
     public string $editStart = '';
@@ -43,6 +47,8 @@ class ControllerSchedule extends Component
         abort_unless(self::canManage($booking), 403);
 
         $this->editingId = $booking->id;
+        $this->editUserName = $booking->user->name;
+        $this->editUserCid = $booking->user->id;
         $this->editPosition = $booking->position;
         $this->editStart = $booking->start->format('Y-m-d\TH:i');
         $this->editEnd = $booking->end->format('Y-m-d\TH:i');

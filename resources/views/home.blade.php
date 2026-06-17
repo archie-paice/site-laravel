@@ -80,6 +80,7 @@
                                 <span class="label-text font-semibold mb-1">Position</span>
                                 <input type="text" name="position" class="input input-bordered w-full"
                                        placeholder="e.g. JAX_CTR" value="{{ old('position') }}" required>
+                                @error('position') <span class="text-error text-sm">{{ $message }}</span> @enderror
                             </label>
 
                             <div class="grid grid-cols-2 gap-4">
@@ -87,12 +88,14 @@
                                     <span class="label-text font-semibold mb-1">Start (zulu)</span>
                                     <input type="datetime-local" name="start" class="input input-bordered w-full"
                                            x-model="start" required>
+                                    @error('start') <span class="text-error text-sm">{{ $message }}</span> @enderror
                                 </label>
 
                                 <label class="flex flex-col">
                                     <span class="label-text font-semibold mb-1">End (zulu)</span>
                                     <input type="datetime-local" name="end" class="input input-bordered w-full"
                                            x-model="end" required>
+                                    @error('end') <span class="text-error text-sm">{{ $message }}</span> @enderror
                                 </label>
                             </div>
 
@@ -104,6 +107,7 @@
                                 <span class="label-text font-semibold mb-1">Description (optional)</span>
                                 <textarea name="description" rows="3" class="textarea textarea-bordered w-full resize-none"
                                           placeholder="e.g. Working the FNO arrival push">{{ old('description') }}</textarea>
+                                @error('description') <span class="text-error text-sm">{{ $message }}</span> @enderror
                             </label>
 
                             <div class="modal-action">

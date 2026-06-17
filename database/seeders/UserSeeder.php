@@ -16,7 +16,8 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         if (App::environment('local', 'development')) {
-            $user = User::firstOrCreate([
+
+            $admin = User::firstOrCreate([
                 'id' => 10000010
             ], [
                 'first_name' => 'Web',
@@ -29,9 +30,11 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core', 'rostered');
+            $admin->rostered = true;
+            $admin->save();
+            $admin->syncRoles(['admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core', 'rostered']);
 
-            $user = User::firstOrCreate([
+            $controller = User::firstOrCreate([
                 'id' => 10000009,
             ], [
                 'first_name' => 'Web',
@@ -44,7 +47,10 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('core');
+            $controller->rostered = true;
+            $controller->save();
+            $controller->syncRoles(['core', 'rostered']);
+
         };
     }
 }

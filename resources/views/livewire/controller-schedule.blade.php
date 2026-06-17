@@ -11,7 +11,7 @@
     @unless($bookings->isEmpty())
         @foreach ($bookings as $booking)
             @if (\App\Livewire\ControllerSchedule::canManage($booking))
-                <div wire:click="edit({{ $booking->id }})" class="cursor-pointer hover:opacity-80" title="Edit this session">
+                <div wire:click="edit({{ $booking->id }})" class="cursor-pointer hover:opacity-80" title="Edit Booking ({{ $booking->user->name }})">
                     <x-booking-card :booking='$booking'/>
                 </div>
             @else
@@ -33,7 +33,8 @@
         <div class="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 p-4"
              wire:click.self="cancelEdit">
             <div class="bg-base-100 rounded-box shadow-xl w-full max-w-lg p-6 max-h-screen overflow-y-auto">
-                <h3 class="text-xl font-bold mb-4">Edit Session</h3>
+                <h3 class="text-xl font-bold">Edit Session</h3>
+                <p class="text-sm text-base-content/50 mb-4">{{ $editUserName }} - {{ $editUserCid }}</p>
 
                 <div class="flex flex-col gap-y-3">
                     <label class="flex flex-col">

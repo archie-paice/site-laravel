@@ -16,22 +16,24 @@ use Illuminate\Support\Facades\Log;
 class SyncRoster implements ShouldQueue, ShouldBeUnique
 {
     use Queueable;
-    private readonly string $ROSTER_API_ENDPOINT;
-    private readonly string $FACILITY_INFO_ENDPOINT;
 
     /**
      * Create a new job instance.
      */
     public function __construct()
     {
-        $this->ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility') . '/roster/both';
-        $this->FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility');
     }
 
     private function updateRoster() {
-        $rosterData = Http::get($this->ROSTER_API_ENDPOINT, [
+        $ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility') . '/roster/both';
+
+        $rosterData = Http::get($ROSTER_API_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
+
+        if ($rosterData->failed()) {
+            throw new \Exception('Failed to fetch roster data: ' . $rosterData->status() . ' - ' . $rosterData->body());
+        }
 
         $roster = $rosterData->json();
         User::where(['rostered' => true])->update(['rostered' => false]);
@@ -48,18 +50,6 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         ])->update([
             'operating_initials' => null
         ]);
-
-        $this->updatePermissions();
-    }
-
-    private function updatePermissions() {
-        foreach (User::where('rostered', true)->get() as $user) {
-            $user->assignRole('rostered');
-        }
-
-        foreach (User::where('rostered', false)->role('rostered')->get() as $user) {
-            $user->removeRole('rostered');
-        }
     }
 
     private function clearUserRoles() {
@@ -85,7 +75,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
                     $user?->assignRole('admin', 'training', 'staff');
                     break;
                 case 'WM':
-                    $user?->assignRole('staff', 'admin');
+                    $user?->assignRole('admin', 'training', 'instructor', 'facilities', 'events', 'staff');
                     break;
                 case 'EC':
                     $user?->assignRole('events', 'staff');
@@ -104,9 +94,14 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
     }
 
     private function updateStaffMembers() {
-        $facilityInfo = Http::get($this->FACILITY_INFO_ENDPOINT, [
+        $FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility');
+        $facilityInfo = Http::get($FACILITY_INFO_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key')
         ]);
+
+        if ($facilityInfo->failed()) {
+            throw new \Exception('Failed to fetch facility info: ' . $facilityInfo->status() . ' - ' . $facilityInfo->body());
+        }
 
         $this->clearUserRoles();
         Staff::truncate();
@@ -134,7 +129,12 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
                 ])->get();
 
                 foreach ($testUsers as $user) {
-                    $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
+                    $user->assignRole('core', 'rostered');
+
+                    if ($user->id === 10000010) {
+                        $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
+                    }
+
                     $user->rostered = true;
                     $user->division = 'USA';
                     $user->facility = 'ZJX';
@@ -145,7 +145,11 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
             Log::info('Roster sync completed successfully.');
         } catch (\Exception $e) {
             // Log error
-            Log::error('Error syncing roster: '.$e->getMessage());
+            Log::error('Error syncing roster: '.$e->getMessage().'\n'.$e->getTraceAsString(), [
+                'url' => config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility'),
+                'environment' => App::environment(),
+                'exception' => get_class($e)
+            ]);
         }
     }
 }

@@ -2,7 +2,7 @@
     <div class='p-4 flex flex-col'>
         <strong class='text-xl'>{{ $booking->position }}</strong>
 
-        <p class='text-lg'>{{ $booking->user->name . ' - ' . $booking->user_id }}</p>
+        <p class='text-lg'>{{ $booking->user->name }}</p>
 
         @if ($booking->description)
             <p class='text-base opacity-70'>{{ $booking->description }}</p>
