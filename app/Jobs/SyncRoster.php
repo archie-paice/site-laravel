@@ -129,12 +129,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
                 ])->get();
 
                 foreach ($testUsers as $user) {
-                    $user->assignRole('core', 'rostered');
-
-                    if ($user->id === 10000010) {
-                        $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
-                    }
-
+                    $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor');
                     $user->rostered = true;
                     $user->division = 'USA';
                     $user->facility = 'ZJX';
