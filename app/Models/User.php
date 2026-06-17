@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\DTOs\VatusaRosterUser;
 use App\Enums\ControllerRating;
+use Http;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -194,5 +195,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Event::class, 'event_positions')
                     ->withPivot('requested_position', 'start', 'end', 'note', 'position_status')
                     ->withTimestamps();
+    }
+
+    public static function createFromVatusa(int $id) {
+        $userData = Http::get(config('app.vatusa_api_url') . '/v2/user/' . $id, [
+            'apikey' => config('app.vatusa_api_key')
+        ])->throw()->json()['data'] ?? throw new \Exception('Failed to fetch user data for CID ' . $id);
+
+        $vatusaUser = new VatusaRosterUser($userData);
+        self::updateFromVatusa($vatusaUser);
     }
 }
