@@ -1,8 +1,10 @@
 @php($colors = \App\Livewire\SectorMap::COLORS)
 
+<div class="flex gap-2">
+
+
 <div class="w-full max-w-2xl mx-auto aspect-square flex flex-col">
     <div class="shrink-0">
-        <h2 class="text-2xl font-bold mb-1">Active Center Split</h2>
         <p class="text-sm opacity-70 mb-3">Live ZJX center sector assignments.</p>
 
         {{-- Split selector --}}
@@ -97,4 +99,5 @@
             </div>
         @endif
     </div>
+</div>
 </div>

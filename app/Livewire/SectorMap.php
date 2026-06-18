@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Enums\ControllerRating;
 use App\Models\CenterSector;
+use App\Models\OnlineController;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -52,11 +53,15 @@ class SectorMap extends Component
     public function mount(): void
     {
         $this->loadFromDatabase();
+
+
     }
 
     public function render()
     {
-        return view('livewire.sector-map');
+        return view('livewire.sector-map', [
+            'onlineSessions' => OnlineController::all(),
+        ]);
     }
 
     #[Computed]
