@@ -43,10 +43,10 @@ test('given a vatusa user, when converted to a database user, then a database us
     expect($user->last_name)->toBe($vatusa->lastName);
     expect($user->email)->toBe($vatusa->email);
     expect($user->facility)->toBe($vatusa->facility);
-    expect($user->joined_at)->toBe($now);
+    expect($user->joined_at->format('Y-m-d H:i:s'))->toBe($now);
 });
 
 test('given the roster sync function exists, when the roster sync function is executed, then it executes without errors', function() {
-    SyncRoster::dispatch();
-
+    $syncJob = new SyncRoster();
+    $syncJob->handle();
 });

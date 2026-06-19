@@ -9,6 +9,10 @@ on:
         description: "Optional image tag override"
         required: false
         default: ""
+        
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   REGISTRY: ghcr.io
@@ -24,7 +28,7 @@ jobs:
     env:
       IMAGE_TAG: ${{ github.event.inputs.image_tag || vars.IMAGE_TAG || 'latest' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Log in to Registry
         uses: docker/login-action@v3
@@ -42,3 +46,23 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+
+  deploy:
+    runs-on: primary-server
+    needs: build
+    environment: production
+
+    steps:
+      - name: Deploy to production host
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOSTNAME }}
+          username: containermanager
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          script: |
+            cd infrastructure/production
+            cat > .env << 'EOF'
+            ${{ secrets.ENV_FILE }}
+            EOF
+            docker compose pull
+            docker compose up -d
