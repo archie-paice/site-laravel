@@ -12,21 +12,39 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AuditLogController extends Controller
 {
     public function index(Request $request) {
-        $search = $request->input('search');
+        $cid = $request->query('cid');
+        $type = $request->query('type');
+
+        // Roster for the controller picker (typeahead on the page).
+        $controllers = User::orderBy('last_name')
+            ->orderBy('first_name')
+            ->get(['id', 'first_name', 'last_name', 'rating']);
+
+        $selectedController = $cid ? User::find($cid) : null;
+
+        // Distinct record (subject) types present in the log, for the type filter.
+        $recordTypes = Activity::query()
+            ->whereNotNull('subject_type')
+            ->distinct()
+            ->pluck('subject_type')
+            ->mapWithKeys(fn ($type) => [$type => Str::headline(class_basename($type))])
+            ->sort();
 
         // Note: subject is NOT eager-loaded. Its morph type may reference a model
         // class that no longer exists on this branch (e.g. App\Models\Faq), and
         // eager-loading would try to instantiate every type up front and fail.
-        $logs = $this->filteredQuery($search)
+        $logs = $this->filteredQuery($cid, $type)
             ->with('causer')
             ->paginate(25)
             ->withQueryString();
 
-        return view('audit-log.index', compact('logs', 'search'));
+        return view('audit-log.index', compact('logs', 'controllers', 'selectedController', 'cid', 'type', 'recordTypes'));
     }
 
     public function export(Request $request): StreamedResponse {
-        $search = $request->input('search');
+        $cid = $request->query('cid');
+        $type = $request->query('type');
+        $limit = (int) $request->query('limit');
 
         $filename = 'audit-log-' . now()->utc()->format('Ymd-His') . 'Z.csv';
 
@@ -35,7 +53,7 @@ class AuditLogController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        return response()->streamDownload(function () use ($search) {
+        return response()->streamDownload(function () use ($cid, $type, $limit) {
             $handle = fopen('php://output', 'w');
 
             fputcsv($handle, [
@@ -49,64 +67,47 @@ class AuditLogController extends Controller
                 'What Changed',
             ]);
 
-            $this->filteredQuery($search)
-                ->with('causer')
-                ->chunk(500, function ($logs) use ($handle) {
-                    foreach ($logs as $log) {
-                        fputcsv($handle, [
-                            $log->created_at->utc()->format('Y-m-d H:i:s') . 'Z',
-                            $log->event ?? $log->description,
-                            $log->causer?->name ?? 'System',
-                            $log->causer?->id,
-                            $log->subject_type ? class_basename($log->subject_type) : '',
-                            $log->subject_id,
-                            $this->subjectName($log),
-                            $this->describeChanges($log),
-                        ]);
-                    }
-                });
+            $writeRow = function ($log) use ($handle) {
+                fputcsv($handle, [
+                    $log->created_at->utc()->format('Y-m-d H:i:s') . 'Z',
+                    $log->event ?? $log->description,
+                    $log->causer?->name ?? 'System',
+                    $log->causer?->id,
+                    $log->subject_type ? class_basename($log->subject_type) : '',
+                    $log->subject_id,
+                    $this->subjectName($log),
+                    $this->describeChanges($log),
+                ]);
+            };
+
+            $query = $this->filteredQuery($cid, $type)->with('causer');
+
+            if ($limit > 0) {
+                // Limit overrides chunking — take the most recent N rows.
+                $query->limit($limit)->get()->each($writeRow);
+            } else {
+                $query->chunk(500, fn ($logs) => $logs->each($writeRow));
+            }
 
             fclose($handle);
         }, $filename, $headers);
     }
 
     /**
-     * Shared, search-aware base query so the on-screen log and the export stay in sync.
+     * Shared base query so the on-screen log and the export stay in sync.
+     * When a CID is selected, returns entries where that user is either the
+     * causer (made the change) or the subject (was changed).
      */
-    private function filteredQuery(?string $search) {
+    private function filteredQuery($cid, $type = null) {
         return Activity::query()
-            ->when(filled($search), function ($query) use ($search) {
-                $terms = preg_split('/\s+/', trim($search));
-
-                $query->where(function ($query) use ($search, $terms) {
-                    $query->where('description', 'like', "%{$search}%")
-                        ->orWhere('event', 'like', "%{$search}%")
-                        ->orWhere('subject_type', 'like', "%{$search}%")
-                        // Match the person who made the change (causer)...
-                        ->orWhereHasMorph('causer', [User::class], fn ($query) => $this->matchUser($query, $terms))
-                        // ...and the person whose record was changed (subject).
-                        ->orWhereHasMorph('subject', [User::class], fn ($query) => $this->matchUser($query, $terms));
+            ->when($cid, function ($query, $cid) {
+                $query->where(function ($query) use ($cid) {
+                    $query->where(fn ($query) => $query->where('causer_type', User::class)->where('causer_id', $cid))
+                        ->orWhere(fn ($query) => $query->where('subject_type', User::class)->where('subject_id', $cid));
                 });
             })
+            ->when($type, fn ($query, $type) => $query->where('subject_type', $type))
             ->orderBy('created_at', 'desc');
-    }
-
-    /**
-     * Match a user across name, operating initials, email and CID. Each whitespace-separated
-     * term must match somewhere (AND between terms), so "web 9" matches a user whose details
-     * contain both "web" and "9" — e.g. initials "WEB" with CID 9.
-     */
-    private function matchUser($query, array $terms) {
-        foreach ($terms as $term) {
-            $query->where(function ($query) use ($term) {
-                $query->where('first_name', 'like', "%{$term}%")
-                    ->orWhere('last_name', 'like', "%{$term}%")
-                    ->orWhere('operating_initials', 'like', "%{$term}%")
-                    ->orWhere('email', 'like', "%{$term}%")
-                    ->orWhere('id', 'like', "%{$term}%")
-                    ->orWhereRaw("CONCAT(first_name, ' ', last_name) LIKE ?", ["%{$term}%"]);
-            });
-        }
     }
 
     /**
