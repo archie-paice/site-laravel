@@ -58,6 +58,16 @@ class Staff extends Model
 
                     break;
 
+                case 'ATA':
+                    static::create([
+                        'title_short' => 'ATA',
+                        'title_long' => 'Training Administrator',
+                        'user_id' => $role['cid'],
+                        'primary_contact' => false,
+                    ]);
+
+                    break;
+
                 case 'WM':
                     static::create([
                         'title_short' => 'WM',
