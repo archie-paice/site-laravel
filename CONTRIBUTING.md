@@ -110,25 +110,12 @@ Run the test suite before submitting your changes:
 php artisan test
 ```
 
-If the project uses PHPUnit directly, you can also run:
-
-```bash
-vendor/bin/phpunit
-```
-
-If the project has linting or formatting checks, run those as well:
-
-```bash
-npm run lint
-npm run format
-```
-
 ## Database Changes
 
 If your contribution changes the database schema:
 
 * Create a Laravel migration.
-* Avoid modifying existing migrations unless the project maintainers specifically request it.
+* Avoid modifying existing migrations unless specifically requested.
 * Include any needed model, factory, seeder, or test updates.
 * Make sure migrations run cleanly on a fresh PostgreSQL database.
 
