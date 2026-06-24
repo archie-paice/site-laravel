@@ -28,7 +28,7 @@ jobs:
     env:
       IMAGE_TAG: ${{ vars.IMAGE_TAG }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Log in to Registry
         uses: docker/login-action@v3
