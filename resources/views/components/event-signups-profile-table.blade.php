@@ -1,5 +1,5 @@
 @if(auth()->id() == $userId)
-    @if($registeredEvents->isEmpty() || ! $registeredEvents->first()->active)
+    @if($registeredEvents->isEmpty())
         <div>
             <strong>You don't have an active event signup. Check the events calendar to see what's upcoming.</strong>
         </div>

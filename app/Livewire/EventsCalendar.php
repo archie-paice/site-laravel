@@ -11,7 +11,7 @@ class EventsCalendar extends LivewireCalendar
 {
     public function events() : Collection
     {
-        return Event::select('id', 'title', 'description', 'start as date')->get();
+        return Event::select('id', 'title', 'description', 'start as date')->where('hidden', false)->get();
     }
 
     public function onEventClick($eventId)

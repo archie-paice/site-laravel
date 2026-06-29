@@ -15,10 +15,25 @@ use Illuminate\Validation\Rules\Enum;
 
 class EventManagementController
 {
-
     public function index() {
         $events = Event::all();
         return view('events.admin', ['events' => $events]);
+    }
+
+    public function toggleVisibility(Event $event) {
+        $event->update([
+            'hidden' => !request()->has('visible'),
+        ]);
+
+        return back();
+    }
+
+    public function togglePositionsLocked(Event $event) {
+        $event->update([
+            'positions_locked' => request()->has('positions_locked'),
+        ]);
+
+        return back();
     }
 
     public function manage(string $id) {

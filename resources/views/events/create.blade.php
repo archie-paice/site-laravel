@@ -4,113 +4,144 @@
 
 @section('body')
 
-    <form method="POST" action="{{ route('admin.events.store') }}" enctype="multipart/form-data" class="flex flex-col gap-5">
+    <form
+        method="POST"
+        action="{{ route('admin.events.store') }}"
+        enctype="multipart/form-data"
+        class="w-full lg:w-1/2 mx-auto flex flex-col gap-5"
+    >
         @csrf
-        <div class="card bg-base-100 border border-base-300">
+
+        <div class="card bg-base-100 border border-base-300 w-full">
             <div class="card-body">
-                <h2 class="card-title">Basic Information</h2>
+                    <h2 class="card-title">Basic Information</h2>
 
-                <label class="label">Event Name</label>
-                <input
-                    name="title"
-                    type="text"
-                    class="input input-bordered w-full"
-                    required
-                    value="{{ old('title') }}"
-                />
+                    <label class="label">Event Name</label>
+                    <input
+                        name="title"
+                        type="text"
+                        class="input input-bordered w-full"
+                        required
+                        value="{{ old('title') }}"
+                    />
 
-                <label class="label">Event Start</label>
-                <input
-                    type="datetime-local"
-                    name="start"
-                    class="input input-bordered w-full"
-                    required
-                    value="{{ old('start') }}"
-                />
+                    <h2 class="card-title">Description</h2>
 
-                <label class="label">Event End</label>
-                <input
-                    type="datetime-local"
-                    name="end"
-                    class="input input-bordered w-full"
-                    required
-                    value="{{ old('end') }}"
-                />
+                    <textarea name="description" required class="textarea w-full" placeholder="Event description..." >{{ old('description') }}</textarea>
 
-                <div class="divider"></div>
+                    <div class="flex gap-4 w-full">
+                        <div class="flex-1">
+                            <label class="label">Event Start</label>
+                            <input
+                                type="datetime-local"
+                                name="start"
+                                class="input input-bordered w-full"
+                                required
+                                value="{{ old('start') }}"
+                            />
+                        </div>
 
-                <h2 class="card-title">Event Type</h2>
+                        <div class="flex-1">
+                            <label class="label">Event End</label>
+                            <input
+                                type="datetime-local"
+                                name="end"
+                                class="input input-bordered w-full"
+                                required
+                                value="{{ old('end') }}"
+                            />
+                        </div>
+                    </div>
 
-                <select
-                    name="type"
-                    class="select select-bordered w-full"
-                >
-                    <option disabled selected>Select type</option>
+                    <div class="divider"></div>
 
-                    @foreach ($types as $t)
-                        <option
-                            value="{{ $t->name }}"
-                            {{ old('type') == $t->name ? 'selected' : '' }}
-                        >
-                            {{ str_replace('_', ' ', $t->name) }}
-                        </option>
-                    @endforeach
-                </select>
+                    <div class="flex gap-4 w-full">
+                        <div class="flex-1">
+                            <h2 class="card-title">Event Type</h2>
 
-                <div class="divider"></div>
-                <h2 class="card-title">Description</h2>
+                            <select
+                                name="type"
+                                class="select select-bordered w-full"
+                            >
+                                <option disabled selected>Select type</option>
 
-                <textarea name="description" required class="textarea" placeholder="Event description..." >{{ old('description') }}</textarea>
+                                @foreach ($types as $t)
+                                    <option
+                                        value="{{ $t->name }}"
+                                        {{ old('type') == $t->name ? 'selected' : '' }}
+                                    >
+                                        {{ str_replace('_', ' ', $t->name) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                <div class="divider"></div>
-                <h2 class="card-title">Event Banner</h2>
-                <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
+                        <div class="flex-1">
+                            <h2 class="card-title">Featured Fields</h2>
 
-                <div class="divider"></div>
-                <h2 class="card-title">Position Preset</h2>
-                <select name="presetPositions" class="select">
-                    <option disabled>Select preset</option>
+                            <input
+                                name="featured_fields"
+                                type="text"
+                                required
+                                placeholder="Eg. KMCO, KJAX, KDAB, KORL"
+                                class="input input-bordered w-full"
+                                value="{{ old('featured_fields') }}"
+                            />
+                        </div>
+                    </div>
 
-                    <option value="" {{ old('presetPositions') == '' ? 'selected' : '' }}>
-                        No preset
-                    </option>
+                    <div class="divider"></div>
 
-                    @foreach ($presetPositions as $p)
-                        <option
-                            value="{{ $p }}"
-                            {{ old('presetPositions') == $p ? 'selected' : '' }}
-                        >
-                            {{ str_replace('_', ' ', $p) }}
-                        </option>
-                    @endforeach
-                </select>
+                    <div class="flex gap-4 w-full">
+                        <div class="flex-1">
+                            <h2 class="card-title">Position Preset</h2>
 
-                <div class="divider"></div>
-                <h2 class="card-title">Featured Fields</h2>
-                <label for="featured_fields" class="label">ICAO or IATA fields only, separated by commas</label>
-                <input name="featured_fields" type="text" required placeholder="Eg. KMCO, KJAX, KDAB, KORL" class="input" value="{{ old('featured_fields') }}" />
+                            <select name="presetPositions" class="select select-bordered w-full">
+                                <option disabled>Select preset</option>
+
+                                <option value="" {{ old('presetPositions') == '' ? 'selected' : '' }}>
+                                    No preset
+                                </option>
+
+                                @foreach ($presetPositions as $p)
+                                    <option
+                                        value="{{ $p }}"
+                                        {{ old('presetPositions') == $p ? 'selected' : '' }}
+                                    >
+                                        {{ str_replace('_', ' ', $p) }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="flex-1">
+                            <h2 class="card-title">Event Banner</h2>
+                            <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <p>
+                        By default, when an event is created, it is hidden from the calendar or list view.
+                        This event will be archived, not deleted, 24 hours after the published end date. This can be reverted
+                        through the event manager.
+                        Create, publish, modify, and delete positions through the Event Manager, which you will be redirected to
+                        after submission.
+                        Editing this event later on will have no impact on the Event Manager, since it only deals with
+                        positions.
+                        You can un-hide this event from the events manager among other common tasks.
+                        You will be notified of any errors in your submission after you submit the form. All changes will be
+                        saved as long as you dont leave this page or refresh.
+                    </p>
 
             </div>
         </div>
 
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Important Event Information</div>
-            <div class="collapse-content text-sm">
-                By default, when an event is created, it is hidden from the calendar or list view.
-                This event will be archived, not deleted, 24 hours after the published end date. This can be reverted
-                through the event manager.
-                Create, publish, modify, and delete positions through the Event Manager, which you will be redirected to
-                after submission.
-                Editing this event later on will have no impact on the Event Manager, since it only deals with
-                positions.
-                You can un-hide this event from the events manager among other common tasks.
-                You will be notified of any errors in your submission after you submit the form. All changes will be
-                saved as long as you dont leave this page or refresh.
-            </div>
-        </div>
-
-        <button class="btn btn-primary" type="submit">Create Event</button>
+        <button class="btn btn-primary w-full mt-2" type="submit">
+            Create Event
+        </button>
     </form>
+
+
 
 @endsection

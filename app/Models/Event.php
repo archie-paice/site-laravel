@@ -20,6 +20,7 @@ class Event extends Model
         'hidden',
         'presetPositions',
         'event_image_route',
+        'positions_locked',
     ];
 
     protected $casts = [
@@ -28,6 +29,7 @@ class Event extends Model
         'end' => 'datetime',
         'featured_fields' => 'array',
         'hidden' => 'boolean',
+        'positions_locked' => 'boolean',
         'presetPositions' => 'array',
     ];
 

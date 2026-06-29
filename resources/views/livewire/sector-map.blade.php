@@ -1,6 +1,6 @@
 @php($colors = \App\Livewire\SectorMap::COLORS)
 
-<div class="flex gap-2">
+<div class="flex gap-2 z-0">
 
 
 <div class="w-full max-w-2xl mx-auto aspect-square flex flex-col">

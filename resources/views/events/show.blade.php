@@ -1,6 +1,14 @@
 @extends('layouts.main')
 
 @section('body')
+    @if($event->hidden)
+        <div class="flex items-center justify-center">
+            <h1>Event Not Public</h1>
+        </div>
+    @else
+
+
+
     <div class="flex flex-col justify-center items-center gap-6">
         <div class="card card-dash bg-base-100 w-xl shadow-sm">
             @if ($event->event_image_route)
@@ -27,9 +35,12 @@
         </div>
 
         @auth
-        <div class="card bg-base-100 w-xl shadow-sm">
-            @livewire('event-registration', ['event' => $event])
-        </div>
+            @if(!$event->positions_locked)
+                <div class="card bg-base-100 w-xl shadow-sm">
+                    @livewire('event-registration', ['event' => $event])
+                </div>
+            @endif
         @endauth
     </div>
+    @endif
 @endsection
