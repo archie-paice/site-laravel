@@ -5,17 +5,20 @@
 @php
     use Illuminate\Support\Str;
 
-    $display = function ($value) {
+    $display = function (mixed $value): string {
         if (is_null($value) || $value === '') {
             return '∅';
         }
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
-        if (is_array($value)) {
-            return json_encode($value);
+        if (is_array($value) || is_object($value)) {
+            return json_encode($value) ?: '∅';
         }
-        return (string) $value;
+        if (is_scalar($value)) {
+            return (string) $value;
+        }
+        return '∅';
     };
 @endphp
 

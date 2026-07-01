@@ -65,7 +65,7 @@ class AuditLogController extends Controller
                 'Record ID',
                 'Record Name',
                 'What Changed',
-            ]);
+            ], ',', '"', '\\');
 
             $writeRow = function ($log) use ($handle) {
                 fputcsv($handle, [
@@ -77,7 +77,7 @@ class AuditLogController extends Controller
                     $log->subject_id,
                     $this->subjectName($log),
                     $this->describeChanges($log),
-                ]);
+                ], ',', '"', '\\');
             };
 
             $query = $this->filteredQuery($cid, $type)->with('causer');
@@ -149,17 +149,20 @@ class AuditLogController extends Controller
         return $parts->implode('; ');
     }
 
-    private function stringifyValue($value): string {
+    private function stringifyValue(mixed $value): string {
         if (is_null($value) || $value === '') {
             return '';
         }
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }
-        if (is_array($value)) {
-            return json_encode($value);
+        if (is_array($value) || is_object($value)) {
+            return json_encode($value) ?: '';
+        }
+        if (is_scalar($value)) {
+            return (string) $value;
         }
 
-        return (string) $value;
+        return '';
     }
 }
