@@ -1,6 +1,6 @@
 @extends('layouts.main')
 
-@section('title', 'Credit Information')
+@section('title', 'Contributors')
 
 @php
     function contributorCard(array $c): void { ?>

@@ -28,7 +28,8 @@ class ManualContributorController extends Controller
         ManualContributor::create($validated);
         Cache::forget('github_contributors');
 
-        return redirect()->back()->with('success', "@{$validated['github_username']} added as a contributor.");
+        $label = $validated['github_username'] ? "@{$validated['github_username']}" : ($validated['display_name'] ?? 'Contributor');
+        return redirect()->back()->with('success', "{$label} added as a contributor.");
     }
 
     public function destroy(ManualContributor $contributor)
@@ -36,6 +37,7 @@ class ManualContributorController extends Controller
         $contributor->delete();
         Cache::forget('github_contributors');
 
-        return redirect()->back()->with('success', "@{$contributor->github_username} removed.");
+        $label = $contributor->github_username ? "@{$contributor->github_username}" : ($contributor->display_name ?? 'Contributor');
+        return redirect()->back()->with('success', "{$label} removed.");
     }
 }

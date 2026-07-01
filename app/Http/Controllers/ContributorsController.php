@@ -35,7 +35,9 @@ class ContributorsController extends Controller
             $response = Http::withHeaders(['Accept' => 'application/vnd.github+json'])
                 ->get('https://api.github.com/repos/zjx-artcc/site-laravel/contributors', ['per_page' => 100]);
 
-            return $response->ok() ? collect($response->json()) : collect();
+            return $response->ok()
+                ? collect($response->json())->reject(fn($c) => ($c['type'] ?? '') === 'Bot')
+                : collect();
         });
 
         $manualLogins = ManualContributor::pluck('github_username');
