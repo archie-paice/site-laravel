@@ -1,3 +1,8 @@
+@php
+    $publicationCategories = \App\Models\PublicationCategory::forNavbar();
+    $mobilePublicationCategories = \App\Models\PublicationCategory::forMobileNav();
+@endphp
+
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20 px-3 sm:px-5">
     {{-- Logo + Home --}}
     <div class="flex-1 min-w-0">
@@ -25,10 +30,27 @@
                 <span>Controllers</span>
                 <x-dropdown-icon/>
             </div>
-            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-sm">
+            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-56 p-2 shadow-sm">
                 <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
                 <li><a href="{{ route('roster.index') }}">Roster</a></li>
                 <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+                <li><a href="{{ route('statistics.index') }}">Statistics</a></li>
+            </ul>
+        </div>
+
+        <div class="dropdown">
+            <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
+                <span>Publications</span>
+                <x-dropdown-icon/>
+            </div>
+            <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-64 p-2 shadow-sm">
+                <li><a href="{{ route('publications.index') }}">All Documents</a></li>
+                @if($publicationCategories->isNotEmpty())
+                    <li class="menu-title text-xs uppercase tracking-wide pt-2">Categories</li>
+                    @foreach($publicationCategories as $publicationCategory)
+                        <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
+                    @endforeach
+                @endif
             </ul>
         </div>
 
@@ -94,6 +116,13 @@
             <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
             <li><a href="{{ route('roster.index') }}">Roster</a></li>
             <li><a href="{{ route('staff.index') }}">Facility Staff</a></li>
+            <li><a href="{{ route('statistics.index') }}">Statistics</a></li>
+
+            <li class="menu-title text-xs uppercase tracking-wide pt-2">Publications</li>
+            <li><a href="{{ route('publications.index') }}">All Documents</a></li>
+            @foreach($mobilePublicationCategories as $publicationCategory)
+                <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
+            @endforeach
 
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>
@@ -119,8 +148,38 @@
                 <li><a href="{{ route('users.show', [auth()->user()->id]) }}">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }} - {{ auth()->user()->rating->mapToString() }}</a></li>
                 <li><a href="{{ route('auth.logout') }}" class="text-error">Logout</a></li>
             @else
-                <li><a href="{{ route('auth.redirect') }}">Login With VATSIM</a></li>
+                <li><a href="#" onclick="event.preventDefault(); vatsim_login_modal.showModal()">Login With VATSIM</a></li>
             @endif
         </ul>
     </div>
 </div>
+
+{{-- VATSIM login confirmation modal (shared by desktop & mobile triggers) --}}
+@guest
+<dialog id="vatsim_login_modal" class="modal" x-data="{ confirmed: false }" @close="confirmed = false">
+    <div class="modal-box text-base-content">
+        <h3 class="font-bold text-lg">Confirm Sign In</h3>
+        <p class="py-4 text-sm">
+            The information contained on all pages of this website is to be used for flight simulation purposes only on the VATSIM network. It is not intended nor should it be used for real world navigation. This site is not affiliated with the FAA, NATCA, the actual Jacksonville ARTCC, or any governing aviation body. All content contained herein is approved only for use on the VATSIM network.
+        </p>
+        <label class="flex items-start cursor-pointer gap-3 mt-2">
+            <input type="checkbox" x-model="confirmed" class="checkbox checkbox-primary mt-0.5 shrink-0" />
+            <span class="text-sm leading-snug">I understand that <strong>we are a virtual organization</strong> and do NOT have any affiliation with the FAA, ZJX, or any government agency.</span>
+        </label>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn btn-error">Cancel</button>
+            </form>
+            <button type="button"
+                    x-bind:disabled="!confirmed"
+                    x-bind:class="confirmed ? 'btn btn-success' : 'btn btn-success btn-disabled'"
+                    @click="window.location.href='{{ route('auth.redirect') }}'">
+                Continue with Login
+            </button>
+        </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
+    </form>
+</dialog>
+@endguest
