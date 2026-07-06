@@ -8,11 +8,10 @@ services:
     env_file:
       - ../.env
     volumes:
-      - ../.env:/var/www/html/.env:ro
+      - ../.env:/var/www/html/.env
     environment:
       APP_ENV: testing
       APP_DEBUG: "true"
-      APP_KEY: ${APP_KEY:-}
       DB_CONNECTION: pgsql
       DB_HOST: postgres
       DB_PORT: "5432"
