@@ -21,6 +21,15 @@ jobs:
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
 
+      - name: Export Laravel app key
+        run: |
+          APP_KEY_VALUE=$(grep '^APP_KEY=' .env | head -n 1 | cut -d= -f2-)
+          if [ -z "$APP_KEY_VALUE" ]; then
+            echo "APP_KEY was not found in .env" >&2
+            exit 1
+          fi
+          echo "APP_KEY=$APP_KEY_VALUE" >> "$GITHUB_ENV"
+
       - name: Build Containers
         run: |
           docker compose -p test -f tests/docker-compose.yml --env-file .env build \
