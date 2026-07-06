@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App;
+use App\Models\Staff;
 use App\Models\User;
 use DateTime;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -45,6 +46,31 @@ class UserSeeder extends Seeder
             ]);
 
             $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+
+            $user = User::firstOrCreate([
+                'id' => 10000008,
+            ], [
+                'first_name' => 'Web',
+                'last_name' => 'Eight',
+                'email' => 'web08@vatusa.net',
+                'rating' => 8,
+                'joined_at' => new DateTime(),
+                'division' => 'USA',
+                'facility' => 'ZJX',
+                'rostered' => true,
+            ]);
+
+            $user->assignRole('admin', 'training', 'staff', 'instructor', 'core');
+
+            Staff::firstOrCreate(['title_short' => 'ATA', 'user_id' => 10000008], [
+                'title_long' => 'Training Administrator',
+                'primary_contact' => false,
+            ]);
+
+            Staff::firstOrCreate(['title_short' => 'INS', 'user_id' => 10000008], [
+                'title_long' => 'Instructor',
+                'primary_contact' => false,
+            ]);
         };
     }
 }

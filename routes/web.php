@@ -103,6 +103,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Logs
     Route::middleware('permission:view audit logs')->group(function() {
         Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
+        Route::get('logs/export', [AuditLogController::class, 'export'])->name('logs.export');
     });
 
     # Training Dept.

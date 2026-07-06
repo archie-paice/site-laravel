@@ -34,6 +34,11 @@ jobs:
         run: |
           docker compose -p test -f tests/docker-compose.yml --env-file .env ps
 
+      - name: Generate Laravel Application Key
+        run: |
+          docker compose -p test -f tests/docker-compose.yml --env-file .env exec -T laravel \
+            sh -c 'touch /var/www/html/.env && php artisan key:generate --force'
+
       - name: Initialize Database
         run: |
           docker compose -p test -f tests/docker-compose.yml --env-file .env exec -T laravel \
