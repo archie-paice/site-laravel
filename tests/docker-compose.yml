@@ -7,6 +7,8 @@ services:
         INSTALL_DEV: "true"
     env_file:
       - ../.env
+    volumes:
+      - ../.env:/var/www/html/.env
     environment:
       APP_ENV: testing
       APP_DEBUG: "true"
