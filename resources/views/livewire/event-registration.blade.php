@@ -143,19 +143,10 @@
 
         </div>
 
-
         @if (!$submitted)
-
-            <button class="btn btn-primary" type="submit">
-                Request
-            </button>
-
+            <button class="btn btn-primary w-full sm:w-auto" type="submit">Request Position</button>
         @else
-
-            <button class="btn btn-error" type="submit">
-                Delete Signup
-            </button>
-
+            <button class="btn btn-error w-full sm:w-auto" type="submit">Delete Signup</button>
         @endif
 
     </form>
