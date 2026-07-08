@@ -9,7 +9,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.2|^8.4",
         "asantibanez/livewire-calendar": "^2.3",
         "doctrine/dbal": "*",
         "laravel/framework": "^12.0",
