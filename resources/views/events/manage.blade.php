@@ -8,7 +8,7 @@
             <div class="bg-base-100 rounded-md p-6 w-full border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
 
                 <h2 class="text-2xl font-light mb-3">
-                    Event Statistics
+                    Event Overview
                 </h2>
 
                 <div class="divide-y divide-base-300">
@@ -45,6 +45,7 @@
                                     class="toggle toggle-success toggle-xl"
                                     onchange="this.form.submit()"
                                     {{ !$event->hidden ? 'checked' : '' }}
+                                    {{ $event->archived ? 'disabled' : '' }}
                                 />
                             </label>
                         </form>
@@ -65,6 +66,26 @@
                                     class="toggle toggle-success toggle-xl"
                                     onchange="this.form.submit()"
                                     {{ $event->positions_locked ? 'checked' : '' }}
+                                />
+                            </label>
+                        </form>
+                    </div>
+
+                    <div class="py-3">
+                        <h3 class="font-bold text-primary">
+                            Archived
+                        </h3>
+                        <form method="POST" action="{{ route('admin.event.archived', $event) }}">
+                            @csrf
+                            @method('PATCH')
+
+                            <label class="flex items-center gap-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    name="archived"
+                                    class="toggle toggle-success toggle-xl"
+                                    onchange="this.form.submit()"
+                                    {{ $event->archived ? 'checked' : '' }}
                                 />
                             </label>
                         </form>

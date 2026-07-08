@@ -28,7 +28,7 @@
     </div>
 
     {{-- Leaflet map, managed entirely by Alpine/Leaflet (kept out of Livewire morphing) --}}
-    <div wire:ignore class="flex-1 min-h-0"
+    <div wire:ignore class="flex-1 min-h-0 z-0"
          x-data="sectorMap({
             highUrl: '{{ asset('geojson/high.json') }}',
             lowUrl: '{{ asset('geojson/low.json') }}',

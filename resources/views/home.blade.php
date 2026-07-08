@@ -1,160 +1,150 @@
 @extends('layouts.main')
 
-
 @section('body-nopad')
     <div
-        class="hero h-[30vh] w-full bg-cover bg-center"
+        class="hero min-h-[260px] h-[42vh] sm:h-[36vh] lg:h-[30vh] w-full bg-cover bg-center"
         style="background-image: url('{{ asset('images/fake_background.png') }}')"
     >
         <div class="hero-overlay bg-black/50"></div>
 
-        <div class="hero-content w-full max-w-none justify-start px-10">
+        <div class="hero-content w-full max-w-none justify-start px-4 sm:px-6 lg:px-10">
             <div class="max-w-3xl text-left text-white">
-                <h1 class="mb-5 text-xl font-bold text-warning">Virtual Jacksonville ARTCC </h1>
-                <h1 class="mb-5 text-5xl font-bold">Elevating Virtual Excellence.</h1>
+                <h1 class="mb-3 text-base sm:text-lg lg:text-xl font-bold text-warning">
+                    Virtual Jacksonville ARTCC
+                </h1>
 
-                <p class="mb-5">
+                <h1 class="mb-4 text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+                    Elevating Virtual Excellence.
+                </h1>
+
+                <p class="max-w-2xl text-sm sm:text-base">
                     The Virtual Jacksonville Air Route Traffic Control Community is dedicated to providing exceptional
                     services to all its esteemed guests and controllers.
                 </p>
-
             </div>
         </div>
     </div>
 @endsection
 
 @section('body')
-    <div class="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 pt-5">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 pt-5">
         @if(count($soloCerts) > 0)
             <x-card-component title="Solo Certs">
                 <ul>
                     @foreach ($soloCerts as $soloCert)
-                        <x-solo-cert-card :soloCert='$soloCert'/>
+                        <x-solo-cert-card :soloCert="$soloCert"/>
                     @endforeach
                 </ul>
             </x-card-component>
         @endif
     </div>
 
+    <div
+        class="mt-6 lg:mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)_minmax(0,24rem)] xl:grid-cols-[24rem_minmax(0,1fr)_24rem] lg:gap-4 items-start"
+    >
 
-    <div class="mt-8 flex gap-4">
-        <div class="flex flex-col gap-4 w-full max-w-sm">
-            <div class="flex flex-col gap-4 w-full max-w-sm">
-                <div
-                    class="bg-base-100 rounded-md p-6 w-full border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
+        <aside class="order-2 lg:order-1 flex flex-col gap-4 w-full min-w-0">
 
-                    <!-- Title -->
-                    <h2 class="text-2xl font-light mb-3">
-                        Quick Links
-                    </h2>
+            <div
+                class="bg-base-100 rounded-md p-4 sm:p-6 w-full border-2 border-base-300 hover:shadow-2xl transition-all duration-300"
+            >
+                <h2 class="text-xl sm:text-2xl font-light mb-3">
+                    Quick Links
+                </h2>
 
-                    <!-- List -->
-                    <div class="divide-y divide-base-300">
-
-                        <div class="py-3">
-                            <h3 class="font-bold text-primary">
-                                <a href="https://discord.gg/bHDwSQn9fh">
-                                    <i class="fa-brands fa-discord"></i> Join Our Discord
-                                </a>
-                            </h3>
-                        </div>
-
-                        <div class="py-3">
-                            <h3 class="font-bold text-primary">
-                                Become a Member
-                            </h3>
-                        </div>
-
-                        <div class="py-3">
-                            <h3 class="font-bold text-primary">
-                                View Events
-                            </h3>
-                        </div>
-
-                        <div class="py-3">
-                            <h3 class="font-bold text-primary">
-                                Read FAQs
-                            </h3>
-                        </div>
-
+                <div class="divide-y divide-base-300">
+                    <div class="py-3">
+                        <h3 class="font-bold text-primary">
+                            <a href="https://discord.gg/bHDwSQn9fh">
+                                <i class="fa-brands fa-discord"></i> Join Our Discord
+                            </a>
+                        </h3>
                     </div>
 
+                    <div class="py-3">
+                        <h3 class="font-bold text-primary">
+                            Become a Member
+                        </h3>
+                    </div>
+
+                    <div class="py-3">
+                        <h3 class="font-bold text-primary">
+                            View Events
+                        </h3>
+                    </div>
+
+                    <div class="py-3">
+                        <h3 class="font-bold text-primary">
+                            Read FAQs
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <x-card-component-2 title="Upcoming Events">
+                <div class="flex justify-between">
+                    @if(!$events->isEmpty())
+                        <h1 class="font-bold text-primary">
+                            <a href="{{ route('events.index') }}">View All Events</a>
+                        </h1>
+                    @endif
                 </div>
 
-                <x-card-component-2 title="Upcoming Events">
-                    <div class="flex justify-between">
-                        @if(!$events->isEmpty())
-                            <h1 class="font-bold text-primary"><a href="{{ route('events.index') }}">View All Events</a>
-                            </h1>
-                        @endif
-                    </div>
+                @if($events->isEmpty())
+                    <h1 class="text-lg">No upcoming events.</h1>
+                @else
+                    @foreach($events as $event)
+                        <div class="flex flex-col my-2">
+                            <div class="bg-base-300 rounded-xl shadow-sm overflow-hidden">
+                                <div class="flex">
+                                    <div
+                                        class="bg-primary text-primary-content w-14 sm:w-16 shrink-0 flex flex-col items-center justify-center py-2"
+                                    >
+                                        <span class="text-xs sm:text-sm font-semibold uppercase">
+                                            {{ $event->start->format('M') }}
+                                        </span>
 
-                    @if($events->isEmpty())
-                        <h1 class="text-lg">No upcoming events.</h1>
+                                        <span class="text-2xl sm:text-3xl font-bold leading-none">
+                                            {{ $event->start->format('d') }}
+                                        </span>
+                                    </div>
 
-                    @else
+                                    <div class="p-3 flex-1 min-w-0">
+                                        <h3 class="font-bold text-base sm:text-lg truncate">
+                                            {{ $event->title }}
+                                        </h3>
 
-                        @foreach($events as $event)
-
-                            <div class="flex flex-col my-2">
-                                <div class="bg-base-300 rounded-xl shadow-sm overflow-hidden">
-                                    <div class="flex">
-
-                                        <!-- Date side -->
-                                        <div
-                                            class="bg-primary text-primary-content w-16 flex flex-col items-center justify-center py-2">
-                                            <span
-                                                class="text-sm font-semibold uppercase">{{ $event->start->format('M') }}</span>
-                                            <span
-                                                class="text-3xl font-bold leading-none">{{ $event->start->format('d') }}</span>
-                                        </div>
-
-                                        <!-- Event info -->
-                                        <div class="p-3 flex-1">
-                                            <h3 class="font-bold text-lg">
-                                                {{ $event->title }}
-                                            </h3>
-
-                                            <p class="text-sm text-base-content/70 mt-1">
-                                                {{$event->getFormattedTimeAttribute()}}
-                                            </p>
-                                        </div>
-
+                                        <p class="text-sm text-base-content/70 mt-1">
+                                            {{ $event->getFormattedTimeAttribute() }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    @endif
+                        </div>
+                    @endforeach
+                @endif
+            </x-card-component-2>
 
-                </x-card-component-2>
+            <x-card-component-2 title="News">
+                @if($news->isEmpty())
+                    <h1 class="text-lg">Nothing new has been announced.</h1>
+                @endif
 
-                <x-card-component-2 title="News">
-
-                    @if($news->isEmpty())
-                        <h1 class="text-lg">Nothing new has been announced.</h1>
-                    @endif
-
-                    <div class="">
-
-
+                <div>
                     @foreach($news as $n)
-
                         <div class="flex flex-col my-5">
                             <div
                                 class="bg-base-300 rounded-md overflow-hidden cursor-pointer hover:shadow-lg transition w-full"
                                 onclick="news_modal_{{ $n->id }}.showModal()"
                             >
-                                <div class="">
-                                    <h3 class="font-medium text-lg text-black px-2">
-                                        {{ $n->title }}
-                                    </h3>
-                                </div>
+                                <h3 class="font-medium text-base sm:text-lg text-black px-3 py-2">
+                                    {{ $n->title }}
+                                </h3>
                             </div>
                         </div>
 
                         <dialog id="news_modal_{{ $n->id }}" class="modal">
-                            <div class="modal-box">
-
+                            <div class="modal-box w-11/12 max-w-2xl">
                                 <h3 class="text-xl font-bold">
                                     {{ $n->title }}
                                 </h3>
@@ -174,42 +164,37 @@
                                         </button>
                                     </form>
                                 </div>
-
                             </div>
                         </dialog>
-
                     @endforeach
-                    </div>
+                </div>
+            </x-card-component-2>
+        </aside>
 
-                </x-card-component-2>
-            </div>
-
-        </div>
-
-        <div class="w-full">
+        <main class="order-1 lg:order-2 w-full min-w-0">
             <x-card-component title="Active Center Split">
-                <livewire:sector-map/>
+                <div class="w-full min-w-0 overflow-x-auto">
+                    <livewire:sector-map/>
+                </div>
             </x-card-component>
-        </div>
+        </main>
 
-        <div class="flex flex-col w-full max-w-sm gap-y-3">
-            <div class="w-full max-w-sm">
-                <x-card-component-2 title="Online Controllers">
-                    @unless(sizeof($onlineSessions) == 0)
-                        @foreach ($onlineSessions as $session)
-                            <x-online-controller
-                                :callsign='$session->callsign'
-                                :user='$session->user'
-                                :userId='$session->user_id'
-                                :onlineSince='new DateTime($session->start)'/>
-                        @endforeach
-                    @else
-                        <h1 class="text-lg">No controllers online.</h1>
-                    @endunless
-                </x-card-component-2>
-            </div>
+        <aside class="order-3 lg:order-3 flex flex-col w-full min-w-0 gap-y-3">
+            <x-card-component-2 title="Online Controllers">
+                @unless(sizeof($onlineSessions) == 0)
+                    @foreach ($onlineSessions as $session)
+                        <x-online-controller
+                            :callsign="$session->callsign"
+                            :user="$session->user"
+                            :userId="$session->user_id"
+                            :onlineSince="new DateTime($session->start)"
+                        />
+                    @endforeach
+                @else
+                    <h1 class="text-lg">No controllers online.</h1>
+                @endunless
+            </x-card-component-2>
+        </aside>
 
-
-        </div>
     </div>
 @endsection

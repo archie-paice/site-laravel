@@ -20,17 +20,42 @@ class EventManagementController
         return view('events.admin', ['events' => $events]);
     }
 
-    public function toggleVisibility(Event $event) {
+    public function toggleVisibility(Event $event)
+    {
+        if ($event->archived) {
+            return back()->with('error', 'Archived events must remain hidden.');
+        }
+
         $event->update([
-            'hidden' => !request()->has('visible'),
+            'hidden' => ! $event->hidden,
         ]);
 
         return back();
     }
 
-    public function togglePositionsLocked(Event $event) {
+    public function toggleArchived(Event $event)
+    {
+        if ($event->archived) {
+            $event->update([
+                'archived' => false,
+                'archived_at' => null,
+                'hidden' => true,
+            ]);
+        } else {
+            $event->update([
+                'archived' => true,
+                'archived_at' => now(),
+                'hidden' => true,
+            ]);
+        }
+
+        return back();
+    }
+
+    public function togglePositionsLocked(Event $event)
+    {
         $event->update([
-            'positions_locked' => request()->has('positions_locked'),
+            'positions_locked' => ! $event->positions_locked,
         ]);
 
         return back();

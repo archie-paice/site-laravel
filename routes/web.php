@@ -119,6 +119,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Events Dept.
     Route::prefix('/events')->middleware('permission:manage events')->group(function () {
         Route::patch('{event}/visibility', [EventManagementController::class, 'toggleVisibility'])->name('admin.event.visibility');
+        Route::patch('{event}/archived', [EventManagementController::class, 'toggleArchived'])->name('admin.event.archived');
         Route::patch('{event}/positions-locked', [EventManagementController::class, 'togglePositionsLocked'])->name('admin.event.positions-locked');
         Route::resource('event-fields', EventFieldController::class)->names('admin.events.event-fields');
         Route::resource('position-presets', EventPositionPresetController::class)->names('admin.events.position-presets');

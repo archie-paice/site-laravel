@@ -21,6 +21,8 @@ class Event extends Model
         'presetPositions',
         'event_image_route',
         'positions_locked',
+        'archived',
+        'archived_at',
     ];
 
     protected $casts = [
@@ -31,6 +33,7 @@ class Event extends Model
         'hidden' => 'boolean',
         'positions_locked' => 'boolean',
         'presetPositions' => 'array',
+        'archived' => 'boolean',
     ];
 
     public function positionRequests() {
