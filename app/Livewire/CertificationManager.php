@@ -24,6 +24,13 @@ class CertificationManager extends SortableTable
         $this->authorizeWrite();
     }
 
+    // Reset to the first page whenever the search term changes so results aren't
+    // hidden on a now-out-of-range page.
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
     // Livewire action requests do not re-run the mounting route's permission
     // middleware, so every mutating action must re-check authorization itself.
     protected function authorizeWrite(): void

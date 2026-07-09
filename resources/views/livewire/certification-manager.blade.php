@@ -1,5 +1,13 @@
-<div x-data="{ search: @entangle('search').live }">
-    <x-search/>
+<div>
+    <div class="flex flex-col mb-3">
+        <label for="search" class="label">Search</label>
+        <input
+            type="text"
+            id="search"
+            wire:model.live.debounce.300ms="search"
+            placeholder="Name or CID"
+            class="input input-sm max-w-xs">
+    </div>
 
     @unless(sizeof($users) == 0)
         <table class='table table-zebra table-md w-max border-2 rounded-md border-base-300 mt-5'>

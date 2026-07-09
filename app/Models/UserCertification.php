@@ -13,6 +13,36 @@ class UserCertification extends Model
         'certification_level_id',
     ];
 
+    protected static function booted(): void
+    {
+        // Record certification grants/revokes in the audit log, attributed to the
+        // affected user (subject) and the acting staff member (causer, resolved by
+        // the activity logger from the authenticated user). DB-level cascade deletes
+        // (e.g. removing a level/facility) bypass Eloquent events, so this only fires
+        // for explicit user-initiated grants and revokes.
+        static::created(fn (UserCertification $cert) => $cert->logChange('issued'));
+        static::deleted(fn (UserCertification $cert) => $cert->logChange('revoked'));
+    }
+
+    protected function logChange(string $event): void
+    {
+        $level = $this->certificationLevel;
+        $facility = $level?->facility;
+
+        $descriptor = $level
+            ? ': '.($facility ? $facility->identifier.' ' : '').$level->name.' ('.$level->abbreviation.')'
+            : '';
+
+        activity()
+            ->performedOn($this->user)
+            ->withProperties([
+                'facility' => $facility?->identifier,
+                'level' => $level?->name,
+                'abbreviation' => $level?->abbreviation,
+            ])
+            ->log('Certification '.$event.$descriptor);
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');

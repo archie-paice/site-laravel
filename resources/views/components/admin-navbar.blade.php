@@ -9,10 +9,6 @@
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
-        @haspermission('certifications:write')
-            <li><a href={{ route('certifications.index') }}>Certifications</a></li>
-        @endhaspermission
-
         @hasrole('training')
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
@@ -23,6 +19,9 @@
                     <li><a href={{ route('training-tickets.index') }}>Training Tickets</a></li>
                     <li><a href={{ route('training-assignments.index') }}>Training Assignments</a></li>
                     <li><a href={{ route('solo-certs.index') }}>Solo Certs</a></li>
+                    @haspermission('certifications:write')
+                        <li><a href={{ route('certifications.index') }}>Certifications</a></li>
+                    @endhaspermission
                 </ul>
             </div>
         @endhasrole

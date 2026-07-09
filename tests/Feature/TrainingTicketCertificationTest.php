@@ -144,6 +144,33 @@ test('the vatusa sync leaves notes unchanged when no cert was issued', function 
     Http::assertSent(fn ($request) => ($request['notes'] ?? null) === 'Base notes.');
 });
 
+test('the training ticket show page displays the pushed certification', function () {
+    $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX']);
+    $level = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'name' => 'Ground', 'abbreviation' => 'GND']);
+    $student = User::factory()->create();
+    $instructor = User::factory()->create();
+    $instructor->assignRole(['staff', 'training']);
+
+    $ticket = TrainingTicket::create([
+        'user_id' => $student->id,
+        'instructor_id' => $instructor->id,
+        'position' => 'MCO_APP',
+        'session_start' => now()->format('Y-m-d H:i:s'),
+        'session_end' => now()->addHour()->format('Y-m-d H:i:s'),
+        'movements' => 10,
+        'score' => 5,
+        'notes' => 'Base notes.',
+        'location' => 1,
+        'issued_certification_level_id' => $level->id,
+    ]);
+
+    $this->actingAs($instructor);
+    $this->get(route('training-tickets.show', $ticket))
+        ->assertStatus(200)
+        ->assertSee('Certification Pushed')
+        ->assertSee('GND');
+});
+
 test('the training ticket email includes the certification issued line', function () {
     $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX']);
     $level = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'name' => 'Ground', 'abbreviation' => 'GND']);

@@ -6,6 +6,7 @@ use App\Models\TrainingTicket;
 use App\Models\User;
 use App\Models\UserCertification;
 use Database\Seeders\PermissionSeeder;
+use Spatie\Activitylog\Models\Activity;
 
 beforeEach(fn () => $this->seed(PermissionSeeder::class));
 
@@ -81,6 +82,23 @@ test('certificationIssuedLabel formats the issued certification', function () {
     ]);
 
     expect($ticket->certificationIssuedLabel())->toBe('Certification Issued: ZJX Ground (GND)');
+});
+
+test('granting and revoking a certification writes audit log entries', function () {
+    $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX']);
+    $level = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'name' => 'Ground', 'abbreviation' => 'GND']);
+    $user = User::factory()->create();
+
+    $cert = UserCertification::create(['user_id' => $user->id, 'certification_level_id' => $level->id]);
+
+    $issued = Activity::latest('id')->first();
+    expect($issued->description)->toContain('Certification issued');
+    expect($issued->subject_id)->toEqual($user->id);
+
+    $cert->delete();
+
+    $revoked = Activity::latest('id')->first();
+    expect($revoked->description)->toContain('Certification revoked');
 });
 
 test('certificationIssuedLabel is null when no certification was issued', function () {
