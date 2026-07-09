@@ -14,7 +14,7 @@ class UserController extends Controller
 {
 
     public function show(int $id) {
-        $user = User::findOrFail($id);
+        $user = User::with('certifications.certificationLevel.facility')->findOrFail($id);
 
         return view('users.show', [
             'user' => $user,

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Training;
 use App\Http\Controllers\Controller;
 use App\Jobs\SyncTrainingTickets;
 use App\Mail\TrainingTicketCreated;
+use App\Models\CertificationFacility;
 use App\Models\TrainingTicket;
 use App\Models\User;
+use App\Models\UserCertification;
 use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -35,8 +37,16 @@ class TrainingTicketController extends Controller
     public function create()
     {
         $users = User::where(['rostered' => true])->orderBy('last_name')->get();
+
+        // Instructors with certifications:write may optionally issue a certification
+        // alongside the ticket. Only load the level list for them.
+        $certificationFacilities = Auth::user()->hasPermissionTo('certifications:write')
+            ? CertificationFacility::orderBy('order')->with('certificationLevels')->get()
+            : collect();
+
         return view('training-tickets.create', [
-            'users' => $users
+            'users' => $users,
+            'certificationFacilities' => $certificationFacilities,
         ]);
         ///^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/
     }
@@ -56,14 +66,23 @@ class TrainingTicketController extends Controller
             'sessionEnd' => 'required|date|after:sessionStart',
             'movements' => 'required|integer',
             'score' => 'required|integer|between:1,5',
-            'notes' => 'required',
+            // Notes come from the Quill editor as HTML, so an "empty" editor still
+            // submits markup like "<p><br></p>". Reject anything with no real text.
+            'notes' => ['required', 'string', 'max:5000', function ($attribute, $value, $fail) {
+                if (trim(strip_tags($value)) === '') {
+                    $fail('The notes field cannot be empty.');
+                }
+            }],
+            'certification_level_id' => 'nullable|integer|exists:certification_levels,id',
         ]);
 
         if($instructor->id == $validated['student']) {
             return redirect()->back()->withInput($request->input())->with('error', 'Cannot create training ticket with yourself as the student.');
         }
 
-
+        // Only issue a certification if one was selected AND the instructor is allowed to.
+        $issueCertification = !empty($validated['certification_level_id'])
+            && $instructor->hasPermissionTo('certifications:write');
 
         $ticket = new TrainingTicket([
             'user_id' => $validated['student'],
@@ -75,9 +94,17 @@ class TrainingTicketController extends Controller
             'score' => $validated['score'],
             'notes' => $validated['notes'],
             'location' => $validated['location'],
+            'issued_certification_level_id' => $issueCertification ? $validated['certification_level_id'] : null,
         ]);
 
         $ticket->save();
+
+        if ($issueCertification) {
+            UserCertification::firstOrCreate([
+                'user_id' => $validated['student'],
+                'certification_level_id' => $validated['certification_level_id'],
+            ]);
+        }
 
         Mail::to($ticket->student->email)->bcc($ticket->instructor->email)->queue(new TrainingTicketCreated($ticket));
         Log::info('Training ticket created', [

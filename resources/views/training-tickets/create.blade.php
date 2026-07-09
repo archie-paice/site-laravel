@@ -113,6 +113,26 @@
 
             <br>
 
+            @if($certificationFacilities->isNotEmpty())
+                <label for="certification_level_id" class="label">Issue Certification (optional)</label>
+                <select name="certification_level_id" id="certification_level_id" class="select">
+                    <option value="">Do not issue a certification</option>
+                    @foreach($certificationFacilities as $facility)
+                        @if($facility->certificationLevels->isNotEmpty())
+                            <optgroup label="{{ $facility->identifier }} — {{ $facility->name }}">
+                                @foreach($facility->certificationLevels as $level)
+                                    <option value="{{ $level->id }}" @selected(old('certification_level_id') == $level->id)>
+                                        {{ $level->name }} ({{ $level->abbreviation }})
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endif
+                    @endforeach
+                </select>
+
+                <br>
+            @endif
+
             <div class="flex flex-row max-w-full">
                 <input type="checkbox" class="checkbox mr-2" name="confirm" required>
                 <label for="confirm" class="">I understand that this training ticket, once synced to VATUSA, will be immutable and final.</label>

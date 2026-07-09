@@ -56,4 +56,12 @@
             <button type="submit" class='btn btn-primary'>Submit Changes</button>
         </form>
     </x-card-component>
+
+    @haspermission('certifications:write')
+        <div class='mt-5'>
+            <x-card-component title='Certifications'>
+                @livewire('user-certifications', ['user' => $user], key('user-certs-'.$user->id))
+            </x-card-component>
+        </div>
+    @endhaspermission
 @endsection
