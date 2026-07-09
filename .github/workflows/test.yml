@@ -14,42 +14,40 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v6
 
-      - name: Create .env from secret
-        run: |
-          printf '%s\n' "$ENV_FILE" > .env
-          chmod 600 .env
-        env:
-          ENV_FILE: ${{ secrets.ENV_FILE }}
-
       - name: Build Containers
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env build \
+          docker compose -p test -f tests/docker-compose.yml build \
             --build-arg INSTALL_DEV=true
 
       - name: Start Services
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env up -d
+          docker compose -p test -f tests/docker-compose.yml up -d
 
       - name: Show Container Status
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env ps
+          docker compose -p test -f tests/docker-compose.yml ps
+
+      - name: Prepare SQLite Database
+        run: |
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
+            sh -c 'mkdir -p /var/www/html/storage/database && touch /var/www/html/storage/database/database.sqlite && chmod 666 /var/www/html/storage/database/database.sqlite'
 
       - name: Generate Laravel Application Key
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env exec -T laravel \
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
             sh -c 'touch /var/www/html/.env && php artisan key:generate --force'
 
       - name: Initialize Database
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env exec -T laravel \
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
             php artisan migrate --seed --force
 
       - name: Execute Tests
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env exec -T laravel \
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
             ./vendor/bin/pest
 
       - name: Teardown
         if: always()
         run: |
-          docker compose -p test -f tests/docker-compose.yml --env-file .env down -v
+          docker compose -p test -f tests/docker-compose.yml down -v
