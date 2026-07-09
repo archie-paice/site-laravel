@@ -7,6 +7,7 @@ use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
 
 class StatisticsController extends Controller
@@ -152,5 +153,157 @@ class StatisticsController extends Controller
             'controllerMonthly'   => $controllerMonthly,
             'controllerSessions'  => $controllerSessions,
         ]);
+    }
+
+    public function quarterly(Request $request)
+    {
+        $data = $this->resolveQuarterlyData($request);
+
+        $perPage = 25;
+        $data['flagged'] = $this->paginate($data['flagged'], $request, 'flagged_page', $perPage);
+        $data['rows']    = $this->paginate($data['rows'], $request, 'rows_page', $perPage);
+
+        return view('statistics.quarterly', $data);
+    }
+
+    private function paginate($items, Request $request, string $pageName, int $perPage): LengthAwarePaginator
+    {
+        $page = max(1, (int) $request->query($pageName, 1));
+
+        return new LengthAwarePaginator(
+            $items->forPage($page, $perPage)->values(),
+            $items->count(),
+            $perPage,
+            $page,
+            ['path' => $request->url(), 'pageName' => $pageName, 'query' => $request->query()]
+        );
+    }
+
+    public function exportQuarterly(Request $request)
+    {
+        $data = $this->resolveQuarterlyData($request);
+
+        $rows = $data['flagged'];
+
+        $filename = "quarterly-flagged-q{$data['quarter']}-{$data['year']}-" . Carbon::now()->utc()->format('Ymd-His') . 'Z.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        return response()->streamDownload(function () use ($rows) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['Controller CID', 'FULL Name', 'Status', 'Hours (In Quarter)'], ',', '"', '\\');
+
+            foreach ($rows as $row) {
+                fputcsv($handle, [
+                    $row->user->id,
+                    $row->user->name,
+                    $this->statusLabel($row->user),
+                    number_format($row->total, 2),
+                ], ',', '"', '\\');
+            }
+
+            fclose($handle);
+        }, $filename, $headers);
+    }
+
+    private function statusLabel(User $user): string
+    {
+        if (!$user->rostered) {
+            return 'Not Rostered';
+        }
+
+        if (strcasecmp($user->facility, config('app.vatusa_facility')) === 0) {
+            return 'Home';
+        }
+
+        return "Visitor ({$user->facility})";
+    }
+
+    private function resolveQuarterlyData(Request $request): array
+    {
+        $now = Carbon::now();
+        $currentQuarter = intdiv($now->month - 1, 3) + 1;
+
+        $year = (int) $request->query('year', $now->year);
+        if ($year < 2000 || $year > 2100) $year = $now->year;
+
+        $quarter = (int) $request->query('quarter', $currentQuarter);
+        if ($quarter < 1 || $quarter > 4) $quarter = $currentQuarter;
+
+        $threshold = (float) $request->query('threshold', 3);
+        if ($threshold < 0) $threshold = 3;
+
+        $rosteredOnly = $request->boolean('rostered_only');
+        $cid = $request->query('cid');
+
+        $months = range(($quarter - 1) * 3 + 1, $quarter * 3);
+
+        $years = ControllerMonthlyStat::select('year')
+            ->distinct()
+            ->orderBy('year', 'desc')
+            ->pluck('year');
+
+        if (!$years->contains($now->year)) {
+            $years = $years->prepend($now->year);
+        }
+
+        $activeUserIds = ControllerMonthlyStat::select('user_id')->distinct()->pluck('user_id');
+
+        $quarterStats = ControllerMonthlyStat::whereIn('user_id', $activeUserIds)
+            ->where('year', $year)
+            ->whereIn('month', $months)
+            ->get()
+            ->groupBy('user_id')
+            ->map(fn($rows) => [
+                'delivery' => $rows->sum('delivery_hours'),
+                'ground'   => $rows->sum('ground_hours'),
+                'tower'    => $rows->sum('tower_hours'),
+                'approach' => $rows->sum('approach_hours'),
+                'center'   => $rows->sum('center_hours'),
+                'total'    => $rows->sum(fn($r) => $r->totalHours()),
+            ]);
+
+        $users = User::whereIn('id', $activeUserIds)
+            ->orderBy('last_name')
+            ->orderBy('first_name')
+            ->get(['id', 'first_name', 'last_name', 'email', 'rating', 'rostered', 'facility']);
+
+        $empty = ['delivery' => 0, 'ground' => 0, 'tower' => 0, 'approach' => 0, 'center' => 0, 'total' => 0];
+
+        $controllers = $users->map(fn($user) => (object) [
+            'id'     => $user->id,
+            'name'   => $user->name,
+            'rating' => $user->rating,
+        ])->values();
+
+        $rows = $users->map(fn($user) => (object) array_merge(
+            ['user' => $user],
+            $quarterStats->get($user->id, $empty)
+        ))->values();
+
+        if ($cid) {
+            $rows = $rows->filter(fn($row) => (string) $row->user->id === (string) $cid)->values();
+        }
+
+        $flagged = $rows->filter(fn($row) => $row->total < $threshold)
+            ->when($rosteredOnly, fn($flagged) => $flagged->filter(fn($row) => $row->user->rostered))
+            ->sortBy('total')
+            ->values();
+
+        return [
+            'rows'         => $rows,
+            'flagged'      => $flagged,
+            'year'         => $year,
+            'quarter'      => $quarter,
+            'years'        => $years,
+            'threshold'    => $threshold,
+            'controllers'  => $controllers,
+            'cid'          => $cid,
+            'rosteredOnly' => $rosteredOnly,
+        ];
     }
 }

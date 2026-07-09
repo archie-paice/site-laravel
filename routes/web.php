@@ -95,6 +95,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
         Route::put('visit-requests/{visitRequest}/approve', [VisitFacilityController::class, 'approve'])->name('visit.approve');
         Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])->name('visit.deny');
+        Route::get('statistics/quarterly', [StatisticsController::class, 'quarterly'])->name('statistics.quarterly');
+        Route::get('statistics/quarterly/export', [StatisticsController::class, 'exportQuarterly'])->name('statistics.quarterly.export');
     });
 
     # Facilities Dept.

@@ -61,12 +61,13 @@
                     <li><a href={{ route('admin.index') }}>Dashboard</a></li>
                     <li><a href={{ route('manage-users.index') }}>User Management</a></li>
                     <li>
-                        <a href={{ route('visit.manage') }}>Visitor Requests 
+                        <a href={{ route('visit.manage') }}>Visitor Requests
                             @if(VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() > 0)
                                 <span class='badge badge-primary'>{{ VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() }}</span>
                             @endif
                         </a>
                     </li>
+                    <li><a href={{ route('statistics.quarterly') }}>Quarterly Hours Review</a></li>
                     <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>
