@@ -72,6 +72,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
                     $user?->assignRole('admin', 'training', 'instructor', 'facilities', 'events', 'staff');
                     break;
                 case 'TA':
+                case 'ATA':
                     $user?->assignRole('admin', 'training', 'staff');
                     break;
                 case 'WM':
