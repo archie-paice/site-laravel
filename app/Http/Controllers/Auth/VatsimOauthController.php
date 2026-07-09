@@ -13,13 +13,17 @@ class VatsimOauthController extends Controller {
     public function callback() {
         $user = Socialite::driver('vatsim')->user();
 
+        // NOTE: `facility` (the ARTCC) is intentionally NOT written here. It is owned
+        // by the VATUSA roster sync (SyncRoster / User::updateFromVatusa), which is the
+        // authoritative source. VATSIM's subdivision is frequently null for VATUSA
+        // controllers, so updating facility at login previously blanked/clobbered it and
+        // made rostered users render as visitors (issue #59).
         User::upsert([
             'id' => $user->cid,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'email' => $user->email,
             'division' => $user->division,
-            'facility' => $user->facility ?? User::find($user->cid)?->facility,
             'rating' => $user->rating
         ], 'id');
     
