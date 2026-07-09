@@ -88,6 +88,7 @@
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">GitHub</a>
                     <a class="link text-lg" href="https://vatusa.net" target="_blank">VATUSA</a>
                     <a class="link text-lg" href="https://vatsim.net" target="_blank">VATSIM</a>
+                    <a class="link text-lg" href="{{ route('contributors.index') }}">Contributors</a>
                 </div>
 
                 <p class="text-md">The content of this website was developed for the Virtual Jacksonville ARTCC (vZJX). vZJX has <strong>no affiliation</strong> to the real Jacksonville ARTCC, the Federal Aviation Administration, or any governing aviation authority, nor does vZJX intend to impersonate them in any way, shape or form. This site should never be used for purposes including flight planning, air traffic control, air traffic management, or any relavant operations</p>
