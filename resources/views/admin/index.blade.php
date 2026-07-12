@@ -29,6 +29,7 @@
             <x-card-component title="Facilities Quick Links">
                 <a class='btn btn-primary mt-5' href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a>
                 <a class='btn btn-primary' href="{{ route('admin.publications.index') }}">Document Management</a>
+                <a class='btn btn-primary' href="{{ route('certification-facilities.index') }}">Facilities Management</a>
             </x-card-component>
         @endrole
 

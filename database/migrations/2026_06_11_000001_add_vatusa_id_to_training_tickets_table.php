@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->json('presetPositions');
+        Schema::table('training_tickets', function (Blueprint $table) {
+            $table->string('vatusa_id')->nullable()->after('vatusa_synced');
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('events', function (Blueprint $table) {
-            $table->dropColumn('presetPositions');
+        Schema::table('training_tickets', function (Blueprint $table) {
+            $table->dropColumn('vatusa_id');
         });
     }
 };

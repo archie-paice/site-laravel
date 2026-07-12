@@ -28,6 +28,11 @@ class Staff extends Model
     public static function fromFacilityInfoDTO(\App\DTOs\VatusaFacilityInfoDTO $infoDTO)
     {
         foreach ($infoDTO->roles as $role) {
+            // User does not exist in users table - gather from out of division
+            if (is_null(User::find($role['cid']))) {
+                User::createFromVatusa($role['cid']);
+            }
+
             switch($role['role']) {
                 case 'ATM':
                     static::create([
@@ -54,6 +59,16 @@ class Staff extends Model
                         'title_long' => 'Training Administrator',
                         'user_id' => $role['cid'],
                         'primary_contact' => true,
+                    ]);
+
+                    break;
+
+                case 'ATA':
+                    static::create([
+                        'title_short' => 'ATA',
+                        'title_long' => 'Training Administrator',
+                        'user_id' => $role['cid'],
+                        'primary_contact' => false,
                     ]);
 
                     break;
