@@ -102,15 +102,19 @@
                 <div class="collapse-title font-semibold">File Upload</div>
                 <div class="collapse-content flex flex-col gap-4">
 
+                    <div class="alert alert-warning text-sm">
+                        <span>Uploaded documents are publicly accessible to anyone. Do not upload private or confidential information.</span>
+                    </div>
+
                     <div>
                         <label for="file" class="label">Document File <span class="text-error">*</span></label>
                         <input id="file"
                                name="file"
                                type="file"
                                required
-                               accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.zip,.gz,.7z,.json,.xml,.txt"
+                               accept=".pdf,.docx,.png,.jpg,.jpeg"
                                class="file-input file-input-bordered w-full @error('file') file-input-error @enderror" />
-                        <p class="text-xs text-base-content/50 mt-1">Accepted: PDF, Word, Excel, PowerPoint, PNG, JPG, ZIP, JSON, XML, TXT. Max 10 MB.</p>
+                        <p class="text-xs text-base-content/50 mt-1">Accepted: PDF, Word (docx), PNG, JPG. Max 10 MB.</p>
                         @error('file')
                             <p class="text-error text-sm mt-1">{{ $message }}</p>
                         @enderror
