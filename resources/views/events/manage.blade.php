@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-{{-- @section('title', 'Event Manager - ' . $event->name . ' (' . $event->type->value . ')') --}}
+{{-- @section('title', 'Event Manager - ' . $event->title . ' (' . $event->type->value . ')') --}}
 @section('title', 'Event Manager')
 
 @section('body')

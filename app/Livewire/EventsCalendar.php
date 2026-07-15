@@ -38,13 +38,27 @@ class EventsCalendar extends Component
         $this->currentMonth = now()->month;
     }
 
-    private function monthGrid(): Collection
+    /**
+     * The visible calendar grid spans from the Sunday on/before the 1st of the
+     * month to the Saturday on/after the last day, so it includes trailing days
+     * from the adjacent months.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function gridBounds(): array
     {
         $start = Carbon::create($this->currentYear, $this->currentMonth, 1);
         $end = $start->copy()->endOfMonth();
 
         $gridStart = $start->copy()->startOfWeek(Carbon::SUNDAY);
         $gridEnd = $end->copy()->endOfWeek(Carbon::SATURDAY);
+
+        return [$gridStart, $gridEnd];
+    }
+
+    private function monthGrid(): Collection
+    {
+        [$gridStart, $gridEnd] = $this->gridBounds();
 
         $days = collect();
         $current = $gridStart->copy();
@@ -59,11 +73,10 @@ class EventsCalendar extends Component
 
     private function events(): Collection
     {
-        $start = Carbon::create($this->currentYear, $this->currentMonth, 1)->startOfMonth();
-        $end = $start->copy()->endOfMonth();
+        [$gridStart, $gridEnd] = $this->gridBounds();
 
-        return Event::where('start', '>=', $start)
-            ->where('start', '<=', $end)
+        return Event::where('hidden', false)
+            ->whereBetween('start', [$gridStart, $gridEnd])
             ->orderBy('start')
             ->get();
     }

@@ -62,9 +62,9 @@ Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth
 Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
 Route::prefix('users/{user}')->group(function() {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
-    Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
-    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->name('users.show.training-assignments');
-    Route::get('solo-certs', [UserController::class, 'soloCerts'])->name('users.show.solo-certs');
+    Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
+    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
+    Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
 });
 
 # Staff Directory

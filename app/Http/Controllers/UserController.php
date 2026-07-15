@@ -97,7 +97,7 @@ class UserController extends Controller
     public function trainingAssignments(int $id) {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $user->id && !Auth::user()->hasPermissionTo('training-assignments:read')) {
             abort(403);
         }
 
@@ -116,7 +116,7 @@ class UserController extends Controller
     public function trainingTickets(int $id) {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $user->id && !Auth::user()->hasPermissionTo('training-tickets:read')) {
             abort(403);
         }
 
@@ -135,7 +135,7 @@ class UserController extends Controller
     public function soloCerts(int $id) {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $user->id && !Auth::user()->hasPermissionTo('solo-certs:read')) {
             abort(403);
         }
 

@@ -100,7 +100,7 @@ class EventController extends Controller
         $featuredFields = FeaturedField::pluck('name')->toArray();
 
         $validated = $request->validate([
-            'name' => 'required|string',
+            'title' => 'required|string',
             'description' => 'required|string',
             'start' => 'required|date',
             'end' => 'required|date',
