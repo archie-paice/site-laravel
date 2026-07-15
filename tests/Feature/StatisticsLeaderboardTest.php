@@ -22,9 +22,11 @@ test('all-months leaderboard sums each controllers hours in SQL', function () {
         'approach_hours' => 0, 'center_hours' => 0,
     ]);
 
-    $stats = $this->get(route('statistics.index', ['year' => 2025, 'month' => 'all']))
+    $response = $this->get(route('statistics.index', ['year' => 2025, 'month' => 'all']))
         ->assertOk()
-        ->viewData('stats');
+        ->assertSee('images/default_profile.jpg'); // avatar rendered for the controller
+
+    $stats = $response->viewData('stats');
 
     $row = $stats->firstWhere('user_id', $user->id);
 
