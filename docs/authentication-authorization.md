@@ -6,7 +6,7 @@ This document explains how users sign in to the ZJX ARTCC site and how the app d
 
 ### There are no passwords
 
-The site never collects, stores, or verifies a password. The only way to authenticate is through VATSIM Connect. The `users` table does carry `password` / `remember_token` columns (inherited from the default Laravel schema and cast/hidden in `app/Models/User.php`), but nothing sets them — there is no registration form, no password reset, and no local login form.
+The site never collects, stores, or verifies a password. The only way to authenticate is through VATSIM Connect — there is no registration form, no password reset, and no local login form. The `users` table has **no** `password` or `remember_token` columns; the customized migration (`database/migrations/0001_01_01_000000_create_users_table.php`) omits them. The `User` model still lists `password`/`remember_token` in `$hidden` and casts `password` to `hashed`, but these are kept only as standard-Laravel safety nets (in case password auth is ever added) — nothing reads or writes them.
 
 The user's primary key is their VATSIM CID. When a user authenticates, the app upserts the `users` row keyed on that CID and logs them in.
 
