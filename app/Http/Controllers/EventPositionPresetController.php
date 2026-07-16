@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\EventPositionPreset;
+use Illuminate\Http\Request;
 
 class EventPositionPresetController extends Controller
 {
@@ -13,6 +13,7 @@ class EventPositionPresetController extends Controller
     public function index()
     {
         $positions = EventPositionPreset::all();
+
         return view('position-presets.index', compact('positions'));
     }
 
@@ -21,7 +22,7 @@ class EventPositionPresetController extends Controller
      */
     public function create()
     {
-        $preset = new EventPositionPreset();
+        $preset = new EventPositionPreset;
 
         return view('position-presets.create');
     }
@@ -62,6 +63,7 @@ class EventPositionPresetController extends Controller
     public function edit($id)
     {
         $position = EventPositionPreset::find($id);
+
         return view('position-presets.edit', ['position' => $position]);
     }
 
@@ -95,6 +97,7 @@ class EventPositionPresetController extends Controller
     {
         $position = EventPositionPreset::find($id);
         $position->delete();
+
         return redirect()->route('position-presets.index')->with('success', 'Preset deleted successfully');
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\DTOs\VatusaFacilityInfoDTO;
 use Illuminate\Database\Eloquent\Model;
 
 class Staff extends Model
@@ -12,18 +13,19 @@ class Staff extends Model
         'title_short',
         'title_long',
         'user_id',
-        'primary_contact'
+        'primary_contact',
     ];
 
     protected $casts = [
         'primary_contact' => 'boolean',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public static function fromFacilityInfoDTO(\App\DTOs\VatusaFacilityInfoDTO $infoDTO)
+    public static function fromFacilityInfoDTO(VatusaFacilityInfoDTO $infoDTO)
     {
         foreach ($infoDTO->roles as $role) {
             // User does not exist in users table - gather from out of division
@@ -31,7 +33,7 @@ class Staff extends Model
                 User::createFromVatusa($role['cid']);
             }
 
-            switch($role['role']) {
+            switch ($role['role']) {
                 case 'ATM':
                     static::create([
                         'title_short' => 'ATM',
@@ -122,6 +124,6 @@ class Staff extends Model
                     break;
             }
         }
-    
+
     }
 }

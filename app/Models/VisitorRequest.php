@@ -9,16 +9,17 @@ use Laravel\Scout\Searchable;
 class VisitorRequest extends Model
 {
     use Searchable;
-    
+
     protected $fillable = [
         'user_id',
         'status',
         'reason',
         'admin_notes',
-        'user_note'
+        'user_note',
     ];
 
-    public function casts() {
+    public function casts()
+    {
         return [
             'status' => VisitRequestStatus::class,
             'created_at' => 'datetime',

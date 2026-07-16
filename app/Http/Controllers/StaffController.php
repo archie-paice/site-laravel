@@ -3,11 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Staff;
-use Illuminate\Http\Request;
 
 class StaffController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $atm = Staff::where(['title_short' => 'ATM'])->first();
         $datm = Staff::where(['title_short' => 'DATM', 'primary_contact' => true])->first();
         $ta = Staff::where(['title_short' => 'TA', 'primary_contact' => true])->first();
@@ -35,7 +35,7 @@ class StaffController extends Controller
             'facilitiesTeam' => $facilitiesTeam,
             'trainingTeam' => $trainingTeam,
             'mentors' => $mentors,
-            'instructors' => $instructors
+            'instructors' => $instructors,
         ]);
     }
 }

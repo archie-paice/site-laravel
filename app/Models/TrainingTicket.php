@@ -1,5 +1,7 @@
 <?php
+
 // https://vatusa-api.ztlartcc.org/#tag/training/paths/~1user~1%7Bcid%7D~1training~1record/post
+
 namespace App\Models;
 
 use DateTime;
@@ -29,15 +31,18 @@ class TrainingTicket extends Model
         'session_end',
     ];
 
-    public function student() {
+    public function student()
+    {
         return $this->belongsTo('App\Models\User', 'user_id');
     }
 
-    public function instructor() {
+    public function instructor()
+    {
         return $this->belongsTo('App\Models\User', 'instructor_id');
     }
 
-    public function duration(): Attribute {
+    public function duration(): Attribute
+    {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
                 try {
@@ -45,7 +50,7 @@ class TrainingTicket extends Model
                     $endDate = new DateTime($attributes['session_end']);
                     $duration = $startDate->diff($endDate);
                 } catch (Exception $e) {
-                    return "00:00";
+                    return '00:00';
                 }
 
                 return $duration->format('%H:%I');
@@ -67,7 +72,7 @@ class TrainingTicket extends Model
             'student_name' => $this->student->name,
             'instructor_name' => $this->instructor->name,
             'position' => $this->position,
-            'date' => $this->session_start
+            'date' => $this->session_start,
         ];
     }
 }

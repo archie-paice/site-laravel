@@ -19,22 +19,23 @@ enum ControllerRating: int
     case SUP = 11;
     case ADM = 12;
 
-    public function mapToString(): string {
-        return match($this) {
-            self::INA => "INA",
-            self::SUS => "SUS",
-            self::OBS => "OBS",
-            self::S1 => "S1",
-            self::S2 => "S2",
-            self::S3 => "S3",
-            self::C1 => "C1",
-            self::C2 => "C2",
-            self::C3 => "C3",
-            self::I1 => "I1",
-            self::I2 => "I2",
-            self::I3 => "I3",
-            self::SUP => "SUP",
-            self::ADM => "ADM",
+    public function mapToString(): string
+    {
+        return match ($this) {
+            self::INA => 'INA',
+            self::SUS => 'SUS',
+            self::OBS => 'OBS',
+            self::S1 => 'S1',
+            self::S2 => 'S2',
+            self::S3 => 'S3',
+            self::C1 => 'C1',
+            self::C2 => 'C2',
+            self::C3 => 'C3',
+            self::I1 => 'I1',
+            self::I2 => 'I2',
+            self::I3 => 'I3',
+            self::SUP => 'SUP',
+            self::ADM => 'ADM',
         };
     }
 }

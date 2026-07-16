@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\DTOs\VatusaRosterUser;
 use App\Enums\ControllerRating;
+use Database\Factories\UserFactory;
 use Http;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,7 +47,7 @@ class User extends Authenticatable
         'facility',
         'rostered',
         'discord_id',
-        'operating_initials'
+        'operating_initials',
     ];
 
     /**
@@ -97,7 +98,8 @@ class User extends Authenticatable
             ->implode('');
     }
 
-    public static function updateFromVatusa(VatusaRosterUser $vatusaUser) {
+    public static function updateFromVatusa(VatusaRosterUser $vatusaUser)
+    {
         $user = static::upsert([
             'id' => $vatusaUser->cid,
             'first_name' => ucfirst($vatusaUser->firstName),
@@ -108,31 +110,32 @@ class User extends Authenticatable
             'division' => 'USA',
             'facility' => $vatusaUser->facility,
             'rostered' => true,
-            'discord_id' => $vatusaUser->discordId
+            'discord_id' => $vatusaUser->discordId,
         ],
-        ['id']);
+            ['id']);
 
         return $user;
     }
 
-    protected function operatingInitials(): Attribute {
+    protected function operatingInitials(): Attribute
+    {
         return Attribute::make(
-            get: fn($value) => strtoupper($value),
-            set: fn($value) => strtoupper($value)
+            get: fn ($value) => strtoupper($value),
+            set: fn ($value) => strtoupper($value)
         );
     }
 
     protected function name(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => ucfirst($attributes['first_name']) . ' ' . ucfirst($attributes['last_name'])
+            get: fn (mixed $value, array $attributes) => ucfirst($attributes['first_name']).' '.ucfirst($attributes['last_name'])
         );
     }
 
     protected function nameReversed(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => ucfirst($attributes['last_name']. ', ' . ucfirst($attributes['first_name']))
+            get: fn (mixed $value, array $attributes) => ucfirst($attributes['last_name'].', '.ucfirst($attributes['first_name']))
         );
     }
 
@@ -152,31 +155,38 @@ class User extends Authenticatable
         );
     }
 
-    public function staffRoles(): HasMany {
+    public function staffRoles(): HasMany
+    {
         return $this->hasMany(Staff::class, 'user_id');
     }
 
-    public function trainingAssignmentsAsStudent(): HasMany {
+    public function trainingAssignmentsAsStudent(): HasMany
+    {
         return $this->hasMany(TrainingAssignment::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
-    public function trainingAssignmentsAsInstructor(): HasMany {
+    public function trainingAssignmentsAsInstructor(): HasMany
+    {
         return $this->hasMany(TrainingAssignment::class, 'instructor_id');
     }
 
-    public function trainingTicketsAsStudent(): HasMany {
+    public function trainingTicketsAsStudent(): HasMany
+    {
         return $this->hasMany(TrainingTicket::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
-    public function trainingTicketsAsInstructor(): HasMany {
+    public function trainingTicketsAsInstructor(): HasMany
+    {
         return $this->hasMany(TrainingTicket::class, 'instructor_id');
     }
 
-    public function soloCerts(): HasMany {
+    public function soloCerts(): HasMany
+    {
         return $this->hasMany(SoloCert::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
-    public function visitRequests(): HasMany {
+    public function visitRequests(): HasMany
+    {
         return $this->hasMany(VisitorRequest::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
@@ -186,10 +196,11 @@ class User extends Authenticatable
             ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
     }
 
-    public function certifications(): HasMany {
+    public function certifications(): HasMany
+    {
         return $this->hasMany(UserCertification::class, 'user_id');
     }
-    
+
     public function toSearchableArray(): array
     {
         return [
@@ -197,20 +208,22 @@ class User extends Authenticatable
             'email' => $this->email,
             'id' => $this->id,
             'rating' => $this->rating->mapToString(),
-            'facility' => $this->facility
+            'facility' => $this->facility,
         ];
     }
 
-    public function events() {
+    public function events()
+    {
         return $this->belongsToMany(Event::class, 'event_positions')
-                    ->withPivot('requested_position', 'start', 'end', 'note', 'position_status')
-                    ->withTimestamps();
+            ->withPivot('requested_position', 'start', 'end', 'note', 'position_status')
+            ->withTimestamps();
     }
 
-    public static function createFromVatusa(int $id) {
-        $userData = Http::get(config('app.vatusa_api_url') . '/v2/user/' . $id, [
-            'apikey' => config('app.vatusa_api_key')
-        ])->throw()->json()['data'] ?? throw new \Exception('Failed to fetch user data for CID ' . $id);
+    public static function createFromVatusa(int $id)
+    {
+        $userData = Http::get(config('app.vatusa_api_url').'/v2/user/'.$id, [
+            'apikey' => config('app.vatusa_api_key'),
+        ])->throw()->json()['data'] ?? throw new \Exception('Failed to fetch user data for CID '.$id);
 
         $vatusaUser = new VatusaRosterUser($userData);
         self::updateFromVatusa($vatusaUser);

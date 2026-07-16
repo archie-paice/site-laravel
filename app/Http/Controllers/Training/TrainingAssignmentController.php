@@ -17,14 +17,13 @@ use Illuminate\Support\Facades\Mail;
 
 class TrainingAssignmentController extends Controller
 {
-
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $validated = $request->validate([
             'search' => 'nullable|string',
             'trainingType' => 'sometimes|min:0',
             'showInactive' => 'nullable|sometimes:on',
         ]);
-
 
         $query = null;
 
@@ -34,7 +33,7 @@ class TrainingAssignmentController extends Controller
             $query = TrainingAssignment::search($request->input('search'))->where('training_type', $validated['trainingType']);
         }
 
-        if (!$request->boolean('showInactive')) {
+        if (! $request->boolean('showInactive')) {
             $query->where('active', true);
         }
 
@@ -43,11 +42,12 @@ class TrainingAssignmentController extends Controller
         return view('training-assignment.index', compact('trainingAssignments'));
     }
 
-    public function create(Request $request) {
+    public function create(Request $request)
+    {
         $validated = $request->validate([
-            'trainingType' => 'int|required'
+            'trainingType' => 'int|required',
         ], [
-            'trainingType.required' => 'Training Type must be specified.'
+            'trainingType.required' => 'Training Type must be specified.',
         ]);
 
         if (is_null(TrainingType::tryFrom($request->input('trainingType')))) {
@@ -55,16 +55,16 @@ class TrainingAssignmentController extends Controller
         }
 
         $activeAssignments = TrainingAssignment::where([
-            "user_id" => Auth::user()->id,
-            "active" => true
+            'user_id' => Auth::user()->id,
+            'active' => true,
         ])->get();
 
-        if(count($activeAssignments) > 0) {
+        if (count($activeAssignments) > 0) {
             return redirect()->back()->withErrors('Training already assigned');
         }
 
-        if (!Auth::user()->rostered) {
-            return redirect()->back()->withErrors( 'Not an active controller.');
+        if (! Auth::user()->rostered) {
+            return redirect()->back()->withErrors('Not an active controller.');
         }
 
         $trainingAssignment = TrainingAssignment::create([
@@ -75,24 +75,27 @@ class TrainingAssignmentController extends Controller
 
         SendTrainingRequestToWebhook::dispatch($trainingAssignment);
         Mail::to(Auth::user()->email)->queue(new TrainingAssignmentCreated($trainingAssignment));
+
         return redirect()->back()->with('success', 'Training requested successfully');
     }
 
-    public function edit(int $id) {
+    public function edit(int $id)
+    {
         $trainingAssignment = TrainingAssignment::findOrFail($id);
         $instructors = Staff::orWhere([
-            "title_short" => "INS"
+            'title_short' => 'INS',
         ])->orWhere([
-            "title_short" => "MTR"
+            'title_short' => 'MTR',
         ])->get();
 
-        return view('training-assignment.edit', ["assignment" => $trainingAssignment, "instructors" => $instructors]);
+        return view('training-assignment.edit', ['assignment' => $trainingAssignment, 'instructors' => $instructors]);
     }
 
-    public function update(Request $request, int $id) {
+    public function update(Request $request, int $id)
+    {
         $user = Auth::user();
 
-        if (!$user->hasPermissionTo('manage students')) {
+        if (! $user->hasPermissionTo('manage students')) {
             return redirect()->back()->with('error', 'Insufficient permissions to edit training assignment');
         }
 
@@ -112,7 +115,7 @@ class TrainingAssignmentController extends Controller
         $trainingAssignment->save();
 
         if ($validated['notifyUser'] ?? false) {
-            Mail::to($trainingAssignment->student->email)->bcc($trainingAssignment->instructor ?? null)->queue(new \App\Mail\TrainingAssignmentUpdated($trainingAssignment));
+            Mail::to($trainingAssignment->student->email)->bcc($trainingAssignment->instructor ?? null)->queue(new TrainingAssignmentUpdated($trainingAssignment));
         }
 
         Log::info('Training assignment updated', [
@@ -123,8 +126,9 @@ class TrainingAssignmentController extends Controller
         return redirect()->back()->with('success', 'Training request updated successfully');
     }
 
-    public function claim(Request $request, int $id) {
-        if (!Auth::user()->hasPermissionTo('claim students')) {
+    public function claim(Request $request, int $id)
+    {
+        if (! Auth::user()->hasPermissionTo('claim students')) {
             return redirect()->back()->with('error', 'You do not have permission to claim training assignments.');
         }
 
@@ -134,44 +138,48 @@ class TrainingAssignmentController extends Controller
             return redirect()->back()->with('error', 'You cannot claim yourself.');
         }
 
-        if (!$assignment->active) {
+        if (! $assignment->active) {
             return redirect()->back()->with('error', 'Cannot update inactive training assignment.');
         }
 
         $assignment->update([
-            "instructor_id" => Auth::user()->id,
+            'instructor_id' => Auth::user()->id,
         ]);
 
-        Mail::to($assignment->student->email)->bcc($assignment->instructor ?? null)->queue(new \App\Mail\TrainingAssignmentUpdated($assignment));
+        Mail::to($assignment->student->email)->bcc($assignment->instructor ?? null)->queue(new TrainingAssignmentUpdated($assignment));
+
         return redirect()->back()->with('success', 'Training assignment claimed successfully');
     }
 
-    public function drop(Request $request, int $id) {
+    public function drop(Request $request, int $id)
+    {
         $user = Auth::user();
-        if (!$user->hasPermissionTo('claim students')) {
+        if (! $user->hasPermissionTo('claim students')) {
             return redirect()->back()->with('error', 'You do not have permission to claim training assignments.');
         }
 
         $assignment = TrainingAssignment::findOrFail($id);
 
-        if (!$assignment->active) {
+        if (! $assignment->active) {
             return redirect()->back()->with('error', 'Cannot update inactive training assignment.');
         }
 
         if ($assignment->instructor_id == $user->id || $user->hasPermissionTo('manage students')) {
             $assignment->update([
-                "instructor_id" => null,
+                'instructor_id' => null,
             ]);
         }
 
-        Mail::to($assignment->student->email)->queue(new \App\Mail\TrainingAssignmentUpdated($assignment));
+        Mail::to($assignment->student->email)->queue(new TrainingAssignmentUpdated($assignment));
+
         return redirect()->back()->with('success', 'Training assignment dropped successfully');
     }
 
-    public function destroy(Request $request) {
+    public function destroy(Request $request)
+    {
         $user = Auth::user();
         $validated = $request->validate([
-            'id' => 'string|required'
+            'id' => 'string|required',
         ]);
 
         $assignment = TrainingAssignment::find($validated['id']);
