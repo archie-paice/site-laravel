@@ -14,8 +14,8 @@ class PermissionSeeder extends Seeder
         'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers'],
         'events' => ['manage events', 'assign event positions', 'publish events'],
         'facilities' => ['manage statistics prefixes', 'manage certification facilities'],
-        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs'],
-        'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students'],
+        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs', 'training-tickets:write'],
+        'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students', 'training-tickets:write'],
     ];
 
     /**

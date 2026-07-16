@@ -52,7 +52,7 @@ class SoloCert extends Model
         return [
             'user' => $this->user->name,
             'position' => $this->position,
-            'issued_by_id' => is_null($this->issued_by) ? null : $this->issued_by->name,
+            'issued_by_id' => $this->issuedBy?->name,
         ];
     }
 }

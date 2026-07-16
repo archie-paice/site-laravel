@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\TrainingStatus;
 use App\Enums\TrainingType;
-use Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;

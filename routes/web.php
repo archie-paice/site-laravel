@@ -43,7 +43,7 @@ Route::post('/visit', [VisitFacilityController::class, 'store'])->middleware('au
 // Oauth
 Route::get('/auth/redirect', [VatsimOauthController::class, 'redirect'])->name('auth.redirect');
 Route::get('/login', function () {
-    return redirect()->route('auth.redirect', 301);
+    return redirect()->route('auth.redirect', [], 301);
 })->name('login');
 Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth.logout');
@@ -109,7 +109,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     Route::prefix('/training')->middleware('role:training')->group(function () {
         Route::resource('tickets', TrainingTicketController::class)->names('training-tickets');
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
-        Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'update', 'destroy', 'store']])->names('solo-certs');
+        Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'destroy', 'store']])->names('solo-certs');
         Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignments.claim');
         Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignments.drop');
         Route::delete('assignments', [TrainingAssignmentController::class, 'destroy'])->name('training-assignments.destroy'); // id sent in payload

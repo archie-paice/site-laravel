@@ -24,8 +24,6 @@ class TrainingTicket extends Model
         'score',
         'notes',
         'location',
-        'ots_status',
-        'solo_granted',
         'vatusa_id',
         'vatusa_synced',
         'position',
@@ -63,7 +61,7 @@ class TrainingTicket extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['user_id', 'instructor_id', 'session_date', 'duration', 'movements', 'score', 'notes', 'location', 'ots_status']);
+            ->logOnly(['user_id', 'instructor_id', 'duration', 'movements', 'score', 'notes', 'location']);
     }
 
     public function toSearchableArray(): array

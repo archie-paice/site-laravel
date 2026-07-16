@@ -25,6 +25,13 @@ class User extends Authenticatable
     use HasFactory, HasRoles, LogsActivity, Notifiable, Searchable;
 
     /**
+     * The primary key is the VATSIM CID, assigned explicitly rather than auto-incremented.
+     */
+    public $incrementing = false;
+
+    protected $keyType = 'int';
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
@@ -44,7 +51,10 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Authentication is exclusively via VATSIM Connect (OAuth). This application
+     * stores no local passwords and there is no password column. The hidden
+     * attributes below and the 'password' => 'hashed' cast are retained only as
+     * standard-Laravel safety nets should password-based auth ever be introduced.
      *
      * @var list<string>
      */
@@ -167,7 +177,7 @@ class User extends Authenticatable
 
     public function trainingTicketsAsInstructor(): HasMany
     {
-        return $this->hasMany(TrainingAssignment::class, 'instructor_id');
+        return $this->hasMany(TrainingTicket::class, 'instructor_id');
     }
 
     public function soloCerts(): HasMany
