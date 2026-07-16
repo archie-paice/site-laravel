@@ -2,7 +2,7 @@
 
 namespace App\Enums;
 
-enum EventType: string 
+enum EventType: string
 {
     case HOME = 'HOME';
     case SUPPORT_REQUIRED = 'SUPPORT_REQUIRED';

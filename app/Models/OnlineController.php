@@ -13,19 +13,21 @@ class OnlineController extends Model
     protected $fillable = [
         'callsign',
         'user_id',
-        'start'
+        'start',
     ];
 
-    public function user(): HasOne {
+    public function user(): HasOne
+    {
         return $this->hasOne(User::class, 'id', 'user_id');
     }
 
-    public static function fromDTO(OnlineControllerDTO $onlineControllerDTO): self {
-        
+    public static function fromDTO(OnlineControllerDTO $onlineControllerDTO): self
+    {
+
         $controller = OnlineController::create([
             'callsign' => $onlineControllerDTO->callsign,
-            'user_id'=> $onlineControllerDTO->id,
-            'start' => $onlineControllerDTO->start
+            'user_id' => $onlineControllerDTO->id,
+            'start' => $onlineControllerDTO->start,
         ]);
 
         return $controller;

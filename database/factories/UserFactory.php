@@ -2,13 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use DateTime;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\User>
+ * @extends Factory<User>
  */
 class UserFactory extends Factory
 {
@@ -29,12 +28,12 @@ class UserFactory extends Factory
             'first_name' => fake()->firstName(),
             'last_name' => fake()->lastName(),
             'email' => fake()->email(),
-            'rating' => rand(2,12),
-            'joined_at' => new DateTime(),
+            'rating' => rand(2, 12),
+            'joined_at' => new DateTime,
             'division' => 'USA',
             'facility' => 'ZJX',
             'rostered' => true,
-            'discord_id' => null
+            'discord_id' => null,
         ];
     }
 
