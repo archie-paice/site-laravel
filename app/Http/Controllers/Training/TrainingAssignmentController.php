@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Training;
 
+use App\Enums\TrainingStatus;
 use App\Enums\TrainingType;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendTrainingRequestToWebhook;
@@ -179,9 +180,9 @@ class TrainingAssignmentController extends Controller
             return redirect()->back(400)->with('error', 'Training assignment not found');
         }
 
-        if ($assignment->user_id == $user->id || $user->hasPermissionTo('deactivate training assignments')) {
+        if ($assignment->user_id == $user->id || $user->hasPermissionTo('training-tickets:write')) {
             $assignment->active = false;
-            $assignment->status = 'withdrawn';
+            $assignment->status = TrainingStatus::FORFEIT;
             $assignment->save();
 
             return redirect()->back()->with('success', 'Training assignment deactivated successfully');

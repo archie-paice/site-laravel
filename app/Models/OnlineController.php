@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\DTOs\OnlineControllerDTO;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class OnlineController extends Model
 {
@@ -16,8 +16,8 @@ class OnlineController extends Model
         'start'
     ];
 
-    public function user(): HasOne {
-        return $this->hasOne(User::class, 'id', 'user_id');
+    public function user(): BelongsTo {
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     public static function fromDTO(OnlineControllerDTO $onlineControllerDTO): self {

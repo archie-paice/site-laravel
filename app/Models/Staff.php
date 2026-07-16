@@ -6,8 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Staff extends Model
 {
-    protected $primaryKey = 'title_short';
-    protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
