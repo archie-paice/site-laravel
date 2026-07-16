@@ -1,55 +1,87 @@
-# Welcome to the vZJX ARTCC Website Repository
+# vZJX ARTCC Website
 
-## Overview
+The web application for the virtual Jacksonville ARTCC (vZJX) on the VATSIM network. It manages the controller roster, training, events, visiting-controller requests, certifications, and related facility operations, and integrates tightly with VATSIM Connect (login) and the VATUSA API (roster, training records, solo certifications).
 
-This repository contains the application source code, configuration, tests, and supporting documentation for the project.
+## Stack
 
-The project is developed through reviewed changes, automated checks, and documented contribution and security practices.
+- **Laravel 12** (PHP 8.2+) with **Livewire** (class-based components) for interactive UI
+- **Tailwind CSS v4 + daisyUI** for styling, built with **Vite**
+- **PostgreSQL** in development and production (see [Testing](#testing) for the CI caveat)
+- **Pest 4** for tests
+- Authentication via **VATSIM Connect OAuth** (no local passwords); authorization via **spatie/laravel-permission**
+- Background work on Laravel's **database** queue; roster/online-controller data synced on a schedule
 
-## Getting Started
+## Architecture at a glance
 
-To set up the project locally, clone the repository and install the required dependencies.
+- All routes live in `routes/web.php` (there is no `routes/api.php`). Scheduled tasks are in `routes/console.php`.
+- Business logic that talks to external services runs in **jobs** (`app/Jobs/`) and **services** (`app/Services/`); external API responses are parsed into **DTOs** (`app/DTOs/`).
+- Domain models are in `app/Models/`, enums in `app/Enums/`, transactional email in `app/Mail/`.
+- Authorization is enforced by Spatie role/permission **middleware** on route groups (registered in `bootstrap/app.php`) plus some inline checks — there are no Policies or Gates.
+
+For the full picture, start with [`docs/architecture.md`](docs/architecture.md).
+
+## Documentation
+
+| Area | Doc |
+| --- | --- |
+| Architecture & directory layout | [`docs/architecture.md`](docs/architecture.md) |
+| Authentication & authorization | [`docs/authentication-authorization.md`](docs/authentication-authorization.md) |
+| Database schema | [`docs/database.md`](docs/database.md) |
+| VATSIM / VATUSA integration | [`docs/vatsim-integration.md`](docs/vatsim-integration.md) |
+| Deployment & CI/CD | [`docs/deployment.md`](docs/deployment.md) |
+| Roster & membership | [`docs/systems/roster-and-membership.md`](docs/systems/roster-and-membership.md) |
+| Training (tickets, assignments, solo certs) | [`docs/systems/training.md`](docs/systems/training.md) |
+| Events | [`docs/systems/events.md`](docs/systems/events.md) |
+| Visiting controllers | [`docs/systems/visiting-controllers.md`](docs/systems/visiting-controllers.md) |
+| Certifications | [`docs/systems/certifications.md`](docs/systems/certifications.md) |
+| Users & profiles | [`docs/systems/users-and-profiles.md`](docs/systems/users-and-profiles.md) |
+| Audit logging | [`docs/systems/audit-logging.md`](docs/systems/audit-logging.md) |
+| Known issues & follow-ups | [`docs/discrepancies.md`](docs/discrepancies.md) |
+
+## Getting started
 
 ```bash
 git clone git@github.com:zjx-artcc/site-laravel.git
-```
+cd site-laravel
 
-Follow the setup instructions used by your team for environment configuration, dependency installation, database setup, and local development.
-
-Common setup tasks may include:
-
-```bash
 composer install
 npm install
 cp .env.example .env
 php artisan key:generate
-php artisan migrate --seed
-npm run dev
-php artisan serve
 ```
 
-Update your local `.env` file as needed for your development environment. Please see [`CONTRIBUTING.md`](CONTRIBUTING.md) for more details.
+Configure PostgreSQL and VATSIM OAuth in your `.env`, then:
+
+```bash
+php artisan migrate --seed
+```
+
+Seeding sets up permissions and queues a roster sync (which needs VATUSA API access — see [`CONTRIBUTING.md`](CONTRIBUTING.md)).
+
+To run the app, prefer `composer run dev` over `php artisan serve` — it runs the web server, queue worker, log tailer, and Vite together:
+
+```bash
+composer run dev
+```
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for full local-setup details, including how to obtain environment secrets.
 
 ## Testing
-
-Run the test suite before opening a pull request:
 
 ```bash
 php artisan test
 ```
 
+Locally, tests run against PostgreSQL (`phpunit.xml` sets `DB_CONNECTION=pgsql`, database `zjx_test`). CI runs the same suite against SQLite inside Docker. This split is a known inconsistency — see the [testing notes in `CONTRIBUTING.md`](CONTRIBUTING.md#testing) and [`docs/discrepancies.md`](docs/discrepancies.md).
+
 ## Contributing
 
-Contributions should follow the project’s contribution guidelines.
-
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) for details on local setup expectations, branching, pull requests, coding standards, testing, and review process.
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for local setup, branching, pull requests, coding standards, testing, and the review process.
 
 ## Security
 
-Please do not report security vulnerabilities through public issues.
-
-See [`SECURITY.md`](SECURITY.md) for supported versions, vulnerability reporting instructions, disclosure expectations, and security practices.
+Do not report security vulnerabilities through public issues. See [`SECURITY.md`](SECURITY.md) for reporting instructions and security practices.
 
 ## License
 
-This project is licensed under GPLv3. See the project license file for more information.
+This project is licensed under GPLv3. See the [`LICENSE`](LICENSE) file for details.
