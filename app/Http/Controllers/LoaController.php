@@ -87,7 +87,7 @@ class LoaController extends Controller
 
     public function manage(Request $request)
     {
-        $loas = Loa::with('user')->orderByRaw("status = ".LoaStatus::PENDING->value." desc")->orderBy('created_at', 'desc')->paginate(25);
+        $loas = Loa::with('user')->orderByRaw('status = '.LoaStatus::PENDING->value.' desc')->orderBy('created_at', 'desc')->paginate(25);
 
         return view('loa.manage', ['loas' => $loas]);
     }

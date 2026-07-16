@@ -1,58 +1,57 @@
 <?php
 
 use App\Http\Controllers\AuditLogController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\CertificationFacilityController;
+use App\Http\Controllers\CertificationLevelController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventFieldController;
+use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoaController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;
-use App\Http\Controllers\LoaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
+use App\Http\Controllers\VisitFacilityController;
 use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
-use App\Mail\TrainingAssignmentUpdated;
+use App\Livewire\EventRegistration;
+use App\Mail\TrainingAssignmentCreated;
 use App\Mail\Welcome;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventPositionPresetController;
-use App\Http\Controllers\EventFieldController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\VisitFacilityController;
-use App\Mail\TrainingAssignmentCreated;
-use App\Http\Controllers\CertificationFacilityController;
-use App\Http\Controllers\CertificationLevelController;
-use App\Livewire\EventRegistration;
 
-# Homepage
+// Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-# Roster
+// Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
 
-# Visit
+// Visit
 Route::get('/visit', [VisitFacilityController::class, 'index'])->name('visit.index');
 Route::get('/visit/create', [VisitFacilityController::class, 'create'])->middleware('auth')->name('visit.create');
 Route::post('/visit', [VisitFacilityController::class, 'store'])->middleware('auth')->name('visit.store');
 
-# Oauth
+// Oauth
 Route::get('/auth/redirect', [VatsimOauthController::class, 'redirect'])->name('auth.redirect');
-Route::get('/login', function() {
-    return redirect()->route('auth.redirect', 301);
+Route::get('/login', function () {
+    return redirect()->route('auth.redirect', [], 301);
 })->name('login');
 Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('auth.callback');
 Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth.logout');
 
-# Users
+// Users
 Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
-Route::prefix('users/{user}')->group(function() {
+Route::prefix('users/{user}')->group(function () {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->name('users.show.training-assignments');
@@ -60,17 +59,17 @@ Route::prefix('users/{user}')->group(function() {
     Route::get('loa', [UserController::class, 'loa'])->middleware('auth')->name('users.show.loa');
 });
 
-# Staff Directory
+// Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
-# LOA
+// LOA
 Route::prefix('loa')->middleware('auth')->name('loa.')->group(function () {
     Route::post('/', [LoaController::class, 'store'])->name('store');
     Route::put('{loa}', [LoaController::class, 'update'])->name('update');
     Route::delete('{loa}', [LoaController::class, 'destroy'])->name('destroy');
 });
 
-# Training Assignment Creation; TODO: make store
+// Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
 Route::prefix('events')->name('events.')->group(function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
@@ -78,14 +77,14 @@ Route::prefix('events')->name('events.')->group(function () {
 });
 Route::post('/events/{event}/request-position', [EventRegistration::class, 'store'])->middleware('auth')->name('events.request-position.store');
 
-# Admin Routes
-Route::prefix('admin')->middleware('permission:view dashboard')->group(function() {
-    # Dashboard
+// Admin Routes
+Route::prefix('admin')->middleware('permission:view dashboard')->group(function () {
+    // Dashboard
     Route::get('/', [DashboardController::class, 'index'])->name('admin.index');
 
-    # User Management
+    // User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
-    Route::middleware('permission:manage visiting controllers')->group(function() {
+    Route::middleware('permission:manage visiting controllers')->group(function () {
         Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
         Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');
         Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
@@ -93,7 +92,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])->name('visit.deny');
     });
 
-    Route::middleware('permission:manage loas')->group(function() {
+    Route::middleware('permission:manage loas')->group(function () {
         Route::get('loas', [LoaController::class, 'manage'])->name('loa.manage');
         Route::get('loas/{loa}', [LoaController::class, 'show'])->name('loa.show');
         Route::put('loas/{loa}/approve', [LoaController::class, 'approve'])->name('loa.approve');
@@ -101,15 +100,15 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::put('loas/{loa}/revoke', [LoaController::class, 'revoke'])->name('loa.revoke');
     });
 
-    # Facilities Dept.
-    Route::prefix('data')->group(function() {
+    // Facilities Dept.
+    Route::prefix('data')->group(function () {
         Route::middleware('permission:manage statistics prefixes')->resource('statistics-prefixes', StatisticsPrefixesController::class);
 
-        Route::middleware('permission:manage certification facilities')->prefix('certification-facilities')->group(function() {
+        Route::middleware('permission:manage certification facilities')->prefix('certification-facilities')->group(function () {
             Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
             Route::post('/', [CertificationFacilityController::class, 'store'])->name('certification-facilities.store');
 
-            Route::prefix('/{facility}')->group(function() {
+            Route::prefix('/{facility}')->group(function () {
                 Route::get('/', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
                 Route::delete('/', [CertificationFacilityController::class, 'destroy'])->name('certification-facilities.destroy');
                 Route::post('/certification-levels', [CertificationLevelController::class, 'store'])->name('certification-levels.store');
@@ -117,23 +116,23 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         });
     });
 
-    # Logs
-    Route::middleware('permission:view audit logs')->group(function() {
+    // Logs
+    Route::middleware('permission:view audit logs')->group(function () {
         Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
         Route::get('logs/export', [AuditLogController::class, 'export'])->name('logs.export');
     });
 
-    # Training Dept.
-    Route::prefix('/training')->middleware('role:training')->group(function() {
+    // Training Dept.
+    Route::prefix('/training')->middleware('role:training')->group(function () {
         Route::resource('tickets', TrainingTicketController::class)->names('training-tickets');
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
-        Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'update', 'destroy', 'store']])->names('solo-certs');
+        Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'destroy', 'store']])->names('solo-certs');
         Route::put('assignments/claim/{assignment}', [TrainingAssignmentController::class, 'claim'])->name('training-assignments.claim');
         Route::put('assignments/drop/{assignment}', [TrainingAssignmentController::class, 'drop'])->name('training-assignments.drop');
-        Route::delete('assignments', [TrainingAssignmentController::class, 'destroy'])->name('training-assignments.destroy'); //id sent in payload
+        Route::delete('assignments', [TrainingAssignmentController::class, 'destroy'])->name('training-assignments.destroy'); // id sent in payload
     });
 
-    # Events Dept.
+    // Events Dept.
     Route::prefix('/events')->middleware('permission:manage events')->group(function () {
         Route::resource('event-fields', EventFieldController::class)->names('admin.events.event-fields');
         Route::resource('position-presets', EventPositionPresetController::class)->names('admin.events.position-presets');
@@ -146,21 +145,24 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     });
 });
 
-# Dev Only Routes
+// Dev Only Routes
 if (App::environment('development', 'local')) {
     Route::get('/sync', function () {
         SyncRoster::dispatch();
         UpdateOnlineControllers::dispatch();
+
         return 'scheduled';
     });
 
     Route::get('/sync-training', function () {
         SyncTrainingTickets::dispatch();
+
         return 'scheduled';
     });
 
     Route::get('/test-email', function () {
         Mail::to('chrisjm66@gmail.com')->send(new Welcome(User::find(1697197)));
+
         return new TrainingAssignmentCreated(TrainingAssignment::find(1));
     });
 }
