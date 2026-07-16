@@ -10,6 +10,7 @@ use Illuminate\View\Component;
 class TrainingAssignmentStatusLabel extends Component
 {
     public TrainingStatus $status;
+
     /**
      * Create a new component instance.
      */

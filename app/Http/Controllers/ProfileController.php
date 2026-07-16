@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TrainingAssignment;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $user = Auth::user();
         $trainingAssignments = Auth::user()->trainingAssignmentsAsStudent;
         $trainingTickets = Auth::user()->trainingTicketsAsStudent;
@@ -17,7 +16,7 @@ class ProfileController extends Controller
             [
                 'user' => $user,
                 'trainingAssignments' => $trainingAssignments,
-                'trainingTickets' => $trainingTickets
+                'trainingTickets' => $trainingTickets,
             ]);
     }
 }
