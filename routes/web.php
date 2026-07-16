@@ -42,7 +42,7 @@ Route::post('/visit', [VisitFacilityController::class, 'store'])->middleware('au
 
 // Oauth
 Route::get('/auth/redirect', [VatsimOauthController::class, 'redirect'])->name('auth.redirect');
-Route::get('/login', function() {
+Route::get('/login', function () {
     return redirect()->route('auth.redirect', [], 301);
 })->name('login');
 Route::get('/auth/callback', [VatsimOauthController::class, 'callback'])->name('auth.callback');

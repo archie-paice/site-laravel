@@ -16,7 +16,8 @@ class OnlineController extends Model
         'start',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
 

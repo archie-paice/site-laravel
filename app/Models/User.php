@@ -21,8 +21,8 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles, LogsActivity, Searchable;
+    /** @use HasFactory<UserFactory> */
+    use HasFactory, HasRoles, LogsActivity, Notifiable, Searchable;
 
     /**
      * The primary key is the VATSIM CID, assigned explicitly rather than auto-incremented.
