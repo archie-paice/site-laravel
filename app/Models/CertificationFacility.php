@@ -16,7 +16,7 @@ class CertificationFacility extends Model
     protected function identifier(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => Str::upper($value),
+            get: fn (mixed $value, array $attributes) => Str::upper($value),
         );
     }
 
@@ -24,5 +24,4 @@ class CertificationFacility extends Model
     {
         return $this->hasMany(CertificationLevel::class, 'facility_id');
     }
-
 }

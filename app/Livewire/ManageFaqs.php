@@ -12,20 +12,28 @@ class ManageFaqs extends Component
     public ?int $editingId = null;
 
     public string $category = 'General Info';
+
     public string $newCategory = '';
+
     public string $question = '';
+
     public string $answer = '';
+
     public bool $is_published = true;
 
     public bool $showForm = false;
+
     public string $search = '';
 
     public ?string $renamingCategory = null;
+
     public string $categoryNewName = '';
 
     // Public page header text
     public bool $editingHeader = false;
+
     public string $pageHeading = '';
+
     public string $pageIntro = '';
 
     public function mount(): void

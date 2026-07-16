@@ -33,7 +33,7 @@ return new class extends Migration
             $table->json('featuredFields')->nullable();
             $table->json('presetPositions')->nullable();
             $table->text('description');
-            
+
             $table->timestamps();
         });
     }

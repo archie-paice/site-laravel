@@ -63,7 +63,7 @@ class FaqSeeder extends Seeder
             [
                 'category' => 'General Info',
                 'question' => 'Who do I contact if I have a question not answered here?',
-                'answer' => "For training questions, contact the Training Administrator or your assigned mentor. For roster or membership questions, contact the Air Traffic Manager (ATM) or Deputy ATM. You can find current staff on the [Facility Staff page](/staff).",
+                'answer' => 'For training questions, contact the Training Administrator or your assigned mentor. For roster or membership questions, contact the Air Traffic Manager (ATM) or Deputy ATM. You can find current staff on the [Facility Staff page](/staff).',
                 'sort_order' => 2,
             ],
         ];

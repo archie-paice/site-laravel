@@ -7,32 +7,31 @@ use App\DTOs\VatusaFacilityInfoDTO;
 use App\DTOs\VatusaRosterUser;
 use App\Models\Staff;
 use App\Models\User;
+use Http;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Http;
 use Illuminate\Support\Facades\Log;
 
-class SyncRoster implements ShouldQueue, ShouldBeUnique
+class SyncRoster implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new job instance.
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
-    private function updateRoster() {
-        $ROSTER_API_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility') . '/roster/both';
+    private function updateRoster()
+    {
+        $ROSTER_API_ENDPOINT = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility').'/roster/both';
 
         $rosterData = Http::get($ROSTER_API_ENDPOINT, [
-            'apikey' => config('app.vatusa_api_key')
+            'apikey' => config('app.vatusa_api_key'),
         ]);
 
         if ($rosterData->failed()) {
-            throw new \Exception('Failed to fetch roster data: ' . $rosterData->status() . ' - ' . $rosterData->body());
+            throw new \Exception('Failed to fetch roster data: '.$rosterData->status().' - '.$rosterData->body());
         }
 
         $roster = $rosterData->json();
@@ -46,13 +45,14 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
 
         // Clear hanging OIs
         User::where([
-            'rostered' => false
+            'rostered' => false,
         ])->update([
-            'operating_initials' => null
+            'operating_initials' => null,
         ]);
     }
 
-    private function clearUserRoles() {
+    private function clearUserRoles()
+    {
         $users = User::all();
 
         foreach ($users as $user) {
@@ -60,7 +60,8 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    private function assignRoles() {
+    private function assignRoles()
+    {
         $staffMembers = Staff::all();
 
         foreach ($staffMembers as $staff) {
@@ -72,6 +73,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
                     $user?->assignRole('admin', 'training', 'instructor', 'facilities', 'events', 'staff');
                     break;
                 case 'TA':
+                case 'ATA':
                     $user?->assignRole('admin', 'training', 'staff');
                     break;
                 case 'WM':
@@ -93,14 +95,15 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         }
     }
 
-    private function updateStaffMembers() {
-        $FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility');
+    private function updateStaffMembers()
+    {
+        $FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility');
         $facilityInfo = Http::get($FACILITY_INFO_ENDPOINT, [
-            'apikey' => config('app.vatusa_api_key')
+            'apikey' => config('app.vatusa_api_key'),
         ]);
 
         if ($facilityInfo->failed()) {
-            throw new \Exception('Failed to fetch facility info: ' . $facilityInfo->status() . ' - ' . $facilityInfo->body());
+            throw new \Exception('Failed to fetch facility info: '.$facilityInfo->status().' - '.$facilityInfo->body());
         }
 
         $this->clearUserRoles();
@@ -125,7 +128,7 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
 
             if (App::environment() == 'development') {
                 $testUsers = User::where([
-                    'first_name' => "Web"
+                    'first_name' => 'Web',
                 ])->get();
 
                 foreach ($testUsers as $user) {
@@ -141,9 +144,9 @@ class SyncRoster implements ShouldQueue, ShouldBeUnique
         } catch (\Exception $e) {
             // Log error
             Log::error('Error syncing roster: '.$e->getMessage().'\n'.$e->getTraceAsString(), [
-                'url' => config('app.vatusa_api_url') . '/v2/facility/' . config('app.vatusa_facility'),
+                'url' => config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility'),
                 'environment' => App::environment(),
-                'exception' => get_class($e)
+                'exception' => get_class($e),
             ]);
         }
     }

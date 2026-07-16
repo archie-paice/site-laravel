@@ -35,10 +35,11 @@ class TrainingTicketController extends Controller
     public function create()
     {
         $users = User::where(['rostered' => true])->orderBy('last_name')->get();
+
         return view('training-tickets.create', [
-            'users' => $users
+            'users' => $users,
         ]);
-        ///^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/
+        // /^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/
     }
 
     /**
@@ -59,11 +60,9 @@ class TrainingTicketController extends Controller
             'notes' => 'required',
         ]);
 
-        if($instructor->id == $validated['student']) {
+        if ($instructor->id == $validated['student']) {
             return redirect()->back()->withInput($request->input())->with('error', 'Cannot create training ticket with yourself as the student.');
         }
-
-
 
         $ticket = new TrainingTicket([
             'user_id' => $validated['student'],
@@ -86,7 +85,7 @@ class TrainingTicketController extends Controller
             'student_id' => $ticket->user_id,
         ]);
         SyncTrainingTickets::dispatch();
-        
+
         return redirect(route('training-tickets.show', [$ticket]))
             ->with('success', 'Training ticket successfully created.');
     }
@@ -97,6 +96,7 @@ class TrainingTicketController extends Controller
     public function show(string $id)
     {
         $trainingTicket = TrainingTicket::findOrFail($id);
+
         return view('training-tickets.show', compact('trainingTicket'));
     }
 
@@ -146,7 +146,6 @@ class TrainingTicketController extends Controller
             'notes' => $validated['notes'],
             'location' => $validated['location'],
         ]);
-
 
         return redirect(route('training-tickets.show', [$id]))
             ->with('success', 'Training ticket successfully updated!');

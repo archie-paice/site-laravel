@@ -2,33 +2,38 @@
 
 namespace App\Models;
 
+use App\DTOs\VatusaFacilityInfoDTO;
 use Illuminate\Database\Eloquent\Model;
 
 class Staff extends Model
 {
-    protected $primaryKey = 'title_short';
-    protected $keyType = 'string';
     public $timestamps = false;
 
     protected $fillable = [
         'title_short',
         'title_long',
         'user_id',
-        'primary_contact'
+        'primary_contact',
     ];
 
     protected $casts = [
         'primary_contact' => 'boolean',
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public static function fromFacilityInfoDTO(\App\DTOs\VatusaFacilityInfoDTO $infoDTO)
+    public static function fromFacilityInfoDTO(VatusaFacilityInfoDTO $infoDTO)
     {
         foreach ($infoDTO->roles as $role) {
-            switch($role['role']) {
+            // User does not exist in users table - gather from out of division
+            if (is_null(User::find($role['cid']))) {
+                User::createFromVatusa($role['cid']);
+            }
+
+            switch ($role['role']) {
                 case 'ATM':
                     static::create([
                         'title_short' => 'ATM',
@@ -54,6 +59,16 @@ class Staff extends Model
                         'title_long' => 'Training Administrator',
                         'user_id' => $role['cid'],
                         'primary_contact' => true,
+                    ]);
+
+                    break;
+
+                case 'ATA':
+                    static::create([
+                        'title_short' => 'ATA',
+                        'title_long' => 'Training Administrator',
+                        'user_id' => $role['cid'],
+                        'primary_contact' => false,
                     ]);
 
                     break;
@@ -109,6 +124,6 @@ class Staff extends Model
                     break;
             }
         }
-    
+
     }
 }
