@@ -11,8 +11,11 @@ use Illuminate\View\Component;
 class OnlineController extends Component
 {
     public ?User $user;
+
     public int $userId; // this is a fallback if user not stored in db
+
     public string $callsign;
+
     public DateTime $onlineSince;
 
     /**

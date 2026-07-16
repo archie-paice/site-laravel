@@ -9,6 +9,7 @@ use Livewire\Component;
 class CertificationLevelsTable extends Component
 {
     public CertificationFacility $facility;
+
     public bool $facilityEditMode = false;
 
     public function mount(int $facilityId): void

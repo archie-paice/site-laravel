@@ -28,7 +28,7 @@ class AddUserToVisitingRoster implements ShouldQueue
         $URL = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility').'/roster/manageVisitor/'.$this->userId;
 
         $request = Http::post($URL, [
-            'apikey' => config('app.vatusa_api_key')
+            'apikey' => config('app.vatusa_api_key'),
         ]);
 
         if ($request->failed()) {
