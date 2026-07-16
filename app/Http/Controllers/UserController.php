@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\LoaStatus;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -97,6 +98,23 @@ class UserController extends Controller
         return view('users.training-tickets', [
             'user' => $user,
             'trainingTickets' => $trainingTickets
+        ]);
+    }
+
+    public function loa(int $id) {
+        $user = User::findOrFail($id);
+
+        if (Auth::user()->id != $user->id) {
+            return response('Unauthorized', 403);
+        }
+
+        $activeLoa = $user->loas()->where('status', '!=', LoaStatus::INACTIVE)->first();
+        $loaHistory = $user->loas()->where('status', LoaStatus::INACTIVE)->paginate(25, ['*'], 'loaPage');
+
+        return view('users.loa', [
+            'user' => $user,
+            'activeLoa' => $activeLoa,
+            'loaHistory' => $loaHistory,
         ]);
     }
 

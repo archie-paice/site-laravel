@@ -1,5 +1,6 @@
 <?php
 
+use App\Jobs\ExpireLoas;
 use App\Jobs\SyncRoster;
 use App\Jobs\UpdateOnlineControllers;
 use Illuminate\Foundation\Inspiring;
@@ -13,3 +14,5 @@ Artisan::command('inspire', function () {
 Schedule::job(new SyncRoster())->everyTwoHours();
 
 Schedule::job(new UpdateOnlineControllers())->everyMinute();
+
+Schedule::job(new ExpireLoas())->daily();

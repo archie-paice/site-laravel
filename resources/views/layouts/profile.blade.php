@@ -11,10 +11,18 @@
                     @class(['tab', 'tab-active' => request()->routeIs('users.show')])
                     >General Info</a>
 
+                    @if (auth()->user()?->id === $user->id)
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.loa", $user) }}'
+                    @class(['tab', 'tab-active' => request()->routeIs('users.show.loa')])
+                    >LOA</a>
+                    @endif
+
                     @role('training')
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.training-tickets", $user) }}' 
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.training-tickets", $user) }}'
                     @class(['tab', 'tab-active' => request()->routeIs('users.show.training-tickets')])
                     >Training Tickets</a>
                     <a 

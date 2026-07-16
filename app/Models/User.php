@@ -170,6 +170,10 @@ class User extends Authenticatable
         return $this->hasMany(VisitorRequest::class, 'user_id')->orderBy('created_at', 'desc');
     }
 
+    public function loas(): HasMany {
+        return $this->hasMany(Loa::class, 'user_id')->orderBy('created_at', 'desc');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

@@ -10,6 +10,7 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;
+use App\Http\Controllers\LoaController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserManagementController;
 use App\Jobs\SyncRoster;
@@ -56,10 +57,18 @@ Route::prefix('users/{user}')->group(function() {
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->name('users.show.solo-certs');
+    Route::get('loa', [UserController::class, 'loa'])->middleware('auth')->name('users.show.loa');
 });
 
 # Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
+
+# LOA
+Route::prefix('loa')->middleware('auth')->name('loa.')->group(function () {
+    Route::post('/', [LoaController::class, 'store'])->name('store');
+    Route::put('{loa}', [LoaController::class, 'update'])->name('update');
+    Route::delete('{loa}', [LoaController::class, 'destroy'])->name('destroy');
+});
 
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
@@ -82,6 +91,14 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::put('visit-requests/{visitRequest}', [VisitFacilityController::class, 'update'])->name('visit.update');
         Route::put('visit-requests/{visitRequest}/approve', [VisitFacilityController::class, 'approve'])->name('visit.approve');
         Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])->name('visit.deny');
+    });
+
+    Route::middleware('permission:manage loas')->group(function() {
+        Route::get('loas', [LoaController::class, 'manage'])->name('loa.manage');
+        Route::get('loas/{loa}', [LoaController::class, 'show'])->name('loa.show');
+        Route::put('loas/{loa}/approve', [LoaController::class, 'approve'])->name('loa.approve');
+        Route::put('loas/{loa}/deny', [LoaController::class, 'deny'])->name('loa.deny');
+        Route::put('loas/{loa}/revoke', [LoaController::class, 'revoke'])->name('loa.revoke');
     });
 
     # Facilities Dept.
