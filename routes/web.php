@@ -4,6 +4,8 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Auth\VatsimOauthController;
+use App\Http\Controllers\Admin\ManualContributorController;
+use App\Http\Controllers\ContributorsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
@@ -25,10 +27,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\EventFieldController;
 use App\Http\Controllers\EventController;
-use App\Http\Controllers\ManageEventController;
 use App\Http\Controllers\VisitFacilityController;
 use App\Mail\TrainingAssignmentCreated;
-use App\Http\Controllers\EventPositionController;
+use App\Http\Controllers\CertificationFacilityController;
+use App\Http\Controllers\CertificationLevelController;
 use App\Livewire\EventRegistration;
 use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\AdminPublicationsController;
@@ -36,6 +38,9 @@ use App\Http\Controllers\AdminPublicationCategoriesController;
 
 # Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+# Contributors
+Route::get('/contributors', [ContributorsController::class, 'index'])->name('contributors.index');
 
 # Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
@@ -57,9 +62,9 @@ Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth
 Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
 Route::prefix('users/{user}')->group(function() {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
-    Route::get('training-tickets', [UserController::class, 'trainingTickets'])->name('users.show.training-tickets');
-    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->name('users.show.training-assignments');
-    Route::get('solo-certs', [UserController::class, 'soloCerts'])->name('users.show.solo-certs');
+    Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
+    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
+    Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
 });
 
 # Staff Directory
@@ -70,6 +75,7 @@ Route::get('controllers/statistics', [StatisticsController::class, 'index'])->na
 
 # Publications & Downloads
 Route::get('/publications/downloads', [PublicationsController::class, 'index'])->name('publications.index');
+Route::get('/publications/{publication}/file', [PublicationsController::class, 'file'])->name('publications.file');
 
 # Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
@@ -99,9 +105,27 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
         Route::get('statistics/quarterly/export', [StatisticsController::class, 'exportQuarterly'])->name('statistics.quarterly.export');
     });
 
+    # Contributors
+    Route::middleware('role:admin')->group(function() {
+        Route::get('contributors', [ManualContributorController::class, 'index'])->name('admin.contributors.index');
+        Route::post('contributors', [ManualContributorController::class, 'store'])->name('admin.contributors.store');
+        Route::delete('contributors/{contributor}', [ManualContributorController::class, 'destroy'])->name('admin.contributors.destroy');
+    });
+
     # Facilities Dept.
-    Route::middleware('permission:manage statistics prefixes')->group(function() {
-        Route::resource('statistics-prefixes', StatisticsPrefixesController::class);
+    Route::prefix('data')->group(function() {
+        Route::middleware('permission:manage statistics prefixes')->resource('statistics-prefixes', StatisticsPrefixesController::class);
+
+        Route::middleware('permission:manage certification facilities')->prefix('certification-facilities')->group(function() {
+            Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
+            Route::post('/', [CertificationFacilityController::class, 'store'])->name('certification-facilities.store');
+
+            Route::prefix('/{facility}')->group(function() {
+                Route::get('/', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
+                Route::delete('/', [CertificationFacilityController::class, 'destroy'])->name('certification-facilities.destroy');
+                Route::post('/certification-levels', [CertificationLevelController::class, 'store'])->name('certification-levels.store');
+            });
+        });
     });
 
     # Senior Staff / Web Team
@@ -110,7 +134,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     });
 
     # Publications Management (Facilities Dept.)
-    Route::middleware('role:facilities')->prefix('publications')->name('admin.publications.')->group(function () {
+    Route::middleware('permission:documents:write')->prefix('publications')->name('admin.publications.')->group(function () {
         Route::get('/',            [AdminPublicationsController::class, 'index'])->name('index');
         Route::get('/create',      [AdminPublicationsController::class, 'create'])->name('create');
         Route::post('/',           [AdminPublicationsController::class, 'store'])->name('store');
@@ -133,6 +157,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function(
     # Logs
     Route::middleware('permission:view audit logs')->group(function() {
         Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
+        Route::get('logs/export', [AuditLogController::class, 'export'])->name('logs.export');
     });
 
     # Training Dept.

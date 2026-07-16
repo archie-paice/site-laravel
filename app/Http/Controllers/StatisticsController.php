@@ -98,19 +98,18 @@ class StatisticsController extends Controller
         if ($month !== 0) $leaderboardQuery->where('month', $month);
 
         if ($month === 0) {
+            // Aggregate per-controller totals in SQL rather than loading every
+            // monthly row into memory and summing in PHP (unbounded over time).
             $rows = $leaderboardQuery
+                ->selectRaw('user_id,
+                    SUM(delivery_hours) as delivery_hours,
+                    SUM(ground_hours) as ground_hours,
+                    SUM(tower_hours) as tower_hours,
+                    SUM(approach_hours) as approach_hours,
+                    SUM(center_hours) as center_hours')
+                ->groupBy('user_id')
                 ->get()
                 ->filter(fn($s) => $s->user !== null)
-                ->groupBy('user_id')
-                ->map(function ($group) {
-                    $first = $group->first();
-                    $first->delivery_hours = $group->sum('delivery_hours');
-                    $first->ground_hours   = $group->sum('ground_hours');
-                    $first->tower_hours    = $group->sum('tower_hours');
-                    $first->approach_hours = $group->sum('approach_hours');
-                    $first->center_hours   = $group->sum('center_hours');
-                    return $first;
-                })
                 ->sortByDesc(fn($s) => $s->totalHours())
                 ->values();
         } else {

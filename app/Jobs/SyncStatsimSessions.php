@@ -27,7 +27,7 @@ class SyncStatsimSessions implements ShouldQueue
         $to = $from->copy()->endOfMonth();
 
         $response = Http::timeout(60)
-            ->withHeaders(['X-Api-Key' => config('app.stats_sim_api_key') ?? ''])
+            ->withHeaders(['X-Api-Key' => config('app.statsim_api_key') ?? ''])
             ->get('https://api.statsim.net/api/atcsessions/dates', [
                 'from' => $from->format('n/j/Y'),
                 'to' => $to->format('n/j/Y'),
