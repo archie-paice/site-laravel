@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-
-    public function show(int $id) {
+    public function show(int $id)
+    {
         $user = User::with('certifications.certificationLevel.facility')->findOrFail($id);
 
         return view('users.show', [

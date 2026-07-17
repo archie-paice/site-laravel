@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Laravel\Socialite\Contracts\Provider;
 use Laravel\Socialite\Facades\Socialite;
 use Laravel\Socialite\Two\User as SocialiteUser;
 
@@ -9,9 +10,9 @@ beforeEach(fn () => $this->seed(PermissionSeeder::class));
 
 function fakeVatsimLogin(array $attributes): void
 {
-    $socialiteUser = (new SocialiteUser())->map($attributes);
+    $socialiteUser = (new SocialiteUser)->map($attributes);
 
-    $provider = Mockery::mock(\Laravel\Socialite\Contracts\Provider::class);
+    $provider = Mockery::mock(Provider::class);
     $provider->shouldReceive('user')->andReturn($socialiteUser);
 
     Socialite::shouldReceive('driver')->with('vatsim')->andReturn($provider);

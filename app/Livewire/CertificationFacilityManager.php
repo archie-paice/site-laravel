@@ -10,13 +10,18 @@ class CertificationFacilityManager extends Component
 {
     // Create form
     public string $name = '';
+
     public string $identifier = '';
+
     public int $order = 0;
 
     // Inline edit state
     public ?int $editingId = null;
+
     public string $editName = '';
+
     public string $editIdentifier = '';
+
     public int $editOrder = 0;
 
     public function mount(): void

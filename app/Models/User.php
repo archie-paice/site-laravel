@@ -207,7 +207,8 @@ class User extends Authenticatable
      * `certifications.certificationLevel` collection to avoid per-cell queries
      * when the relation is eager-loaded (e.g. on the roster).
      */
-    public function highestCertificationLevelFor(int $facilityId): ?CertificationLevel {
+    public function highestCertificationLevelFor(int $facilityId): ?CertificationLevel
+    {
         return $this->certifications
             ->map(fn (UserCertification $c) => $c->certificationLevel)
             ->filter(fn (?CertificationLevel $level) => $level && $level->facility_id === $facilityId)
@@ -215,7 +216,8 @@ class User extends Authenticatable
             ->first();
     }
 
-    public function hasCertificationLevel(int $certificationLevelId): bool {
+    public function hasCertificationLevel(int $certificationLevelId): bool
+    {
         return $this->certifications
             ->contains('certification_level_id', $certificationLevelId);
     }

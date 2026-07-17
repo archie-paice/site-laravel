@@ -24,7 +24,7 @@ function ticketPayload(User $student, ?int $levelId = null): array
         'score' => 5,
         'notes' => 'Great work.',
         'certification_level_id' => $levelId,
-    ], fn ($value) => !is_null($value));
+    ], fn ($value) => ! is_null($value));
 }
 
 test('an instructor with certifications:write issues a cert via a training ticket', function () {
@@ -111,7 +111,7 @@ test('the vatusa sync appends the certification issued line to the notes', funct
         'issued_certification_level_id' => $level->id,
     ]);
 
-    (new SyncTrainingTickets())->handle();
+    (new SyncTrainingTickets)->handle();
 
     Http::assertSent(function ($request) {
         return str_contains($request['notes'] ?? '', 'Base notes.')
@@ -139,7 +139,7 @@ test('the vatusa sync leaves notes unchanged when no cert was issued', function 
         'location' => 1,
     ]);
 
-    (new SyncTrainingTickets())->handle();
+    (new SyncTrainingTickets)->handle();
 
     Http::assertSent(fn ($request) => ($request['notes'] ?? null) === 'Base notes.');
 });

@@ -3,7 +3,6 @@
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\CertificationFacilityController;
-use App\Http\Controllers\CertificationLevelController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventFieldController;
@@ -28,15 +27,6 @@ use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventPositionPresetController;
-use App\Http\Controllers\EventFieldController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\VisitFacilityController;
-use App\Mail\TrainingAssignmentCreated;
-use App\Http\Controllers\CertificationFacilityController;
-use App\Livewire\EventRegistration;
-
-# Homepage
 
 // Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
@@ -96,7 +86,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     Route::prefix('data')->group(function () {
         Route::middleware('permission:manage statistics prefixes')->resource('statistics-prefixes', StatisticsPrefixesController::class);
 
-        Route::middleware('permission:certification-facilities:write')->prefix('certification-facilities')->group(function() {
+        Route::middleware('permission:certification-facilities:write')->prefix('certification-facilities')->group(function () {
             // Facility + level CRUD is handled by Livewire components on these pages.
             Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
             Route::get('/{facility}', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
@@ -132,12 +122,12 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     });
 });
 
-# Certification Management (instructors + admins; gated only by certifications:write)
-Route::prefix('admin')->middleware('permission:certifications:write')->group(function() {
+// Certification Management (instructors + admins; gated only by certifications:write)
+Route::prefix('admin')->middleware('permission:certifications:write')->group(function () {
     Route::get('certifications', fn () => view('certifications.index'))->name('certifications.index');
 });
 
-# Dev Only Routes
+// Dev Only Routes
 if (App::environment('development', 'local')) {
     Route::get('/sync', function () {
         SyncRoster::dispatch();

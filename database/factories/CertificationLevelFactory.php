@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\CertificationFacility;
+use App\Models\CertificationLevel;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\CertificationLevel>
+ * @extends Factory<CertificationLevel>
  */
 class CertificationLevelFactory extends Factory
 {

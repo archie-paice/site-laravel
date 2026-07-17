@@ -12,11 +12,14 @@ class CertificationManager extends SortableTable
     use WithPagination;
 
     public string $search = '';
+
     public string $sortField = 'last_name';
+
     public string $sortDirection = 'asc';
 
     // Which (user, facility) cell is being edited, if any.
     public ?int $editingUserId = null;
+
     public ?int $editingFacilityId = null;
 
     public function mount(): void

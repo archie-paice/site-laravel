@@ -81,7 +81,7 @@ class TrainingTicketController extends Controller
         }
 
         // Only issue a certification if one was selected AND the instructor is allowed to.
-        $issueCertification = !empty($validated['certification_level_id'])
+        $issueCertification = ! empty($validated['certification_level_id'])
             && $instructor->hasPermissionTo('certifications:write');
 
         $ticket = new TrainingTicket([

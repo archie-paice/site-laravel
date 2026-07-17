@@ -11,8 +11,11 @@ class CertificationLevelRow extends Component
     public CertificationLevel $certificationLevel;
 
     public bool $editing = false;
+
     public string $name = '';
+
     public string $abbreviation = '';
+
     public ?int $level = null;
 
     public function mount(CertificationLevel $certificationLevel): void

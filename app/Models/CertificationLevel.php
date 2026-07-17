@@ -21,7 +21,8 @@ class CertificationLevel extends Model
         return $this->belongsTo(CertificationFacility::class, 'facility_id');
     }
 
-    public function userCertifications() {
+    public function userCertifications()
+    {
         return $this->hasMany(UserCertification::class, 'certification_level_id');
     }
 }

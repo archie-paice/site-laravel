@@ -20,8 +20,8 @@ class CertificationFacility extends Model
     protected function identifier(): Attribute
     {
         return Attribute::make(
-            get: fn(mixed $value, array $attributes) => Str::upper($value),
-            set: fn(mixed $value) => Str::upper($value),
+            get: fn (mixed $value, array $attributes) => Str::upper($value),
+            set: fn (mixed $value) => Str::upper($value),
         );
     }
 

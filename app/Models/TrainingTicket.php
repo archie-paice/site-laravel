@@ -42,7 +42,8 @@ class TrainingTicket extends Model
         return $this->belongsTo('App\Models\User', 'instructor_id');
     }
 
-    public function issuedCertificationLevel() {
+    public function issuedCertificationLevel()
+    {
         return $this->belongsTo(CertificationLevel::class, 'issued_certification_level_id');
     }
 
@@ -52,22 +53,24 @@ class TrainingTicket extends Model
      * Reused by both the VATUSA sync payload and the notification email so the
      * wording stays in one place.
      */
-    public function certificationIssuedLabel(): ?string {
+    public function certificationIssuedLabel(): ?string
+    {
         $level = $this->issuedCertificationLevel;
 
-        if (!$level) {
+        if (! $level) {
             return null;
         }
 
         $facility = $level->facility;
 
         return 'Certification Issued: '
-            . ($facility ? $facility->identifier . ' ' : '')
-            . $level->name
-            . ' (' . $level->abbreviation . ')';
+            .($facility ? $facility->identifier.' ' : '')
+            .$level->name
+            .' ('.$level->abbreviation.')';
     }
 
-    public function duration(): Attribute {
+    public function duration(): Attribute
+    {
         return Attribute::make(
             get: function (mixed $value, array $attributes) {
                 try {

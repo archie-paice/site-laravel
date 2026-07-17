@@ -14,7 +14,9 @@ class CertificationLevelsTable extends Component
 
     // Add-level form
     public string $newName = '';
+
     public string $newAbbreviation = '';
+
     public ?int $newLevel = null;
 
     public function mount(int $facilityId): void
