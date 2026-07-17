@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class RatingReadonly extends Component
 {
     public int $rating;
+
     /**
      * Create a new component instance.
      */

@@ -6,7 +6,6 @@ use App;
 use App\Models\Staff;
 use App\Models\User;
 use DateTime;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -18,13 +17,13 @@ class UserSeeder extends Seeder
     {
         if (App::environment('local', 'development')) {
             $user = User::firstOrCreate([
-                'id' => 10000010
+                'id' => 10000010,
             ], [
                 'first_name' => 'Web',
                 'last_name' => 'Ten',
                 'email' => 'web10@vatusa.net',
                 'rating' => 11,
-                'joined_at' => new DateTime(),
+                'joined_at' => new DateTime,
                 'division' => 'USA',
                 'facility' => 'ZJX',
                 'rostered' => true,
@@ -39,7 +38,7 @@ class UserSeeder extends Seeder
                 'last_name' => 'Nine',
                 'email' => 'web09@vatusa.net',
                 'rating' => 10,
-                'joined_at' => new DateTime(),
+                'joined_at' => new DateTime,
                 'division' => 'USA',
                 'facility' => 'ZJX',
                 'rostered' => true,
@@ -54,7 +53,7 @@ class UserSeeder extends Seeder
                 'last_name' => 'Eight',
                 'email' => 'web08@vatusa.net',
                 'rating' => 8,
-                'joined_at' => new DateTime(),
+                'joined_at' => new DateTime,
                 'division' => 'USA',
                 'facility' => 'ZJX',
                 'rostered' => true,
@@ -71,6 +70,6 @@ class UserSeeder extends Seeder
                 'title_long' => 'Instructor',
                 'primary_contact' => false,
             ]);
-        };
+        }
     }
 }

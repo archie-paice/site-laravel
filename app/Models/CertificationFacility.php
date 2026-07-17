@@ -29,5 +29,4 @@ class CertificationFacility extends Model
     {
         return $this->hasMany(CertificationLevel::class, 'facility_id')->orderBy('level', 'desc');
     }
-
 }

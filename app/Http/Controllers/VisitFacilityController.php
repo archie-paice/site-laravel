@@ -9,9 +9,9 @@ use App\Mail\VisitorRequestReceived;
 use App\Mail\VisitorRequestRejected;
 use App\Models\User;
 use App\Models\VisitorRequest;
+use App\Services\VisitingChecklistService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Services\VisitingChecklistService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 
@@ -31,6 +31,7 @@ class VisitFacilityController extends Controller
     public function show(Request $request, int $visitRequest)
     {
         $request = VisitorRequest::findOrFail($visitRequest);
+
         return view('visit.show', ['request' => $request]);
     }
 
@@ -43,6 +44,7 @@ class VisitFacilityController extends Controller
         $query = $request->input('search');
 
         $visitRequests = VisitorRequest::search($query)->orderBy('created_at', 'desc')->paginate(25);
+
         return view('visit.manage', ['visitRequests' => $visitRequests]);
     }
 
@@ -54,17 +56,18 @@ class VisitFacilityController extends Controller
 
         $cid = strval(Auth::user()->id);
         $checklist = $visitingChecklistService->getChecklistItems($cid);
-        
+
         return view('visit.create', ['checklist' => $checklist]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         if (VisitorRequest::where('user_id', Auth::user()->id)->count() > 0) {
             return redirect()->route('visit.index')->with('error', 'You have already submitted a visit request.');
         }
 
         $validated = $request->validate([
-            'personalNote' => 'required|string|max:1000'
+            'personalNote' => 'required|string|max:1000',
         ]);
 
         $visitRequest = VisitorRequest::create([
@@ -75,6 +78,7 @@ class VisitFacilityController extends Controller
 
         Mail::to($visitRequest->user->email)->bcc(['atm@zjxartcc.org', 'datm@zjxartcc.org'])->queue(new VisitorRequestReceived($visitRequest));
         Log::info('New visit request submitted for user '.$visitRequest->user_id.' by '.Auth::user()->id);
+
         return redirect()->route('visit.index')->with('success', 'Visit request submitted successfully.');
     }
 
@@ -82,7 +86,7 @@ class VisitFacilityController extends Controller
     {
         $validated = $request->validate([
             'adminNotes' => 'string|nullable|max:1000',
-            'reason' => 'string|required|max:1000'
+            'reason' => 'string|required|max:1000',
         ]);
 
         $visitRequest = VisitorRequest::findOrFail($visitRequest);
@@ -98,6 +102,7 @@ class VisitFacilityController extends Controller
 
         Log::info('Visit request for user '.$visitRequest->user_id.' denied. Reason: '.$validated['reason'].' Admin Notes: '.($validated['adminNotes'] ?? 'N/A').' by '.Auth::user()->id);
         Mail::to($visitRequest->user->email)->bcc(['atm@zjxartcc.org', 'datm@zjxartcc.org'])->queue(new VisitorRequestRejected($visitRequest));
+
         return redirect()->back()->with('success', 'Visit request denied.');
     }
 
@@ -105,9 +110,9 @@ class VisitFacilityController extends Controller
     {
         $validated = $request->validate([
             'operatingInitials' => 'required|string|size:2',
-            'adminNotes' => 'string|nullable|max:1000'
+            'adminNotes' => 'string|nullable|max:1000',
         ], [
-            'operatingInitials.size' => 'Operating initials must be 2 characters long'
+            'operatingInitials.size' => 'Operating initials must be 2 characters long',
         ]);
 
         if (User::where('operating_initials', strtoupper($validated['operatingInitials']))->exists()) {
@@ -131,6 +136,7 @@ class VisitFacilityController extends Controller
         Mail::to($visitRequest->user->email)->bcc(['atm@zjxartcc.org', 'datm@zjxartcc.org'])->queue(new VisitorRequestAccepted($visitRequest));
         AddUserToVisitingRoster::dispatch($visitRequest->user->id);
         Log::info('Visit request for user '.$visitRequest->user_id.' approved. Operating Initials: '.$validated['operatingInitials'].' Admin Notes: '.($validated['adminNotes'] ?? 'N/A').' by '.Auth::user()->id);
+
         return redirect()->back()->with('success', 'Visit request approved.');
     }
 }

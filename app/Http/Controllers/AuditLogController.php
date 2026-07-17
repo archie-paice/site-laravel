@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -11,7 +10,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class AuditLogController extends Controller
 {
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         $cid = $request->query('cid');
         $type = $request->query('type');
 
@@ -41,12 +41,13 @@ class AuditLogController extends Controller
         return view('audit-log.index', compact('logs', 'controllers', 'selectedController', 'cid', 'type', 'recordTypes'));
     }
 
-    public function export(Request $request): StreamedResponse {
+    public function export(Request $request): StreamedResponse
+    {
         $cid = $request->query('cid');
         $type = $request->query('type');
         $limit = (int) $request->query('limit');
 
-        $filename = 'audit-log-' . now()->utc()->format('Ymd-His') . 'Z.csv';
+        $filename = 'audit-log-'.now()->utc()->format('Ymd-His').'Z.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -69,7 +70,7 @@ class AuditLogController extends Controller
 
             $writeRow = function ($log) use ($handle) {
                 fputcsv($handle, [
-                    $log->created_at->utc()->format('Y-m-d H:i:s') . 'Z',
+                    $log->created_at->utc()->format('Y-m-d H:i:s').'Z',
                     $log->event ?? $log->description,
                     $log->causer?->name ?? 'System',
                     $log->causer?->id,
@@ -98,7 +99,8 @@ class AuditLogController extends Controller
      * When a CID is selected, returns entries where that user is either the
      * causer (made the change) or the subject (was changed).
      */
-    private function filteredQuery($cid, $type = null) {
+    private function filteredQuery($cid, $type = null)
+    {
         return Activity::query()
             ->when($cid, function ($query, $cid) {
                 $query->where(function ($query) use ($cid) {
@@ -113,20 +115,22 @@ class AuditLogController extends Controller
     /**
      * Resolve the subject's display name, tolerating model classes that no longer exist.
      */
-    private function subjectName(Activity $log): ?string {
+    private function subjectName(Activity $log): ?string
+    {
         $subject = rescue(fn () => $log->subject, null, false);
 
         if (! $subject) {
             return null;
         }
 
-        return $subject->name ?? ('#' . $subject->getKey());
+        return $subject->name ?? ('#'.$subject->getKey());
     }
 
     /**
      * Flatten an activity's property diff into a single readable string for export.
      */
-    private function describeChanges(Activity $log): string {
+    private function describeChanges(Activity $log): string
+    {
         $new = collect($log->properties['attributes'] ?? []);
         $old = collect($log->properties['old'] ?? []);
         $event = $log->event ?? $log->description;
@@ -140,16 +144,17 @@ class AuditLogController extends Controller
                     return null;
                 }
 
-                return Str::headline($key) . ": {$from} -> {$to}";
+                return Str::headline($key).": {$from} -> {$to}";
             }
 
-            return Str::headline($key) . ': ' . ($to !== '' ? $to : $from);
+            return Str::headline($key).': '.($to !== '' ? $to : $from);
         })->filter();
 
         return $parts->implode('; ');
     }
 
-    private function stringifyValue(mixed $value): string {
+    private function stringifyValue(mixed $value): string
+    {
         if (is_null($value) || $value === '') {
             return '';
         }

@@ -1,22 +1,31 @@
 <?php
 
 namespace App\DTOs;
+
 class VisitingChecklistDTO
 {
     public bool $error = false;
+
     public bool $hasHomeFacility;
+
     public bool $needsBasic;
+
     public int $visitingDays;
+
     public bool $visitingDaysMet; // 60 days
+
     public bool $ninetyDaysSincePromotion;
-    public bool $fiftyHoursSincePromotion; 
+
+    public bool $fiftyHoursSincePromotion;
+
     public bool $visitEligible;
 
-    public function __construct(array|null $data)
+    public function __construct(?array $data)
     {
         if (is_null($data)) {
             $this->error = true;
             $this->visitEligible = false;
+
             return;
         }
 

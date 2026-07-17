@@ -1,5 +1,7 @@
 <?php
+
 // https://vatusa-api.ztlartcc.org/#tag/training/paths/~1user~1%7Bcid%7D~1training~1record/post
+
 namespace App\Models;
 
 use DateTime;
@@ -22,8 +24,6 @@ class TrainingTicket extends Model
         'score',
         'notes',
         'location',
-        'ots_status',
-        'solo_granted',
         'vatusa_id',
         'vatusa_synced',
         'position',
@@ -32,11 +32,13 @@ class TrainingTicket extends Model
         'session_end',
     ];
 
-    public function student() {
+    public function student()
+    {
         return $this->belongsTo('App\Models\User', 'user_id');
     }
 
-    public function instructor() {
+    public function instructor()
+    {
         return $this->belongsTo('App\Models\User', 'instructor_id');
     }
 
@@ -73,7 +75,7 @@ class TrainingTicket extends Model
                     $endDate = new DateTime($attributes['session_end']);
                     $duration = $startDate->diff($endDate);
                 } catch (Exception $e) {
-                    return "00:00";
+                    return '00:00';
                 }
 
                 return $duration->format('%H:%I');
@@ -84,7 +86,7 @@ class TrainingTicket extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['user_id', 'instructor_id', 'session_date', 'duration', 'movements', 'score', 'notes', 'location', 'ots_status']);
+            ->logOnly(['user_id', 'instructor_id', 'duration', 'movements', 'score', 'notes', 'location']);
     }
 
     public function toSearchableArray(): array
@@ -95,7 +97,7 @@ class TrainingTicket extends Model
             'student_name' => $this->student->name,
             'instructor_name' => $this->instructor->name,
             'position' => $this->position,
-            'date' => $this->session_start
+            'date' => $this->session_start,
         ];
     }
 }

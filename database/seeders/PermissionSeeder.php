@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use DB;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -15,7 +14,7 @@ class PermissionSeeder extends Seeder
         'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers', 'certifications:write' ],
         'events' => ['manage events', 'assign event positions', 'publish events'],
         'facilities' => ['manage statistics prefixes', 'certification-facilities:write'],
-        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs' ],
+        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs', 'training-tickets:write'],
         'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students', 'certifications:write'],
     ];
 

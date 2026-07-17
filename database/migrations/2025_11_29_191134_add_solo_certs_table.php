@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('solo_certs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('issued_by_id')->constrained('users')->onDelete('set null');
+            $table->foreignId('issued_by_id')->constrained('users')->restrictOnDelete();
             $table->string('position');
             $table->boolean('revoked')->default(false);
             $table->timestamps(); // auto expires in 30 days - see model
