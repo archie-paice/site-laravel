@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Enums\TrainingStatus;
 use App\Enums\TrainingType;
-use Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Laravel\Scout\Searchable;
@@ -14,13 +13,14 @@ use Spatie\Activitylog\Traits\LogsActivity;
 class TrainingAssignment extends Model
 {
     use LogsActivity, Searchable;
+
     protected $fillable = [
         'id',
         'instructor_id',
         'training_type',
         'user_id',
         'status',
-        'active'
+        'active',
     ];
 
     protected $casts = [
@@ -39,23 +39,26 @@ class TrainingAssignment extends Model
         return $this->belongsTo(User::class, 'instructor_id');
     }
 
-    public function status(): Attribute {
+    public function status(): Attribute
+    {
         return Attribute::make(
             set: fn ($value) => strtolower($value)
         );
     }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
             ->logOnly(['user_id', 'instructor_id', 'status']);
     }
 
-    public function toSearchableArray(): array {
+    public function toSearchableArray(): array
+    {
         return [
             'name' => $this->student->name,
             'trainingType' => $this->training_type->mapToString(),
             'status' => $this->status,
-            'date' => $this->created_at
+            'date' => $this->created_at,
         ];
     }
 }

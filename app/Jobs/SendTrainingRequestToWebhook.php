@@ -14,10 +14,7 @@ class SendTrainingRequestToWebhook implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public TrainingAssignment $trainingAssignment)
-    {
-        
-    }
+    public function __construct(public TrainingAssignment $trainingAssignment) {}
 
     /**
      * Execute the job.
@@ -35,7 +32,7 @@ class SendTrainingRequestToWebhook implements ShouldQueue
                     'fields' => [
                         [
                             'name' => 'Assignment ID',
-                            'value' => (string)$this->trainingAssignment->id,
+                            'value' => (string) $this->trainingAssignment->id,
                             'inline' => true,
                         ],
                         [

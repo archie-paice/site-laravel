@@ -13,8 +13,8 @@ class CertificationLevel extends Model
         'abbreviation',
     ];
 
-
-    public function facility() {
+    public function facility()
+    {
         return $this->belongsTo(CertificationFacility::class, 'facility_id');
     }
 }

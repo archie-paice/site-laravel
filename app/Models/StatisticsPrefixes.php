@@ -14,13 +14,14 @@ class StatisticsPrefixes extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'name'
+        'name',
     ];
 
-    protected function name(): Attribute {
+    protected function name(): Attribute
+    {
         return Attribute::make(
-            get: fn($value) => strtoupper($value),
-            set: fn($value) => strtoupper($value)
+            get: fn ($value) => strtoupper($value),
+            set: fn ($value) => strtoupper($value)
         );
     }
 
