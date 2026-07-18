@@ -40,9 +40,9 @@
         <x-label label='Home Subdivision' :value='$user->facility'/>
     @endunless
 
-    @hasrole('staff')
+    @if(auth()->user()?->hasRole('staff'))
         <x-label label="Email" :value="$user->email"/>
-    @endhasrole
+    @endif
 
     <div class='col-span-2'>
         <x-label-slot label='Biography'>

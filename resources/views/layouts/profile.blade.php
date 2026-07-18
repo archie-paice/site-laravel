@@ -11,7 +11,7 @@
                     @class(['tab', 'tab-active' => request()->routeIs('users.show')])
                     >General Info</a>
 
-                    @role('training')
+                    @if(auth()->user()?->hasRole('training'))
                     <a 
                     role="tab" 
                     href='{{ route("users.show.training-tickets", $user) }}' 
@@ -27,7 +27,7 @@
                     href='{{ route("users.show.solo-certs", $user) }}' 
                     @class(['tab', 'tab-active' => request()->routeIs('users.show.solo-certs')])
                     >Solo Certs</a>
-                    @endrole
+                    @endif
                 </div>
                 
             </div>
