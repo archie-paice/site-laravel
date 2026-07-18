@@ -5,6 +5,7 @@ use App\Models\CertificationLevel;
 use App\Models\User;
 use App\Models\UserCertification;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Auth;
 
 beforeEach(fn () => $this->seed(PermissionSeeder::class));
@@ -29,7 +30,7 @@ test('a user profile renders when the guard reports authenticated but resolves a
     // @role/@hasrole directives used across the profile pages must be null-safe.
     $user = User::factory()->create();
 
-    $guard = Mockery::mock(Illuminate\Contracts\Auth\Guard::class)->shouldIgnoreMissing(null);
+    $guard = Mockery::mock(Guard::class)->shouldIgnoreMissing(null);
     $guard->shouldReceive('check')->andReturnTrue();
     $guard->shouldReceive('guest')->andReturnFalse();
     $guard->shouldReceive('user')->andReturnNull();
