@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\RemoveUserFromRoster;
 use App\Jobs\SyncStatsimSessions;
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
+use App\Models\TrainingTicket;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StatisticsController extends Controller
 {
@@ -201,7 +206,7 @@ class StatisticsController extends Controller
         return response()->streamDownload(function () use ($rows) {
             $handle = fopen('php://output', 'w');
 
-            fputcsv($handle, ['Controller CID', 'FULL Name', 'Status', 'Hours (In Quarter)'], ',', '"', '\\');
+            fputcsv($handle, ['Controller CID', 'FULL Name', 'Status', 'Hours (In Quarter)', 'Training Hrs (Student)', 'Training Hrs (Instructor)'], ',', '"', '\\');
 
             foreach ($rows as $row) {
                 fputcsv($handle, [
@@ -209,11 +214,66 @@ class StatisticsController extends Controller
                     $row->user->name,
                     $this->statusLabel($row->user),
                     number_format($row->total, 2),
+                    number_format($row->training_student, 2),
+                    number_format($row->training_instructor, 2),
                 ], ',', '"', '\\');
             }
 
             fclose($handle);
         }, $filename, $headers);
+    }
+
+    /**
+     * Total training hours per controller for the quarter, split into time spent
+     * as a student and time spent as an instructor. Keyed by user id.
+     */
+    private function quarterlyTrainingHours($userIds, int $year, array $months): Collection
+    {
+        $start = Carbon::create($year, $months[0], 1)->startOfMonth();
+        $end = Carbon::create($year, end($months), 1)->endOfMonth();
+
+        $tickets = TrainingTicket::whereBetween('session_start', [$start, $end])
+            ->where(fn ($q) => $q->whereIn('user_id', $userIds)->orWhereIn('instructor_id', $userIds))
+            ->get(['user_id', 'instructor_id', 'session_start', 'session_end']);
+
+        $hours = collect();
+
+        foreach ($tickets as $ticket) {
+            if (! $ticket->session_start || ! $ticket->session_end) {
+                continue;
+            }
+
+            $seconds = Carbon::parse($ticket->session_end)->diffInSeconds(Carbon::parse($ticket->session_start), true);
+            $duration = max(0, $seconds) / 3600;
+
+            $student = $hours->get($ticket->user_id, ['student' => 0.0, 'instructor' => 0.0]);
+            $student['student'] += $duration;
+            $hours->put($ticket->user_id, $student);
+
+            $instructor = $hours->get($ticket->instructor_id, ['student' => 0.0, 'instructor' => 0.0]);
+            $instructor['instructor'] += $duration;
+            $hours->put($ticket->instructor_id, $instructor);
+        }
+
+        return $hours;
+    }
+
+    public function removeInactive(Request $request)
+    {
+        $validated = $request->validate([
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'integer',
+            'reason' => 'required|string|max:255',
+        ]);
+
+        $users = User::whereIn('id', $validated['user_ids'])->get();
+
+        foreach ($users as $user) {
+            RemoveUserFromRoster::dispatch($user->id, $validated['reason']);
+            Log::info('Queued roster removal for user '.$user->id.' ('.$user->name.'). Reason: '.$validated['reason'].' by '.Auth::id());
+        }
+
+        return redirect()->back()->with('success', 'Queued removal for '.$users->count().' controller(s).');
     }
 
     private function statusLabel(User $user): string
@@ -284,7 +344,10 @@ class StatisticsController extends Controller
             ->orderBy('first_name')
             ->get(['id', 'first_name', 'last_name', 'email', 'rating', 'rostered', 'facility']);
 
+        $training = $this->quarterlyTrainingHours($activeUserIds, $year, $months);
+
         $empty = ['delivery' => 0, 'ground' => 0, 'tower' => 0, 'approach' => 0, 'center' => 0, 'total' => 0];
+        $emptyTraining = ['student' => 0.0, 'instructor' => 0.0];
 
         $controllers = $users->map(fn ($user) => (object) [
             'id' => $user->id,
@@ -292,10 +355,19 @@ class StatisticsController extends Controller
             'rating' => $user->rating,
         ])->values();
 
-        $rows = $users->map(fn ($user) => (object) array_merge(
-            ['user' => $user],
-            $quarterStats->get($user->id, $empty)
-        ))->values();
+        $rows = $users->map(function ($user) use ($quarterStats, $training, $empty, $emptyTraining) {
+            $trainingHours = $training->get($user->id, $emptyTraining);
+
+            return (object) array_merge(
+                ['user' => $user],
+                $quarterStats->get($user->id, $empty),
+                [
+                    'training_student' => $trainingHours['student'],
+                    'training_instructor' => $trainingHours['instructor'],
+                    'training_total' => $trainingHours['student'] + $trainingHours['instructor'],
+                ]
+            );
+        })->values();
 
         if ($cid) {
             $rows = $rows->filter(fn ($row) => (string) $row->user->id === (string) $cid)->values();

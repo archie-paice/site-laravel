@@ -104,6 +104,10 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::get('statistics/quarterly/export', [StatisticsController::class, 'exportQuarterly'])->name('statistics.quarterly.export');
     });
 
+    Route::middleware('permission:remove inactive controllers')->group(function () {
+        Route::post('statistics/quarterly/remove', [StatisticsController::class, 'removeInactive'])->name('statistics.quarterly.remove');
+    });
+
     // Contributors
     Route::middleware('role:admin')->group(function () {
         Route::get('contributors', [ManualContributorController::class, 'index'])->name('admin.contributors.index');

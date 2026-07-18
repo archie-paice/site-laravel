@@ -150,18 +150,40 @@
             @if($flagged->total() === 0)
                 <p class="text-base mt-3">No controllers are below {{ number_format($threshold, 1) }}h for {{ $periodLabel }}.</p>
             @else
+                @haspermission('remove inactive controllers')
+                    <form method="POST" action="{{ route('statistics.quarterly.remove') }}"
+                          x-data="{ selected: [], reason: '' }"
+                          @submit="if (selected.length === 0) { $event.preventDefault(); return; }
+                                   if (!reason.trim()) { $event.preventDefault(); alert('A removal reason is required.'); return; }
+                                   if (!confirm('Remove ' + selected.length + ' controller(s) from the roster? This cannot be undone.')) { $event.preventDefault(); }">
+                        @csrf
+                @endhaspermission
                 <div class="overflow-x-auto mt-3">
                     <table class="table table-zebra table-sm sm:table-md w-full border border-base-300">
                         <thead>
                             <tr>
+                                @haspermission('remove inactive controllers')
+                                    <th class="w-8">
+                                        <input type="checkbox" class="checkbox checkbox-sm"
+                                               @click="selected = $event.target.checked ? [{{ $flagged->getCollection()->map(fn($r) => $r->user->id)->implode(',') }}] : []"
+                                               :checked="selected.length === {{ $flagged->count() }} && selected.length > 0">
+                                    </th>
+                                @endhaspermission
                                 <th>Controller</th>
                                 <th class="hidden sm:table-cell">Status</th>
+                                <th class="text-right whitespace-nowrap">Training</th>
                                 <th class="text-right whitespace-nowrap">{{ $periodLabel }} Hours</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($flagged as $row)
                                 <tr>
+                                    @haspermission('remove inactive controllers')
+                                        <td>
+                                            <input type="checkbox" name="user_ids[]" value="{{ $row->user->id }}"
+                                                   class="checkbox checkbox-sm" x-model.number="selected">
+                                        </td>
+                                    @endhaspermission
                                     <td>
                                         <a href="{{ route('users.show', ['user' => $row->user->id]) }}"
                                            class="font-medium hover:underline">{{ $row->user->name }}</a>
@@ -175,12 +197,34 @@
                                             <span class="text-sm">{{ $status['label'] }}</span>
                                         @endif
                                     </td>
+                                    <td class="text-right whitespace-nowrap">
+                                        @if($row->training_total > 0)
+                                            <span class="font-medium">{{ number_format($row->training_total, 1) }}h</span>
+                                            <span class="text-xs text-base-content/60 ml-1">(S {{ number_format($row->training_student, 1) }} / I {{ number_format($row->training_instructor, 1) }})</span>
+                                        @else
+                                            <span class="text-base-content/40">—</span>
+                                        @endif
+                                    </td>
                                     <td class="text-right font-bold text-error">{{ number_format($row->total, 1) }}h</td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+                @haspermission('remove inactive controllers')
+                        <div class="flex flex-col sm:flex-row sm:items-end gap-3 mt-4">
+                            <div class="flex flex-col gap-1 w-full sm:max-w-md">
+                                <label class="text-sm">Removal reason (applied to all selected)</label>
+                                <input type="text" x-model="reason" maxlength="255" placeholder="e.g. Inactivity — below quarterly hours minimum" class="input w-full">
+                            </div>
+                            <button type="submit" class="btn btn-error w-full sm:w-auto"
+                                    :disabled="selected.length === 0">
+                                Remove Selected (<span x-text="selected.length"></span>)
+                            </button>
+                        </div>
+                        <p class="text-xs text-base-content/60 mt-2">Removes the selected controllers from the VATUSA roster. Only controllers on the current page can be selected at once.</p>
+                    </form>
+                @endhaspermission
                 <div class="mt-3">{{ $flagged->links() }}</div>
             @endif
         </x-card-component>
@@ -201,6 +245,8 @@
                             <th class="text-right hidden sm:table-cell whitespace-nowrap">Tower</th>
                             <th class="text-right hidden sm:table-cell whitespace-nowrap">TRACON</th>
                             <th class="text-right hidden sm:table-cell whitespace-nowrap">Center</th>
+                            <th class="text-right hidden lg:table-cell whitespace-nowrap">Trng (Student)</th>
+                            <th class="text-right hidden lg:table-cell whitespace-nowrap">Trng (Instr)</th>
                             <th class="text-right whitespace-nowrap">Total</th>
                         </tr>
                     </thead>
@@ -225,6 +271,8 @@
                                 <td class="text-right hidden sm:table-cell">{{ $row->tower > 0 ? number_format($row->tower, 1).'h' : '—' }}</td>
                                 <td class="text-right hidden sm:table-cell">{{ $row->approach > 0 ? number_format($row->approach, 1).'h' : '—' }}</td>
                                 <td class="text-right hidden sm:table-cell">{{ $row->center > 0 ? number_format($row->center, 1).'h' : '—' }}</td>
+                                <td class="text-right hidden lg:table-cell">{{ $row->training_student > 0 ? number_format($row->training_student, 1).'h' : '—' }}</td>
+                                <td class="text-right hidden lg:table-cell">{{ $row->training_instructor > 0 ? number_format($row->training_instructor, 1).'h' : '—' }}</td>
                                 <td class="text-right font-bold {{ $row->total < $threshold ? 'text-error' : '' }}">{{ number_format($row->total, 1) }}h</td>
                             </tr>
                         @endforeach
