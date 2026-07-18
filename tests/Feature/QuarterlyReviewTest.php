@@ -1,11 +1,13 @@
 <?php
 
 use App\Jobs\RemoveUserFromRoster;
+use App\Mail\ControllerRemovedFromRoster;
 use App\Models\ControllerMonthlyStat;
 use App\Models\TrainingTicket;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
@@ -231,10 +233,11 @@ test('a user without the removal permission is forbidden', function () {
     Queue::assertNothingPushed();
 });
 
-test('the removal job de-rosters the user locally on a successful VATUSA call', function () {
+test('the removal job de-rosters the user locally and emails them on a successful VATUSA call', function () {
     Http::fake([
         '*' => Http::response(['status' => 'OK'], 200),
     ]);
+    Mail::fake();
 
     $user = User::factory()->create([
         'rostered' => true,
@@ -248,4 +251,25 @@ test('the removal job de-rosters the user locally on a successful VATUSA call', 
 
     expect($user->rostered)->toBeFalse()
         ->and($user->operating_initials)->toBe(''); // cleared (accessor upper-cases null to '')
+
+    Mail::assertQueued(ControllerRemovedFromRoster::class, fn ($mail) => $mail->hasTo($user->email)
+        && $mail->user->id === $user->id
+        && $mail->reason === 'Inactivity');
+});
+
+test('the removal job does not email the user when the VATUSA call fails', function () {
+    Http::fake([
+        '*' => Http::response(['status' => 'error'], 500),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity'))->handle();
+
+    $user->refresh();
+
+    expect($user->rostered)->toBeTrue();
+
+    Mail::assertNothingQueued();
 });

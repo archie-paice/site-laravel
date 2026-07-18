@@ -2,11 +2,13 @@
 
 namespace App\Jobs;
 
+use App\Mail\ControllerRemovedFromRoster;
 use App\Models\User;
 use Http;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class RemoveUserFromRoster implements ShouldQueue
 {
@@ -58,6 +60,8 @@ class RemoveUserFromRoster implements ShouldQueue
         $user->rostered = false;
         $user->operating_initials = null;
         $user->save();
+
+        Mail::to($user->email)->bcc(['atm@zjxartcc.org', 'datm@zjxartcc.org'])->queue(new ControllerRemovedFromRoster($user, $this->reason));
 
         Log::info('Successfully removed user '.$this->userId.' from roster. Reason: '.$this->reason);
     }
