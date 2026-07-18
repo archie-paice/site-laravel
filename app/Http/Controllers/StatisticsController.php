@@ -107,28 +107,23 @@ class StatisticsController extends Controller
             $leaderboardQuery->where('month', $month);
         }
 
-        if ($month === 0) {
-            // Aggregate per-controller totals in SQL rather than loading every
-            // monthly row into memory and summing in PHP (unbounded over time).
-            $rows = $leaderboardQuery
-                ->selectRaw('user_id,
-                    SUM(delivery_hours) as delivery_hours,
-                    SUM(ground_hours) as ground_hours,
-                    SUM(tower_hours) as tower_hours,
-                    SUM(approach_hours) as approach_hours,
-                    SUM(center_hours) as center_hours')
-                ->groupBy('user_id')
-                ->get()
-                ->filter(fn ($s) => $s->user !== null)
-                ->sortByDesc(fn ($s) => $s->totalHours())
-                ->values();
-        } else {
-            $rows = $leaderboardQuery
-                ->get()
-                ->filter(fn ($s) => $s->user !== null)
-                ->sortByDesc(fn ($s) => $s->totalHours())
-                ->values();
-        }
+        // Aggregate per-controller totals in SQL rather than loading every
+        // monthly row into memory and summing in PHP (unbounded over time).
+        // Grouping by user_id also collapses the multiple rows a single
+        // controller would otherwise produce when a specific month is combined
+        // with "All Years" (one row per year).
+        $rows = $leaderboardQuery
+            ->selectRaw('user_id,
+                SUM(delivery_hours) as delivery_hours,
+                SUM(ground_hours) as ground_hours,
+                SUM(tower_hours) as tower_hours,
+                SUM(approach_hours) as approach_hours,
+                SUM(center_hours) as center_hours')
+            ->groupBy('user_id')
+            ->get()
+            ->filter(fn ($s) => $s->user !== null)
+            ->sortByDesc(fn ($s) => $s->totalHours())
+            ->values();
 
         $totals = [
             'delivery' => $rows->sum('delivery_hours'),
@@ -143,9 +138,11 @@ class StatisticsController extends Controller
             'SUM(delivery_hours + ground_hours + tower_hours + approach_hours + center_hours) as total'
         )->value('total') ?? 0;
 
-        $earliest = ControllerMonthlyStat::selectRaw('MIN(year * 100 + month) as ym, MIN(year) as y, MIN(month) as m')->first();
-        $allTimeSince = ($earliest && $earliest->y)
-            ? Carbon::create($earliest->y, $earliest->m, 1)->format('M Y')
+        // Take the single earliest (year, month) pair so the month can't be
+        // sourced from a different row than the year.
+        $earliest = ControllerMonthlyStat::selectRaw('MIN(year * 100 + month) as ym')->value('ym');
+        $allTimeSince = $earliest
+            ? Carbon::create(intdiv($earliest, 100), $earliest % 100, 1)->format('M Y')
             : null;
 
         return view('statistics.index', [
@@ -170,7 +167,7 @@ class StatisticsController extends Controller
 
         $perPage = 25;
         $data['flagged'] = $this->paginate($data['flagged'], $request, 'flagged_page', $perPage);
-        $data['rows']    = $this->paginate($data['rows'], $request, 'rows_page', $perPage);
+        $data['rows'] = $this->paginate($data['rows'], $request, 'rows_page', $perPage);
 
         return view('statistics.quarterly', $data);
     }
@@ -194,10 +191,10 @@ class StatisticsController extends Controller
 
         $rows = $data['flagged'];
 
-        $filename = "quarterly-flagged-q{$data['quarter']}-{$data['year']}-" . Carbon::now()->utc()->format('Ymd-His') . 'Z.csv';
+        $filename = "quarterly-flagged-q{$data['quarter']}-{$data['year']}-".Carbon::now()->utc()->format('Ymd-His').'Z.csv';
 
         $headers = [
-            'Content-Type'        => 'text/csv',
+            'Content-Type' => 'text/csv',
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
@@ -221,7 +218,7 @@ class StatisticsController extends Controller
 
     private function statusLabel(User $user): string
     {
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return 'Not Rostered';
         }
 
@@ -238,13 +235,19 @@ class StatisticsController extends Controller
         $currentQuarter = intdiv($now->month - 1, 3) + 1;
 
         $year = (int) $request->query('year', $now->year);
-        if ($year < 2000 || $year > 2100) $year = $now->year;
+        if ($year < 2000 || $year > 2100) {
+            $year = $now->year;
+        }
 
         $quarter = (int) $request->query('quarter', $currentQuarter);
-        if ($quarter < 1 || $quarter > 4) $quarter = $currentQuarter;
+        if ($quarter < 1 || $quarter > 4) {
+            $quarter = $currentQuarter;
+        }
 
         $threshold = (float) $request->query('threshold', 3);
-        if ($threshold < 0) $threshold = 3;
+        if ($threshold < 0) {
+            $threshold = 3;
+        }
 
         $rosteredOnly = $request->boolean('rostered_only');
         $cid = $request->query('cid');
@@ -256,7 +259,7 @@ class StatisticsController extends Controller
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        if (!$years->contains($now->year)) {
+        if (! $years->contains($now->year)) {
             $years = $years->prepend($now->year);
         }
 
@@ -267,13 +270,13 @@ class StatisticsController extends Controller
             ->whereIn('month', $months)
             ->get()
             ->groupBy('user_id')
-            ->map(fn($rows) => [
+            ->map(fn ($rows) => [
                 'delivery' => $rows->sum('delivery_hours'),
-                'ground'   => $rows->sum('ground_hours'),
-                'tower'    => $rows->sum('tower_hours'),
+                'ground' => $rows->sum('ground_hours'),
+                'tower' => $rows->sum('tower_hours'),
                 'approach' => $rows->sum('approach_hours'),
-                'center'   => $rows->sum('center_hours'),
-                'total'    => $rows->sum(fn($r) => $r->totalHours()),
+                'center' => $rows->sum('center_hours'),
+                'total' => $rows->sum(fn ($r) => $r->totalHours()),
             ]);
 
         $users = User::whereIn('id', $activeUserIds)
@@ -283,35 +286,35 @@ class StatisticsController extends Controller
 
         $empty = ['delivery' => 0, 'ground' => 0, 'tower' => 0, 'approach' => 0, 'center' => 0, 'total' => 0];
 
-        $controllers = $users->map(fn($user) => (object) [
-            'id'     => $user->id,
-            'name'   => $user->name,
+        $controllers = $users->map(fn ($user) => (object) [
+            'id' => $user->id,
+            'name' => $user->name,
             'rating' => $user->rating,
         ])->values();
 
-        $rows = $users->map(fn($user) => (object) array_merge(
+        $rows = $users->map(fn ($user) => (object) array_merge(
             ['user' => $user],
             $quarterStats->get($user->id, $empty)
         ))->values();
 
         if ($cid) {
-            $rows = $rows->filter(fn($row) => (string) $row->user->id === (string) $cid)->values();
+            $rows = $rows->filter(fn ($row) => (string) $row->user->id === (string) $cid)->values();
         }
 
-        $flagged = $rows->filter(fn($row) => $row->total < $threshold)
-            ->when($rosteredOnly, fn($flagged) => $flagged->filter(fn($row) => $row->user->rostered))
+        $flagged = $rows->filter(fn ($row) => $row->total < $threshold)
+            ->when($rosteredOnly, fn ($flagged) => $flagged->filter(fn ($row) => $row->user->rostered))
             ->sortBy('total')
             ->values();
 
         return [
-            'rows'         => $rows,
-            'flagged'      => $flagged,
-            'year'         => $year,
-            'quarter'      => $quarter,
-            'years'        => $years,
-            'threshold'    => $threshold,
-            'controllers'  => $controllers,
-            'cid'          => $cid,
+            'rows' => $rows,
+            'flagged' => $flagged,
+            'year' => $year,
+            'quarter' => $quarter,
+            'years' => $years,
+            'threshold' => $threshold,
+            'controllers' => $controllers,
+            'cid' => $cid,
             'rosteredOnly' => $rosteredOnly,
         ];
     }

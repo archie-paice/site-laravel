@@ -97,7 +97,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-assignments:read')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->can('training-assignments:read')) {
             abort(403);
         }
 
@@ -117,7 +117,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-tickets:read')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->can('training-tickets:read')) {
             abort(403);
         }
 
@@ -137,7 +137,7 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('solo-certs:read')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->can('solo-certs:read')) {
             abort(403);
         }
 
