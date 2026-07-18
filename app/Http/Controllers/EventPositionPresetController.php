@@ -97,6 +97,7 @@ class EventPositionPresetController extends Controller
     {
         $position = EventPositionPreset::find($id);
         $position->delete();
+
         return redirect()->route('admin.events.position-presets.index')->with('success', 'Preset deleted successfully');
     }
 }

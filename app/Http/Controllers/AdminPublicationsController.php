@@ -11,10 +11,12 @@ use Illuminate\Validation\Rule;
 class AdminPublicationsController extends Controller
 {
     private const DISK = 'public';
-    private const DIRECTORY = 'documents';
-    private const ALLOWED_MIMES = 'pdf,docx,png,jpg,jpeg';
-    private const MAX_KB = 10240;
 
+    private const DIRECTORY = 'documents';
+
+    private const ALLOWED_MIMES = 'pdf,docx,png,jpg,jpeg';
+
+    private const MAX_KB = 10240;
 
     public function index()
     {
@@ -44,12 +46,12 @@ class AdminPublicationsController extends Controller
 
         Publication::create([
             'publication_category_id' => $validated['publication_category_id'],
-            'name'                    => $validated['name'],
-            'description'             => $validated['description'],
-            'version'                 => $validated['version'],
-            'file_path'               => $storedPath,
-            'original_filename'       => $file->getClientOriginalName(),
-            'file_size'               => $file->getSize(),
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'version' => $validated['version'],
+            'file_path' => $storedPath,
+            'original_filename' => $file->getClientOriginalName(),
+            'file_size' => $file->getSize(),
         ]);
 
         return redirect()
@@ -72,9 +74,9 @@ class AdminPublicationsController extends Controller
 
         $document->fill([
             'publication_category_id' => $validated['publication_category_id'],
-            'name'                    => $validated['name'],
-            'description'             => $validated['description'],
-            'version'                 => $validated['version'],
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'version' => $validated['version'],
         ]);
 
         if ($request->hasFile('file')) {
@@ -115,14 +117,14 @@ class AdminPublicationsController extends Controller
     {
         return $request->validate([
             'publication_category_id' => ['required', Rule::exists('publication_categories', 'id')],
-            'name'                    => ['required', 'string', 'max:255'],
-            'description'             => ['required', 'string'],
-            'version'                 => ['required', 'string', 'max:50'],
-            'file'                    => [
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'version' => ['required', 'string', 'max:50'],
+            'file' => [
                 $fileRequired ? 'required' : 'nullable',
                 'file',
-                'mimes:' . self::ALLOWED_MIMES,
-                'max:' . self::MAX_KB,
+                'mimes:'.self::ALLOWED_MIMES,
+                'max:'.self::MAX_KB,
             ],
         ]);
     }

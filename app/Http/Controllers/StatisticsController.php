@@ -14,14 +14,14 @@ class StatisticsController extends Controller
     public function sync(Request $request)
     {
         $request->validate([
-            'from_year'  => 'required|integer|min:2000|max:2100',
+            'from_year' => 'required|integer|min:2000|max:2100',
             'from_month' => 'required|integer|min:1|max:12',
-            'to_year'    => 'required|integer|min:2000|max:2100',
-            'to_month'   => 'required|integer|min:1|max:12',
+            'to_year' => 'required|integer|min:2000|max:2100',
+            'to_month' => 'required|integer|min:1|max:12',
         ]);
 
         $from = Carbon::create($request->from_year, $request->from_month, 1)->startOfMonth();
-        $to   = Carbon::create($request->to_year, $request->to_month, 1)->startOfMonth();
+        $to = Carbon::create($request->to_year, $request->to_month, 1)->startOfMonth();
 
         if ($from->greaterThan($to)) {
             return back()->withErrors(['from' => 'Start date must be before or equal to end date.']);
@@ -40,22 +40,26 @@ class StatisticsController extends Controller
 
     public function index(Request $request)
     {
-        $now   = Carbon::now();
+        $now = Carbon::now();
         $yearParam = $request->query('year', $now->year);
-        $year  = ($yearParam === 'all' || (int) $yearParam === 0) ? 0 : (int) $yearParam;
+        $year = ($yearParam === 'all' || (int) $yearParam === 0) ? 0 : (int) $yearParam;
         $month = $request->query('month', $now->month);
-        $cid   = $request->query('cid');
+        $cid = $request->query('cid');
 
-        if ($year !== 0 && ($year < 2000 || $year > 2100)) $year = $now->year;
+        if ($year !== 0 && ($year < 2000 || $year > 2100)) {
+            $year = $now->year;
+        }
         $month = ($month === 'all' || (int) $month === 0) ? 0 : (int) $month;
-        if ($month !== 0 && ($month < 1 || $month > 12)) $month = $now->month;
+        if ($month !== 0 && ($month < 1 || $month > 12)) {
+            $month = $now->month;
+        }
 
         $years = ControllerMonthlyStat::select('year')
             ->distinct()
             ->orderBy('year', 'desc')
             ->pluck('year');
 
-        if (!$years->contains($now->year)) {
+        if (! $years->contains($now->year)) {
             $years = $years->prepend($now->year);
         }
 
@@ -66,7 +70,7 @@ class StatisticsController extends Controller
 
         // Individual controller lookup
         $selectedController = null;
-        $controllerMonthly  = collect();
+        $controllerMonthly = collect();
         $controllerSessions = collect();
 
         if ($cid) {
@@ -74,7 +78,9 @@ class StatisticsController extends Controller
 
             if ($selectedController) {
                 $monthlyQuery = ControllerMonthlyStat::where('user_id', $cid);
-                if ($year !== 0) $monthlyQuery->where('year', $year);
+                if ($year !== 0) {
+                    $monthlyQuery->where('year', $year);
+                }
                 $controllerMonthly = $monthlyQuery
                     ->orderBy('year')
                     ->orderBy('month')
@@ -82,7 +88,7 @@ class StatisticsController extends Controller
 
                 if ($month !== 0 && $year !== 0) {
                     $from = Carbon::create($year, $month, 1)->startOfMonth();
-                    $to   = $from->copy()->endOfMonth();
+                    $to = $from->copy()->endOfMonth();
                     $controllerSessions = ControllerSession::where('user_id', $cid)
                         ->whereBetween('start', [$from, $to])
                         ->orderBy('start', 'desc')
@@ -93,8 +99,12 @@ class StatisticsController extends Controller
 
         // Leaderboard (only shown when no controller selected)
         $leaderboardQuery = ControllerMonthlyStat::with('user');
-        if ($year !== 0) $leaderboardQuery->where('year', $year);
-        if ($month !== 0) $leaderboardQuery->where('month', $month);
+        if ($year !== 0) {
+            $leaderboardQuery->where('year', $year);
+        }
+        if ($month !== 0) {
+            $leaderboardQuery->where('month', $month);
+        }
 
         if ($month === 0) {
             // Aggregate per-controller totals in SQL rather than loading every
@@ -108,24 +118,24 @@ class StatisticsController extends Controller
                     SUM(center_hours) as center_hours')
                 ->groupBy('user_id')
                 ->get()
-                ->filter(fn($s) => $s->user !== null)
-                ->sortByDesc(fn($s) => $s->totalHours())
+                ->filter(fn ($s) => $s->user !== null)
+                ->sortByDesc(fn ($s) => $s->totalHours())
                 ->values();
         } else {
             $rows = $leaderboardQuery
                 ->get()
-                ->filter(fn($s) => $s->user !== null)
-                ->sortByDesc(fn($s) => $s->totalHours())
+                ->filter(fn ($s) => $s->user !== null)
+                ->sortByDesc(fn ($s) => $s->totalHours())
                 ->values();
         }
 
         $totals = [
             'delivery' => $rows->sum('delivery_hours'),
-            'ground'   => $rows->sum('ground_hours'),
-            'tower'    => $rows->sum('tower_hours'),
+            'ground' => $rows->sum('ground_hours'),
+            'tower' => $rows->sum('tower_hours'),
             'approach' => $rows->sum('approach_hours'),
-            'center'   => $rows->sum('center_hours'),
-            'total'    => $rows->sum(fn($s) => $s->totalHours()),
+            'center' => $rows->sum('center_hours'),
+            'total' => $rows->sum(fn ($s) => $s->totalHours()),
         ];
 
         $allTimeHours = ControllerMonthlyStat::selectRaw(
@@ -138,18 +148,18 @@ class StatisticsController extends Controller
             : null;
 
         return view('statistics.index', [
-            'stats'               => $rows,
-            'year'                => $year,
-            'month'               => $month,
-            'years'               => $years,
-            'totals'              => $totals,
-            'allTimeHours'        => $allTimeHours,
-            'allTimeSince'        => $allTimeSince,
-            'controllers'         => $controllers,
-            'cid'                 => $cid,
-            'selectedController'  => $selectedController,
-            'controllerMonthly'   => $controllerMonthly,
-            'controllerSessions'  => $controllerSessions,
+            'stats' => $rows,
+            'year' => $year,
+            'month' => $month,
+            'years' => $years,
+            'totals' => $totals,
+            'allTimeHours' => $allTimeHours,
+            'allTimeSince' => $allTimeSince,
+            'controllers' => $controllers,
+            'cid' => $cid,
+            'selectedController' => $selectedController,
+            'controllerMonthly' => $controllerMonthly,
+            'controllerSessions' => $controllerSessions,
         ]);
     }
 }

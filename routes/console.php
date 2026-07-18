@@ -14,7 +14,7 @@ Artisan::command('inspire', function () {
 
 Schedule::job(new SyncRoster)->everyTwoHours();
 
-Schedule::job(new UpdateOnlineControllers())->everyMinute();
+Schedule::job(new UpdateOnlineControllers)->everyMinute();
 
 Schedule::call(function () {
     $now = Carbon::now();

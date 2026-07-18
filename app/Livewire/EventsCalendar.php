@@ -2,14 +2,15 @@
 
 namespace App\Livewire;
 
-use Carbon\Carbon;
-use Livewire\Component;
-use Illuminate\Support\Collection;
 use App\Models\Event;
+use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Livewire\Component;
 
 class EventsCalendar extends Component
 {
     public int $currentYear;
+
     public int $currentMonth;
 
     public function mount(): void

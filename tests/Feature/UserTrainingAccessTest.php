@@ -8,9 +8,9 @@ beforeEach(function () {
 });
 
 $routes = [
-    'users.show.training-tickets'     => 'training-tickets:read',
+    'users.show.training-tickets' => 'training-tickets:read',
     'users.show.training-assignments' => 'training-assignments:read',
-    'users.show.solo-certs'           => 'solo-certs:read',
+    'users.show.solo-certs' => 'solo-certs:read',
 ];
 
 test('guests are redirected to login', function (string $route) {
