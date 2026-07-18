@@ -9,25 +9,27 @@ use Laravel\Scout\Searchable;
 
 class SoloCert extends Model
 {
-
     use Searchable;
+
     protected $fillable = [
         'user_id',
         'issued_by_id',
-        'position'
+        'position',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
-        'revoked' => 'boolean'
+        'revoked' => 'boolean',
     ];
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function issuedBy(): BelongsTo {
+    public function issuedBy(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'issued_by_id');
     }
 
@@ -45,11 +47,12 @@ class SoloCert extends Model
         );
     }
 
-    public function toSearchableArray(): array {
+    public function toSearchableArray(): array
+    {
         return [
             'user' => $this->user->name,
             'position' => $this->position,
-            'issued_by_id' => is_null($this->issued_by) ? null : $this->issued_by->name
+            'issued_by_id' => $this->issuedBy?->name,
         ];
     }
 }

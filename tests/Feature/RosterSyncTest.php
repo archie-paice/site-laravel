@@ -5,7 +5,7 @@ use App\Jobs\SyncRoster;
 use App\Models\User;
 
 test('given a vatusa user, when converted to a database user, then a database user is input and accurate', function () {
-    $now = new DateTime();
+    $now = new DateTime;
     $now = $now->format('Y-m-d H:i:s');
 
     $vatusa = new VatusaRosterUser([
@@ -27,12 +27,12 @@ test('given a vatusa user, when converted to a database user, then a database us
         'discord_id' => null,
         'flag_nameprivacy' => false,
         'last_competency_date' => $now,
-        'promotion_eligible'=> false,
+        'promotion_eligible' => false,
         'transfer_eligible' => false,
         'roles' => [],
         'isMentor' => false,
         'isSupIns' => false,
-        'last_promotion' => $now
+        'last_promotion' => $now,
     ]);
 
     User::updateFromVatusa($vatusa);
@@ -46,7 +46,7 @@ test('given a vatusa user, when converted to a database user, then a database us
     expect($user->joined_at->format('Y-m-d H:i:s'))->toBe($now);
 });
 
-test('given the roster sync function exists, when the roster sync function is executed, then it executes without errors', function() {
-    $syncJob = new SyncRoster();
+test('given the roster sync function exists, when the roster sync function is executed, then it executes without errors', function () {
+    $syncJob = new SyncRoster;
     $syncJob->handle();
 });

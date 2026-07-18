@@ -12,8 +12,9 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::job(new SyncRoster())->everyTwoHours();
+Schedule::job(new SyncRoster)->everyTwoHours();
 
+<<<<<<< HEAD
 Schedule::job(new UpdateOnlineControllers())->everyMinute();
 
 Schedule::call(function () {
@@ -22,3 +23,6 @@ Schedule::call(function () {
     $prev = $now->copy()->subMonthNoOverflow();
     SyncStatsimSessions::dispatch($prev->year, $prev->month);
 })->dailyAt('04:00');
+=======
+Schedule::job(new UpdateOnlineControllers)->everyMinute();
+>>>>>>> origin/main
