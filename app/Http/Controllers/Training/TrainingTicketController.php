@@ -94,7 +94,7 @@ class TrainingTicketController extends Controller
     {
         $trainingTicket = TrainingTicket::findOrFail($id);
 
-        if (Auth::id() !== $trainingTicket->user_id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $trainingTicket->user_id && ! Auth::user()->hasRole('training')) {
             abort(403);
         }
 

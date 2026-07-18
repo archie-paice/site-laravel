@@ -1,10 +1,18 @@
 <?php
 
+use App\Http\Controllers\Admin\ManualContributorController;
+use App\Http\Controllers\AdminPublicationCategoriesController;
+use App\Http\Controllers\AdminPublicationsController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\VatsimOauthController;
-use App\Http\Controllers\Admin\ManualContributorController;
+use App\Http\Controllers\CertificationFacilityController;
+use App\Http\Controllers\CertificationLevelController;
 use App\Http\Controllers\ContributorsController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventFieldController;
+use App\Http\Controllers\EventPositionPresetController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StatisticsController;
@@ -24,22 +32,14 @@ use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\EventPositionPresetController;
-use App\Http\Controllers\EventFieldController;
-use App\Http\Controllers\EventController;
-use App\Http\Controllers\CertificationFacilityController;
-use App\Http\Controllers\CertificationLevelController;
-use App\Http\Controllers\PublicationsController;
-use App\Http\Controllers\AdminPublicationsController;
-use App\Http\Controllers\AdminPublicationCategoriesController;
 
 // Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-# Contributors
+// Contributors
 Route::get('/contributors', [ContributorsController::class, 'index'])->name('contributors.index');
 
-# Roster
+// Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
 
 // Visit
@@ -67,17 +67,17 @@ Route::prefix('users/{user}')->group(function () {
 // Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])->name('staff.index');
 
-# Controller Statistics
+// Controller Statistics
 Route::get('controllers/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
 
-# Publications & Downloads
+// Publications & Downloads
 Route::get('/publications/downloads', [PublicationsController::class, 'index'])->name('publications.index');
 Route::get('/publications/{publication}/file', [PublicationsController::class, 'file'])->name('publications.file');
 
-# Training Assignment Creation; TODO: make store
+// Training Assignment Creation; TODO: make store
 Route::post('training-assignment/create', [TrainingAssignmentController::class, 'create'])->middleware('auth')->name('training-assignment.create');
 
-# Training ticket view (own or training staff)
+// Training ticket view (own or training staff)
 Route::get('training-tickets/{ticket}', [TrainingTicketController::class, 'show'])->middleware('auth')->name('training-tickets.show');
 Route::prefix('events')->name('events.')->group(function () {
     Route::get('/', [EventController::class, 'index'])->name('index');
@@ -102,15 +102,15 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::get('statistics/quarterly/export', [StatisticsController::class, 'exportQuarterly'])->name('statistics.quarterly.export');
     });
 
-    # Contributors
-    Route::middleware('role:admin')->group(function() {
+    // Contributors
+    Route::middleware('role:admin')->group(function () {
         Route::get('contributors', [ManualContributorController::class, 'index'])->name('admin.contributors.index');
         Route::post('contributors', [ManualContributorController::class, 'store'])->name('admin.contributors.store');
         Route::delete('contributors/{contributor}', [ManualContributorController::class, 'destroy'])->name('admin.contributors.destroy');
     });
 
-    # Facilities Dept.
-    Route::prefix('data')->group(function() {
+    // Facilities Dept.
+    Route::prefix('data')->group(function () {
         Route::middleware('permission:manage statistics prefixes')->resource('statistics-prefixes', StatisticsPrefixesController::class);
 
         Route::middleware('permission:manage certification facilities')->prefix('certification-facilities')->group(function () {
@@ -125,40 +125,40 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         });
     });
 
-    # Senior Staff / Web Team
-    Route::middleware('role:admin')->group(function() {
+    // Senior Staff / Web Team
+    Route::middleware('role:admin')->group(function () {
         Route::post('statistics/sync', [StatisticsController::class, 'sync'])->name('statistics.sync');
     });
 
-    # Publications Management (Facilities Dept.)
+    // Publications Management (Facilities Dept.)
     Route::middleware('permission:documents:write')->prefix('publications')->name('admin.publications.')->group(function () {
-        Route::get('/',            [AdminPublicationsController::class, 'index'])->name('index');
-        Route::get('/create',      [AdminPublicationsController::class, 'create'])->name('create');
-        Route::post('/',           [AdminPublicationsController::class, 'store'])->name('store');
+        Route::get('/', [AdminPublicationsController::class, 'index'])->name('index');
+        Route::get('/create', [AdminPublicationsController::class, 'create'])->name('create');
+        Route::post('/', [AdminPublicationsController::class, 'store'])->name('store');
 
         Route::prefix('categories')->name('categories.')->group(function () {
-            Route::get('/',            [AdminPublicationCategoriesController::class, 'index'])->name('index');
-            Route::get('/create',      [AdminPublicationCategoriesController::class, 'create'])->name('create');
-            Route::post('/',           [AdminPublicationCategoriesController::class, 'store'])->name('store');
-            Route::get('/{id}/edit',   [AdminPublicationCategoriesController::class, 'edit'])->name('edit');
-            Route::put('/{id}',        [AdminPublicationCategoriesController::class, 'update'])->name('update');
-            Route::delete('/{id}',     [AdminPublicationCategoriesController::class, 'destroy'])->name('destroy');
+            Route::get('/', [AdminPublicationCategoriesController::class, 'index'])->name('index');
+            Route::get('/create', [AdminPublicationCategoriesController::class, 'create'])->name('create');
+            Route::post('/', [AdminPublicationCategoriesController::class, 'store'])->name('store');
+            Route::get('/{id}/edit', [AdminPublicationCategoriesController::class, 'edit'])->name('edit');
+            Route::put('/{id}', [AdminPublicationCategoriesController::class, 'update'])->name('update');
+            Route::delete('/{id}', [AdminPublicationCategoriesController::class, 'destroy'])->name('destroy');
             Route::patch('/{id}/toggle-nav', [AdminPublicationCategoriesController::class, 'toggleNav'])->name('toggle-nav');
         });
 
-        Route::get('/{id}/edit',   [AdminPublicationsController::class, 'edit'])->name('edit');
-        Route::put('/{id}',        [AdminPublicationsController::class, 'update'])->name('update');
-        Route::delete('/{id}',     [AdminPublicationsController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/edit', [AdminPublicationsController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [AdminPublicationsController::class, 'update'])->name('update');
+        Route::delete('/{id}', [AdminPublicationsController::class, 'destroy'])->name('destroy');
     });
 
-    # Logs
-    Route::middleware('permission:view audit logs')->group(function() {
+    // Logs
+    Route::middleware('permission:view audit logs')->group(function () {
         Route::get('logs', [AuditLogController::class, 'index'])->name('logs.index');
         Route::get('logs/export', [AuditLogController::class, 'export'])->name('logs.export');
     });
 
-    # Training Dept.
-    Route::prefix('/training')->middleware('role:training')->group(function() {
+    // Training Dept.
+    Route::prefix('/training')->middleware('role:training')->group(function () {
         Route::resource('tickets', TrainingTicketController::class, ['except' => ['show']])->names('training-tickets');
         Route::resource('assignments', TrainingAssignmentController::class, ['only' => ['update', 'edit', 'index']])->names('training-assignments');
         Route::resource('solo-certs', SoloCertController::class, ['only' => ['index', 'create', 'destroy', 'store']])->names('solo-certs');

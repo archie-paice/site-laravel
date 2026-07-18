@@ -4,11 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
-use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,18 +14,18 @@ class UserController extends Controller
     public function show(int $id)
     {
         $user = User::findOrFail($id);
-        $now  = Carbon::now();
+        $now = Carbon::now();
 
         $allStats = ControllerMonthlyStat::where('user_id', $id)->get();
 
-        $totalHours = $allStats->sum(fn($s) => $s->totalHours());
+        $totalHours = $allStats->sum(fn ($s) => $s->totalHours());
         $monthHours = $allStats
             ->where('year', $now->year)
             ->where('month', $now->month)
-            ->sum(fn($s) => $s->totalHours());
-        $yearHours  = $allStats
+            ->sum(fn ($s) => $s->totalHours());
+        $yearHours = $allStats
             ->where('year', $now->year)
-            ->sum(fn($s) => $s->totalHours());
+            ->sum(fn ($s) => $s->totalHours());
 
         $recentSessions = ControllerSession::where('user_id', $id)
             ->orderBy('start', 'desc')
@@ -36,10 +33,10 @@ class UserController extends Controller
             ->get();
 
         return view('users.show', [
-            'user'           => $user,
-            'totalHours'     => $totalHours,
-            'monthHours'     => $monthHours,
-            'yearHours'      => $yearHours,
+            'user' => $user,
+            'totalHours' => $totalHours,
+            'monthHours' => $monthHours,
+            'yearHours' => $yearHours,
             'recentSessions' => $recentSessions,
         ]);
     }
@@ -100,11 +97,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasPermissionTo('training-assignments:read')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-assignments:read')) {
             abort(403);
         }
 
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training assignments are only available for rostered users.');
         }
 
@@ -120,11 +117,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasPermissionTo('training-tickets:read')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-tickets:read')) {
             abort(403);
         }
 
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training tickets are only available for rostered users.');
         }
 
@@ -140,11 +137,11 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasPermissionTo('solo-certs:read')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('solo-certs:read')) {
             abort(403);
         }
 
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
         }
 

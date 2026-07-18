@@ -20,15 +20,16 @@ class ManualContributorController extends Controller
     {
         $validated = $request->validate([
             'github_username' => 'nullable|string|max:39|unique:manual_contributors,github_username',
-            'display_name'    => 'required_without:github_username|nullable|string|max:100',
-            'section'         => 'required|in:main,fork,contributor,beta',
-            'note'            => 'nullable|string|max:100',
+            'display_name' => 'required_without:github_username|nullable|string|max:100',
+            'section' => 'required|in:main,fork,contributor,beta',
+            'note' => 'nullable|string|max:100',
         ]);
 
         ManualContributor::create($validated);
         Cache::forget('github_contributors');
 
         $label = $validated['github_username'] ? "@{$validated['github_username']}" : ($validated['display_name'] ?? 'Contributor');
+
         return redirect()->back()->with('success', "{$label} added as a contributor.");
     }
 
@@ -38,6 +39,7 @@ class ManualContributorController extends Controller
         Cache::forget('github_contributors');
 
         $label = $contributor->github_username ? "@{$contributor->github_username}" : ($contributor->display_name ?? 'Contributor');
+
         return redirect()->back()->with('success', "{$label} removed.");
     }
 }

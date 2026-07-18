@@ -33,19 +33,21 @@ class SyncStatsimSessions implements ShouldQueue
                 'to' => $to->format('n/j/Y'),
             ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             Log::error('Statsim sync failed', [
                 'status' => $response->status(),
                 'body' => Str::limit($response->body(), 500),
                 'year' => $this->year,
                 'month' => $this->month,
             ]);
+
             return;
         }
 
         $sessions = $response->json() ?? [];
-        if (!is_array($sessions)) {
+        if (! is_array($sessions)) {
             Log::error('Statsim sync returned non-array payload', ['year' => $this->year, 'month' => $this->month]);
+
             return;
         }
 
@@ -60,16 +62,16 @@ class SyncStatsimSessions implements ShouldQueue
             $loggedOn = $session['loggedOn'] ?? null;
             $loggedOff = $session['loggedOff'] ?? null;
 
-            if (!$callsign || !$vatsimId || !$sessionId || !$loggedOn || !$loggedOff) {
+            if (! $callsign || ! $vatsimId || ! $sessionId || ! $loggedOn || ! $loggedOff) {
                 continue;
             }
 
-            if (!Str::startsWith($callsign, $prefixes)) {
+            if (! Str::startsWith($callsign, $prefixes)) {
                 continue;
             }
 
             $userId = (int) $vatsimId;
-            if (!$rosteredCids->has($userId)) {
+            if (! $rosteredCids->has($userId)) {
                 continue;
             }
 

@@ -14,8 +14,8 @@ beforeEach(function () {
 function makeCategory(): PublicationCategory
 {
     return PublicationCategory::create([
-        'title'         => 'Standard Operating Procedures',
-        'description'   => 'Facility SOPs',
+        'title' => 'Standard Operating Procedures',
+        'description' => 'Facility SOPs',
         'display_order' => 0,
     ]);
 }
@@ -24,12 +24,12 @@ function makePublication(string $filePath = 'documents/example.pdf'): Publicatio
 {
     return Publication::create([
         'publication_category_id' => makeCategory()->id,
-        'name'                    => 'Example Document',
-        'description'             => 'An example document.',
-        'version'                 => '1.0',
-        'file_path'               => $filePath,
-        'original_filename'       => 'example.pdf',
-        'file_size'               => 1234,
+        'name' => 'Example Document',
+        'description' => 'An example document.',
+        'version' => '1.0',
+        'file_path' => $filePath,
+        'original_filename' => 'example.pdf',
+        'file_size' => 1234,
     ]);
 }
 
@@ -92,10 +92,10 @@ test('an allowed file type can be uploaded', function () {
 
     $response = $this->actingAs($user)->post(route('admin.publications.store'), [
         'publication_category_id' => $category->id,
-        'name'                    => 'New SOP',
-        'description'             => 'A new SOP.',
-        'version'                 => '2.0',
-        'file'                    => UploadedFile::fake()->create('sop.pdf', 200, 'application/pdf'),
+        'name' => 'New SOP',
+        'description' => 'A new SOP.',
+        'version' => '2.0',
+        'file' => UploadedFile::fake()->create('sop.pdf', 200, 'application/pdf'),
     ]);
 
     $response->assertRedirect(route('admin.publications.index'));
@@ -111,10 +111,10 @@ test('a disallowed file type is rejected', function () {
 
     $response = $this->actingAs($user)->post(route('admin.publications.store'), [
         'publication_category_id' => $category->id,
-        'name'                    => 'Bad Upload',
-        'description'             => 'Should be rejected.',
-        'version'                 => '1.0',
-        'file'                    => UploadedFile::fake()->create('notes.txt', 10, 'text/plain'),
+        'name' => 'Bad Upload',
+        'description' => 'Should be rejected.',
+        'version' => '1.0',
+        'file' => UploadedFile::fake()->create('notes.txt', 10, 'text/plain'),
     ]);
 
     $response->assertSessionHasErrors('file');

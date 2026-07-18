@@ -101,8 +101,8 @@ class AdminPublicationCategoriesController extends Controller
     private function validateCategory(Request $request): array
     {
         return $request->validate([
-            'title'         => ['required', 'string', 'max:255'],
-            'description'   => ['required', 'string'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
             'display_order' => ['required', 'integer', 'min:0'],
         ]);
     }

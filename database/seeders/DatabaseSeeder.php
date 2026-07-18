@@ -17,8 +17,7 @@ class DatabaseSeeder extends Seeder
         StatisticsPrefixesSeeder $statisticsPrefixes,
         PublicationCategorySeeder $publicationCategorySeeder,
         StatsSyncSeeder $statsSyncSeeder,
-    ): void
-    {
+    ): void {
         $permissionSeeder->run();
         $userSeeder->run();
         $statisticsPrefixes->run();

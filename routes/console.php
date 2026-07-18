@@ -14,8 +14,7 @@ Artisan::command('inspire', function () {
 
 Schedule::job(new SyncRoster)->everyTwoHours();
 
-<<<<<<< HEAD
-Schedule::job(new UpdateOnlineControllers())->everyMinute();
+Schedule::job(new UpdateOnlineControllers)->everyMinute();
 
 Schedule::call(function () {
     $now = Carbon::now();
@@ -23,6 +22,3 @@ Schedule::call(function () {
     $prev = $now->copy()->subMonthNoOverflow();
     SyncStatsimSessions::dispatch($prev->year, $prev->month);
 })->dailyAt('04:00');
-=======
-Schedule::job(new UpdateOnlineControllers)->everyMinute();
->>>>>>> origin/main

@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Services\Socialite\VatsimProvider;
-use Http;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 

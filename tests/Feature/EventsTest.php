@@ -24,21 +24,21 @@ test('updating an event persists the new title', function () {
     $this->actingAs(makeEventManager());
 
     $event = Event::create([
-        'title'       => 'Original Title',
+        'title' => 'Original Title',
         'description' => 'Original description',
-        'start'       => now()->addDay(),
-        'end'         => now()->addDay()->addHours(2),
-        'type'        => EventType::HOME,
+        'start' => now()->addDay(),
+        'end' => now()->addDay()->addHours(2),
+        'type' => EventType::HOME,
         'featured_fields' => [],
-        'hidden'      => false,
+        'hidden' => false,
     ]);
 
     $response = $this->put(route('admin.events.update', ['event' => $event->id]), [
-        'title'       => 'Updated Title',
+        'title' => 'Updated Title',
         'description' => 'Updated description',
-        'start'       => now()->addDay()->toDateTimeString(),
-        'end'         => now()->addDay()->addHours(2)->toDateTimeString(),
-        'type'        => EventType::HOME->value,
+        'start' => now()->addDay()->toDateTimeString(),
+        'end' => now()->addDay()->addHours(2)->toDateTimeString(),
+        'type' => EventType::HOME->value,
     ]);
 
     $response->assertRedirect(route('admin.events.index'));
@@ -49,13 +49,13 @@ test('admin events list renders event titles', function () {
     $this->actingAs(makeEventManager());
 
     Event::create([
-        'title'       => 'Visible In Admin List',
+        'title' => 'Visible In Admin List',
         'description' => 'desc',
-        'start'       => now()->addDay(),
-        'end'         => now()->addDay()->addHours(2),
-        'type'        => EventType::HOME,
+        'start' => now()->addDay(),
+        'end' => now()->addDay()->addHours(2),
+        'type' => EventType::HOME,
         'featured_fields' => [],
-        'hidden'      => false,
+        'hidden' => false,
     ]);
 
     $this->get(route('admin.events.index'))
@@ -67,23 +67,23 @@ test('public calendar hides hidden events', function () {
     $mid = Carbon::create(now()->year, now()->month, 15, 12);
 
     Event::create([
-        'title'       => 'Published Event',
+        'title' => 'Published Event',
         'description' => 'desc',
-        'start'       => $mid,
-        'end'         => $mid->copy()->addHours(2),
-        'type'        => EventType::HOME,
+        'start' => $mid,
+        'end' => $mid->copy()->addHours(2),
+        'type' => EventType::HOME,
         'featured_fields' => [],
-        'hidden'      => false,
+        'hidden' => false,
     ]);
 
     Event::create([
-        'title'       => 'Secret Event',
+        'title' => 'Secret Event',
         'description' => 'desc',
-        'start'       => $mid,
-        'end'         => $mid->copy()->addHours(2),
-        'type'        => EventType::HOME,
+        'start' => $mid,
+        'end' => $mid->copy()->addHours(2),
+        'type' => EventType::HOME,
         'featured_fields' => [],
-        'hidden'      => true,
+        'hidden' => true,
     ]);
 
     Livewire::test(EventsCalendar::class)
@@ -97,13 +97,13 @@ test('calendar shows events on visible adjacent-month days', function () {
     expect($gridStart->month)->toBe(3); // sanity: it really is an adjacent-month day
 
     Event::create([
-        'title'       => 'Adjacent Month Event',
+        'title' => 'Adjacent Month Event',
         'description' => 'desc',
-        'start'       => $gridStart->copy()->addHours(12),
-        'end'         => $gridStart->copy()->addHours(14),
-        'type'        => EventType::HOME,
+        'start' => $gridStart->copy()->addHours(12),
+        'end' => $gridStart->copy()->addHours(14),
+        'type' => EventType::HOME,
         'featured_fields' => [],
-        'hidden'      => false,
+        'hidden' => false,
     ]);
 
     Livewire::test(EventsCalendar::class)

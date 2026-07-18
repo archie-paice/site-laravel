@@ -21,6 +21,7 @@ class PublicationCategory extends Model
     }
 
     public const NAV_CACHE_KEY = 'navbar.publication_categories';
+
     private const ORDER_PARK_OFFSET = 1000000;
 
     protected $fillable = [
