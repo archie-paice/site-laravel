@@ -373,10 +373,18 @@ class StatisticsController extends Controller
             $rows = $rows->filter(fn ($row) => (string) $row->user->id === (string) $cid)->values();
         }
 
-        $flagged = $rows->filter(fn ($row) => $row->total < $threshold)
-            ->when($rosteredOnly, fn ($flagged) => $flagged->filter(fn ($row) => $row->user->rostered))
+        // Only rostered controllers can be removed from the roster, so the flagged
+        // list (the table the removal action operates on) always excludes anyone
+        // who isn't currently rostered.
+        $flagged = $rows->filter(fn ($row) => $row->total < $threshold && $row->user->rostered)
             ->sortBy('total')
             ->values();
+
+        // The "Rostered only" toggle applies to the full breakdown table, which by
+        // default includes everyone who has ever logged StatsSim hours.
+        if ($rosteredOnly) {
+            $rows = $rows->filter(fn ($row) => $row->user->rostered)->values();
+        }
 
         return [
             'rows' => $rows,

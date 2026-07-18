@@ -135,9 +135,9 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <label class="label cursor-pointer gap-2">
+                    <label class="label cursor-pointer gap-2" title="Limits the All Controllers table below to currently rostered controllers. The Flagged Controllers table always excludes unrostered controllers.">
                         <input type="checkbox" name="rostered_only" value="1" class="checkbox" @checked($rosteredOnly)>
-                        <span class="text-sm">Rostered only</span>
+                        <span class="text-sm">Rostered only (All Controllers table)</span>
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary w-full sm:w-auto">Search</button>
@@ -198,12 +198,8 @@
                                         @endif
                                     </td>
                                     <td class="text-right whitespace-nowrap">
-                                        @if($row->training_total > 0)
-                                            <span class="font-medium">{{ number_format($row->training_total, 1) }}h</span>
-                                            <span class="text-xs text-base-content/60 ml-1">(S {{ number_format($row->training_student, 1) }} / I {{ number_format($row->training_instructor, 1) }})</span>
-                                        @else
-                                            <span class="text-base-content/40">—</span>
-                                        @endif
+                                        <span class="font-medium">{{ number_format($row->training_total, 1) }}h</span>
+                                        <span class="text-xs text-base-content/60 ml-1">(S {{ number_format($row->training_student, 1) }} / I {{ number_format($row->training_instructor, 1) }})</span>
                                     </td>
                                     <td class="text-right font-bold text-error">{{ number_format($row->total, 1) }}h</td>
                                 </tr>
@@ -245,8 +241,8 @@
                             <th class="text-right hidden sm:table-cell whitespace-nowrap">Tower</th>
                             <th class="text-right hidden sm:table-cell whitespace-nowrap">TRACON</th>
                             <th class="text-right hidden sm:table-cell whitespace-nowrap">Center</th>
-                            <th class="text-right hidden lg:table-cell whitespace-nowrap">Trng (Student)</th>
-                            <th class="text-right hidden lg:table-cell whitespace-nowrap">Trng (Instr)</th>
+                            <th class="text-right hidden lg:table-cell">Training (Student)</th>
+                            <th class="text-right hidden lg:table-cell">Training (Instructor)</th>
                             <th class="text-right whitespace-nowrap">Total</th>
                         </tr>
                     </thead>
@@ -271,8 +267,8 @@
                                 <td class="text-right hidden sm:table-cell">{{ $row->tower > 0 ? number_format($row->tower, 1).'h' : '—' }}</td>
                                 <td class="text-right hidden sm:table-cell">{{ $row->approach > 0 ? number_format($row->approach, 1).'h' : '—' }}</td>
                                 <td class="text-right hidden sm:table-cell">{{ $row->center > 0 ? number_format($row->center, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden lg:table-cell">{{ $row->training_student > 0 ? number_format($row->training_student, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden lg:table-cell">{{ $row->training_instructor > 0 ? number_format($row->training_instructor, 1).'h' : '—' }}</td>
+                                <td class="text-right hidden lg:table-cell">{{ number_format($row->training_student, 1) }}h</td>
+                                <td class="text-right hidden lg:table-cell">{{ number_format($row->training_instructor, 1) }}h</td>
                                 <td class="text-right font-bold {{ $row->total < $threshold ? 'text-error' : '' }}">{{ number_format($row->total, 1) }}h</td>
                             </tr>
                         @endforeach

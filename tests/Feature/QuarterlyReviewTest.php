@@ -65,6 +65,120 @@ test('quarterly rows include training hours split into student and instructor ti
         ->and($instructorRow->training_student)->toBe(0.0);
 });
 
+test('the flagged table always excludes unrostered controllers regardless of the rostered_only toggle', function () {
+    $rosteredLowHours = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $unrosteredLowHours = User::factory()->create(['rostered' => false, 'facility' => config('app.vatusa_facility')]);
+
+    foreach ([$rosteredLowHours, $unrosteredLowHours] as $user) {
+        ControllerMonthlyStat::create([
+            'user_id' => $user->id, 'year' => 2026, 'month' => 7,
+            'delivery_hours' => 1, 'ground_hours' => 0, 'tower_hours' => 0,
+            'approach_hours' => 0, 'center_hours' => 0,
+        ]);
+    }
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+
+    $response = $this->actingAs($admin)
+        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->assertOk();
+
+    $flaggedIds = $response->viewData('flagged')->getCollection()->pluck('user.id');
+
+    expect($flaggedIds)->toContain($rosteredLowHours->id)
+        ->and($flaggedIds)->not->toContain($unrosteredLowHours->id);
+});
+
+test('the rostered_only toggle filters the All Controllers table', function () {
+    $rostered = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $unrostered = User::factory()->create(['rostered' => false, 'facility' => config('app.vatusa_facility')]);
+
+    foreach ([$rostered, $unrostered] as $user) {
+        ControllerMonthlyStat::create([
+            'user_id' => $user->id, 'year' => 2026, 'month' => 7,
+            'delivery_hours' => 5, 'ground_hours' => 0, 'tower_hours' => 0,
+            'approach_hours' => 0, 'center_hours' => 0,
+        ]);
+    }
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+
+    $withUnrostered = $this->actingAs($admin)
+        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3]))
+        ->viewData('rows')->getCollection()->pluck('user.id');
+
+    expect($withUnrostered)->toContain($unrostered->id);
+
+    $rosteredOnly = $this->actingAs($admin)
+        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'rostered_only' => 1]))
+        ->viewData('rows')->getCollection()->pluck('user.id');
+
+    expect($rosteredOnly)->toContain($rostered->id)
+        ->and($rosteredOnly)->not->toContain($unrostered->id);
+});
+
+test('zero training hours render as 0.0h rather than a dash, in both tables', function () {
+    $noTraining = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    ControllerMonthlyStat::create([
+        'user_id' => $noTraining->id, 'year' => 2026, 'month' => 7,
+        'delivery_hours' => 1, 'ground_hours' => 0, 'tower_hours' => 0,
+        'approach_hours' => 0, 'center_hours' => 0,
+    ]);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+
+    $html = $this->actingAs($admin)
+        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->assertOk()
+        ->getContent();
+
+    expect($html)->toContain('S 0.0 / I 0.0');
+});
+
+test('a user with the removal permission sees the multi-select and remove action on the flagged table', function () {
+    $inactive = User::factory()->create(['rostered' => true]);
+
+    ControllerMonthlyStat::create([
+        'user_id' => $inactive->id, 'year' => 2026, 'month' => 7,
+        'delivery_hours' => 0, 'ground_hours' => 0, 'tower_hours' => 0,
+        'approach_hours' => 0, 'center_hours' => 0,
+    ]);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+
+    $this->actingAs($admin)
+        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->assertOk()
+        ->assertSee('name="user_ids[]"', false)
+        ->assertSee('Remove Selected');
+});
+
+test('a user without the removal permission does not see the multi-select or remove action', function () {
+    $inactive = User::factory()->create(['rostered' => true]);
+
+    ControllerMonthlyStat::create([
+        'user_id' => $inactive->id, 'year' => 2026, 'month' => 7,
+        'delivery_hours' => 0, 'ground_hours' => 0, 'tower_hours' => 0,
+        'approach_hours' => 0, 'center_hours' => 0,
+    ]);
+
+    $staff = User::factory()->create();
+    $staff->assignRole('staff');
+    // Can view the page but lacks "remove inactive controllers".
+    $staff->givePermissionTo('manage visiting controllers');
+
+    $this->actingAs($staff)
+        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->assertOk()
+        ->assertDontSee('name="user_ids[]"', false)
+        ->assertDontSee('Remove Selected');
+});
+
 test('a senior staff member can queue removal of flagged controllers', function () {
     Queue::fake();
 
