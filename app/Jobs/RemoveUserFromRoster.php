@@ -17,7 +17,7 @@ class RemoveUserFromRoster implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public int $userId, public string $reason)
+    public function __construct(public int $userId, public string $reason, public int $by)
     {
         //
     }
@@ -44,9 +44,14 @@ class RemoveUserFromRoster implements ShouldQueue
             ? config('app.vatusa_api_url').'/v2/facility/'.$facility.'/roster/manageVisitor/'.$this->userId
             : config('app.vatusa_api_url').'/v2/facility/'.$facility.'/roster/'.$this->userId;
 
+        // VATUSA's roster-removal endpoint authenticates this server-to-server
+        // call via API key rather than a staff session, so it requires the CID
+        // of the responsible staff member explicitly. The visitor-removal
+        // endpoint doesn't use "by", but harmlessly ignores it.
         $request = Http::delete($URL, [
             'apikey' => config('app.vatusa_api_key'),
             'reason' => $this->reason,
+            'by' => $this->by,
         ]);
 
         if ($request->failed()) {

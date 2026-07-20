@@ -197,7 +197,8 @@ test('a senior staff member can queue removal of flagged controllers', function 
         ->assertRedirect();
 
     Queue::assertPushed(RemoveUserFromRoster::class, fn ($job) => $job->userId === $inactive->id
-        && $job->reason === 'Inactivity — below quarterly minimum');
+        && $job->reason === 'Inactivity — below quarterly minimum'
+        && $job->by === $admin->id);
 });
 
 test('removal requires a reason', function () {
@@ -244,8 +245,9 @@ test('the removal job de-rosters the user locally and emails them on a successfu
         'operating_initials' => 'AB',
         'facility' => config('app.vatusa_facility'),
     ]);
+    $admin = User::factory()->create();
 
-    (new RemoveUserFromRoster($user->id, 'Inactivity'))->handle();
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
 
     $user->refresh();
 
@@ -255,6 +257,8 @@ test('the removal job de-rosters the user locally and emails them on a successfu
     Mail::assertQueued(ControllerRemovedFromRoster::class, fn ($mail) => $mail->hasTo($user->email)
         && $mail->user->id === $user->id
         && $mail->reason === 'Inactivity');
+
+    Http::assertSent(fn ($request) => $request['by'] === $admin->id);
 });
 
 test('the removal job does not email the user when the VATUSA call fails', function () {
@@ -264,8 +268,9 @@ test('the removal job does not email the user when the VATUSA call fails', funct
     Mail::fake();
 
     $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $admin = User::factory()->create();
 
-    (new RemoveUserFromRoster($user->id, 'Inactivity'))->handle();
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
 
     $user->refresh();
 

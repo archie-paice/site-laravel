@@ -269,7 +269,7 @@ class StatisticsController extends Controller
         $users = User::whereIn('id', $validated['user_ids'])->get();
 
         foreach ($users as $user) {
-            RemoveUserFromRoster::dispatch($user->id, $validated['reason']);
+            RemoveUserFromRoster::dispatch($user->id, $validated['reason'], Auth::id());
             Log::info('Queued roster removal for user '.$user->id.' ('.$user->name.'). Reason: '.$validated['reason'].' by '.Auth::id());
         }
 
