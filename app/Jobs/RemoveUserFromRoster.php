@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Mail\ControllerRemovedFromRoster;
+use App\Mail\RosterRemovalFailed;
 use App\Models\User;
 use Http;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -56,6 +57,11 @@ class RemoveUserFromRoster implements ShouldQueue
 
         if ($request->failed()) {
             Log::error('Failed to remove user '.$this->userId.' from roster. Response: '.$request->body());
+
+            $requestedBy = User::find($this->by);
+            if ($requestedBy) {
+                Mail::to($requestedBy->email)->queue(new RosterRemovalFailed($user, $this->reason, $request->body()));
+            }
 
             return;
         }

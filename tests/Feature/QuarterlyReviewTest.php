@@ -2,6 +2,7 @@
 
 use App\Jobs\RemoveUserFromRoster;
 use App\Mail\ControllerRemovedFromRoster;
+use App\Mail\RosterRemovalFailed;
 use App\Models\ControllerMonthlyStat;
 use App\Models\TrainingTicket;
 use App\Models\User;
@@ -276,5 +277,21 @@ test('the removal job does not email the user when the VATUSA call fails', funct
 
     expect($user->rostered)->toBeTrue();
 
-    Mail::assertNothingQueued();
+    Mail::assertNotQueued(ControllerRemovedFromRoster::class);
+});
+
+test('the removal job emails the requesting staff member when the VATUSA call fails', function () {
+    Http::fake([
+        '*' => Http::response(['status' => 'error'], 500),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $admin = User::factory()->create();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
+
+    Mail::assertQueued(RosterRemovalFailed::class, fn ($mail) => $mail->hasTo($admin->email)
+        && $mail->user->id === $user->id
+        && $mail->reason === 'Inactivity');
 });
