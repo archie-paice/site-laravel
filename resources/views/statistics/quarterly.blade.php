@@ -211,7 +211,7 @@
                         <div class="flex flex-col sm:flex-row sm:items-end gap-3 mt-4">
                             <div class="flex flex-col gap-1 w-full sm:max-w-md">
                                 <label class="text-sm">Removal reason (applied to all selected)</label>
-                                <input type="text" x-model="reason" maxlength="255" placeholder="e.g. Inactivity — below quarterly hours minimum" class="input w-full">
+                                <input type="text" name="reason" x-model="reason" maxlength="255" placeholder="e.g. Inactivity — below quarterly hours minimum" class="input w-full">
                             </div>
                             <button type="submit" class="btn btn-error w-full sm:w-auto"
                                     :disabled="selected.length === 0">

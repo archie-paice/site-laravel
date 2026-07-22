@@ -29,12 +29,13 @@
         @yield('secondary-navbar')
 
         @if ($errors->any())
-            <div class="alert alert-danger">
+            <div x-data="{open: true}" x-show='open' class="alert alert-error alert-dismissible fade show" role="alert">
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
                 </ul>
+                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
             </div>
         @endif
 
