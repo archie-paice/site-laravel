@@ -7,13 +7,13 @@ use DateTime;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class SyncTrainingTickets implements ShouldQueue
 {
     use Queueable;
+
     /**
      * Create a new job instance.
      */
@@ -27,14 +27,13 @@ class SyncTrainingTickets implements ShouldQueue
      */
     public function handle(): void
     {
-        //https://api.vatusa.net/v2/training/record/{recordID}
+        // https://api.vatusa.net/v2/training/record/{recordID}
         $unsyncedTickets = TrainingTicket::where(['vatusa_synced' => false]);
 
         foreach ($unsyncedTickets->get() as $ticket) {
             $this->createVatusaTrainingTicket($ticket);
         }
     }
-
 
     private function createVatusaTrainingTicket(mixed $ticket)
     {
@@ -54,15 +53,17 @@ class SyncTrainingTickets implements ShouldQueue
             ]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
+
             return;
         }
 
-        if (!isset($request) || !$request->successful()) {
+        if (! isset($request) || ! $request->successful()) {
             Log::warning('Vatusa training record create failed', [
                 'status' => isset($request) ? $request->status() : null,
                 'body' => isset($request) ? $request->body() : null,
                 'ticket_id' => $ticket->id,
             ]);
+
             return;
         }
 

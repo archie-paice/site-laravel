@@ -9,6 +9,7 @@ use Illuminate\View\Component;
 class ProfileTrainingTicketsTable extends Component
 {
     public mixed $trainingTickets;
+
     /**
      * Create a new component instance.
      */

@@ -2,10 +2,10 @@
 
 namespace App\Livewire;
 
-use Livewire\Component;
-use App\Models\EventPosition;
 use App\Models\Event;
+use App\Models\EventPosition;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class EventRegistration extends Component
 {
@@ -22,12 +22,19 @@ class EventRegistration extends Component
     // from the list.
 
     public $notes;
+
     public Event $event;
+
     public $positionPreset;
+
     public $positions = [];
+
     public $selectedPosition;
+
     public $start;
+
     public $end;
+
     public $submitted = false;
 
     public function mount(Event $event)
@@ -58,14 +65,14 @@ class EventRegistration extends Component
             'start' => [
                 'required',
                 'date',
-                'after_or_equal:' . $this->event->start->toDateTimeString(),
-                'before_or_equal:' . $this->event->end->toDateTimeString(),
+                'after_or_equal:'.$this->event->start->toDateTimeString(),
+                'before_or_equal:'.$this->event->end->toDateTimeString(),
             ],
             'end' => [
                 'required',
                 'date',
                 'after:start',
-                'before_or_equal:' . $this->event->end->toDateTimeString(),
+                'before_or_equal:'.$this->event->end->toDateTimeString(),
             ],
         ]);
 
@@ -85,12 +92,14 @@ class EventRegistration extends Component
         $this->submitted = true;
     }
 
-    public function destroy() {
+    public function destroy()
+    {
         $authenticatedUser = Auth::user();
         $registration = EventPosition::where('user_id', $authenticatedUser->id)->where('event_id', $this->event->id)->first();
         $registration->delete();
         $this->submitted = false;
     }
+
     public function render()
     {
         return view('livewire.event-registration');

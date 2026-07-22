@@ -11,7 +11,6 @@ use App\Mail\SoloCertRevoked;
 use App\Models\SoloCert;
 use App\Models\TrainingAssignment;
 use App\Models\User;
-use App\Services\VatusaSoloCertService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -31,19 +30,22 @@ class SoloCertController extends Controller
         return view('solo-certs.index', compact('soloCerts'));
     }
 
-    public function show(int $id) {
+    public function show(int $id)
+    {
         $soloCert = SoloCert::findOrFail($id);
     }
 
-    public function create() {
+    public function create()
+    {
         $users = User::where(['rostered' => true])->get();
 
         return view('solo-certs.create', [
-            'users' => $users
+            'users' => $users,
         ]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'userId' => 'required|exists:users,id',
             'position' => ['required', 'regex:/^([A-Z]{2,3})(_([A-Z]{1,3}))?_(DEL|GND|TWR|APP|DEP|CTR)$/'],
@@ -61,7 +63,7 @@ class SoloCertController extends Controller
 
         $relaventAssignments = TrainingAssignment::where([
             'user_id' => $validated['userId'],
-            'active' => true
+            'active' => true,
         ])->get();
 
         foreach ($relaventAssignments as $relaventAssignment) {
@@ -71,7 +73,7 @@ class SoloCertController extends Controller
 
         CreateVatusaSoloCert::dispatch($soloCert);
         Mail::to($soloCert->user)->bcc([$soloCert->issuedBy, config('app.vatusa_facility').'-ta@vatusa.net'])->queue(new SoloCertIssued($soloCert));
-        
+
         Log::info('Solo cert issued', [
             'solo_cert_id' => $soloCert->id,
             'issued_by' => Auth::user()->id,
@@ -82,10 +84,11 @@ class SoloCertController extends Controller
         return redirect(route('solo-certs.index'))->with('success', 'Solo certification created successfully.');
     }
 
-    public function destroy(int $id) {
+    public function destroy(int $id)
+    {
         $soloCert = SoloCert::findOrFail($id);
 
-        if (!\Auth::user()->hasPermissionTo('revoke solo certs')) {
+        if (! \Auth::user()->hasPermissionTo('revoke solo certs')) {
             abort(403, 'You do not have permission to revoke solo certifications.');
         }
 
@@ -93,7 +96,7 @@ class SoloCertController extends Controller
 
         $relaventAssignments = TrainingAssignment::where([
             'user_id' => $soloCert->user_id,
-            'active' => true
+            'active' => true,
         ])->get();
 
         foreach ($relaventAssignments as $relaventAssignment) {

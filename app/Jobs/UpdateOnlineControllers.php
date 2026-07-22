@@ -14,21 +14,18 @@ class UpdateOnlineControllers implements ShouldQueue
 {
     use Queueable;
 
-
     /**
      * Create a new job instance.
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Execute the job.
      */
     public function handle(): void
     {
-        $API_ENDPOINT = config('app.vatsim_api_url') . '/v2/atc/online';
-        
+        $API_ENDPOINT = config('app.vatsim_api_url').'/v2/atc/online';
+
         $onlineData = Http::get($API_ENDPOINT);
 
         $controllers = json_decode($onlineData, true);
