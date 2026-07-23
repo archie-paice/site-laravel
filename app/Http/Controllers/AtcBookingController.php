@@ -7,10 +7,11 @@ use Illuminate\Http\Request;
 
 class AtcBookingController extends Controller
 {
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'position' => ['required', 'string', 'max:255'],
-            'start' => ['required', 'date'],
+            'start' => ['required', 'date', 'after_or_equal:now'],
             'end' => ['required', 'date', 'after:start', function ($attribute, $value, $fail) use ($request) {
                 $start = strtotime((string) $request->input('start'));
                 $end = strtotime((string) $value);
@@ -19,6 +20,8 @@ class AtcBookingController extends Controller
                 }
             }],
             'description' => ['nullable', 'string', 'max:1000'],
+        ], [
+            'start.after_or_equal' => 'The start time cannot be in the past.',
         ]);
 
         AtcBooking::create([
