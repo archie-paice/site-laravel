@@ -10,7 +10,8 @@ class EventTable extends Component
 {
     private Collection $events;
 
-    public function mount() {
+    public function mount()
+    {
         $this->events = Event::all();
     }
 

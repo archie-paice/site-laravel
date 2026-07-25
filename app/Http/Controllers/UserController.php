@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
-use Log;
 
 class UserController extends Controller
 {
-
-    public function show(int $id) {
+    public function show(int $id)
+    {
         $user = User::findOrFail($id);
 
         return view('users.show', [
@@ -21,28 +17,30 @@ class UserController extends Controller
         ]);
     }
 
-    public function edit(Request $request, int $id) {
+    public function edit(Request $request, int $id)
+    {
         $user = User::findOrFail($id);
         $authenticatedUser = Auth::user();
 
-        if ($authenticatedUser->id != $user->id && !$authenticatedUser->hasPermissionTo('manage users')) {
+        if ($authenticatedUser->id != $user->id && ! $authenticatedUser->hasPermissionTo('manage users')) {
             return response('Unauthorized', 403);
         }
-        
-        return view('users.edit', ['user'=> $user]);
+
+        return view('users.edit', ['user' => $user]);
     }
 
-    public function update(Request $request, int $id) {
+    public function update(Request $request, int $id)
+    {
         $validated = $request->validate([
             'operatingInitials' => 'string|nullable|size:2', // can only be edited if admin
             'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
-            'biography' => 'string|nullable|max:1000'
+            'biography' => 'string|nullable|max:1000',
         ], [
-            'operatingInitials.max' => 'Operating initials must be 2 characters long'
+            'operatingInitials.max' => 'Operating initials must be 2 characters long',
         ]);
 
-        if (Auth::user()->id != $id && !Auth::user()->hasPermissionTo('manage users')) {
-            return response('Unauthorized', 403 );
+        if (Auth::user()->id != $id && ! Auth::user()->hasPermissionTo('manage users')) {
+            return response('Unauthorized', 403);
         }
 
         $user = User::findOrFail($id);
@@ -50,7 +48,7 @@ class UserController extends Controller
         if ($request->hasFile('image')) {
             $imageName = 'profile_'.$user->id.'.'.$request->file('image')->getClientOriginalExtension();
             $path = $request->file('image')->storeAs('profile', $imageName, 'public');
-    
+
             $user->profile_image_route = 'storage/'.$path;
         }
 
@@ -67,13 +65,15 @@ class UserController extends Controller
         }
 
         $user->save();
+
         return redirect()->route('users.edit', ['user' => $user->id])->with('success', 'User updated successfully');
     }
 
-    public function trainingAssignments(int $id) {
+    public function trainingAssignments(int $id)
+    {
         $user = User::findOrFail($id);
 
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training assignments are only available for rostered users.');
         }
 
@@ -81,14 +81,15 @@ class UserController extends Controller
 
         return view('users.training-assignments', [
             'user' => $user,
-            'trainingAssignments' => $trainingAssignments
+            'trainingAssignments' => $trainingAssignments,
         ]);
     }
 
-    public function trainingTickets(int $id) {
+    public function trainingTickets(int $id)
+    {
         $user = User::findOrFail($id);
 
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training tickets are only available for rostered users.');
         }
 
@@ -96,13 +97,14 @@ class UserController extends Controller
 
         return view('users.training-tickets', [
             'user' => $user,
-            'trainingTickets' => $trainingTickets
+            'trainingTickets' => $trainingTickets,
         ]);
     }
 
-    public function soloCerts(int $id) {
+    public function soloCerts(int $id)
+    {
         $user = User::findOrFail($id);
-        if (!$user->rostered) {
+        if (! $user->rostered) {
             return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
         }
 
@@ -110,7 +112,7 @@ class UserController extends Controller
 
         return view('users.solo-certs', [
             'user' => $user,
-            'soloCerts' => $soloCerts
+            'soloCerts' => $soloCerts,
         ]);
     }
 }

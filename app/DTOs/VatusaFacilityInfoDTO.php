@@ -5,11 +5,17 @@ namespace App\DTOs;
 class VatusaFacilityInfoDTO
 {
     public int $atmId;
+
     public int $datmId;
+
     public int $taId;
+
     public int $wmId;
+
     public int $ecId;
+
     public int $feId;
+
     public array $roles;
 
     public function __construct(array $facilityInfo)

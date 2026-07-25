@@ -22,7 +22,7 @@ class CertificationLevelController extends Controller
             'abbreviation' => 'required|string|max:3',
         ]);
 
-        $certificationLevel = new CertificationLevel();
+        $certificationLevel = new CertificationLevel;
         $certificationLevel->facility_id = $facilityId;
         $certificationLevel->name = $validated['name'];
         $certificationLevel->abbreviation = $validated['abbreviation'] ?? null;

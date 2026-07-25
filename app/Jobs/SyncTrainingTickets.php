@@ -7,13 +7,13 @@ use DateTime;
 use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
-use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class SyncTrainingTickets implements ShouldQueue
 {
     use Queueable;
+
     /**
      * Create a new job instance.
      */
@@ -27,14 +27,13 @@ class SyncTrainingTickets implements ShouldQueue
      */
     public function handle(): void
     {
-        //https://api.vatusa.net/v2/training/record/{recordID}
+        // https://api.vatusa.net/v2/training/record/{recordID}
         $unsyncedTickets = TrainingTicket::where(['vatusa_synced' => false]);
 
         foreach ($unsyncedTickets->get() as $ticket) {
             $this->createVatusaTrainingTicket($ticket);
         }
     }
-
 
     private function createVatusaTrainingTicket(mixed $ticket)
     {
@@ -54,6 +53,39 @@ class SyncTrainingTickets implements ShouldQueue
             ]);
         } catch (Exception $e) {
             Log::error($e->getMessage());
+
+            return;
         }
+
+        if (! isset($request) || ! $request->successful()) {
+            Log::warning('Vatusa training record create failed', [
+                'status' => isset($request) ? $request->status() : null,
+                'body' => isset($request) ? $request->body() : null,
+                'ticket_id' => $ticket->id,
+            ]);
+
+            return;
+        }
+
+        $body = $request->json();
+
+        $vatusaId = null;
+        if (is_array($body)) {
+            if (isset($body['data']['id'])) {
+                $vatusaId = $body['data']['id'];
+            } elseif (isset($body['data']['recordID'])) {
+                $vatusaId = $body['data']['recordID'];
+            } elseif (isset($body['data']['record']['id'])) {
+                $vatusaId = $body['data']['record']['id'];
+            } elseif (isset($body['recordID'])) {
+                $vatusaId = $body['recordID'];
+            } elseif (isset($body['id'])) {
+                $vatusaId = $body['id'];
+            }
+        }
+
+        $ticket->vatusa_synced = true;
+        $ticket->vatusa_id = $vatusaId ? (string) $vatusaId : substr(preg_replace('/[^a-z0-9]/i', '', sha1($request->body() ?? (string) microtime(true))), 0, 12);
+        $ticket->save();
     }
 }

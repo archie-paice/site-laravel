@@ -44,6 +44,6 @@ return new class extends Migration
             $table->string('bannerKey')->nullable();
             $table->json('presetPositions')->nullable();
             $table->string('type')->nullable();
-    });
+        });
     }
 };

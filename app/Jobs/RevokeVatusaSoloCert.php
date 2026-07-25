@@ -14,16 +14,18 @@ class RevokeVatusaSoloCert implements ShouldQueue
     use Queueable;
 
     private readonly string $API_URL;
+
     /**
      * Create a new job instance.
      */
     public function __construct(private readonly SoloCert $soloCert)
     {
-        $this->API_URL = config('app.vatusa_api_url') . '/v2/solo';
+        $this->API_URL = config('app.vatusa_api_url').'/v2/solo';
     }
 
     /**
      * Execute the job.
+     *
      * @throws ConnectionException
      */
     public function handle(): void

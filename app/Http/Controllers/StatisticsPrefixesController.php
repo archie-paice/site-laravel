@@ -2,9 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\StatisticsPrefixes;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Log;
@@ -27,12 +25,13 @@ class StatisticsPrefixesController extends Controller
     {
 
         $validated = $request->validate([
-            'name' => 'required|max:5|min:2'
+            'name' => 'required|max:5|min:2',
         ]);
 
         StatisticsPrefixes::firstOrCreate(['name' => $validated['name']]);
 
         Log::info('Statistics prefix {prefix} added by user {user}', ['prefix' => $validated['name'], 'user' => Auth::user()->id]);
+
         return redirect()->back()->with('success', Str::upper($validated['name']).' added succesfully!');
     }
 

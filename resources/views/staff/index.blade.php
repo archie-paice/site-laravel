@@ -23,7 +23,12 @@
             description="The Training Administrator is responsible for overseeing the training department of the ARTCC."
             :staff="$ta"
             reportsTo="Air Traffic Manager"
-        />
+        >
+            <x-assistant-staff
+                positionTitle="Assistant Training Administrators"
+                :staff="$trainingTeam"
+            />
+        </x-staff-card>
 
         <x-staff-card
             position="Events Coordinator"

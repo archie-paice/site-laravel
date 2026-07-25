@@ -27,15 +27,20 @@ RUN apk add --no-cache \
 COPY --from=composer:2.7.6 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
+ARG INSTALL_DEV=false
 
 # copy necessary files and change permissions
-COPY ../.. .
+COPY . .
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 775 /var/www/html/storage \
     && chmod -R 775 /var/www/html/bootstrap/cache
 
 # install php and node.js dependencies
-RUN composer install --no-dev --prefer-dist \
+RUN if [ "$INSTALL_DEV" = "true" ]; then \
+      composer install --prefer-dist --no-interaction; \
+    else \
+      composer install --no-dev --prefer-dist --no-interaction; \
+    fi \
     && npm install \
     && npm run build
 
