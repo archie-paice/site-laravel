@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class RemoveUserFromRoster implements ShouldQueue
 {
@@ -48,17 +49,40 @@ class RemoveUserFromRoster implements ShouldQueue
         // VATUSA's roster-removal endpoint authenticates this server-to-server
         // call via API key rather than a staff session, so it requires the CID
         // of the responsible staff member explicitly. The visitor-removal
-        // endpoint doesn't use "by", but harmlessly ignores it.
-        $request = Http::delete($URL, [
-            'apikey' => config('app.vatusa_api_key'),
-            'reason' => $this->reason,
-            'by' => $this->by,
-        ]);
+        // endpoint doesn't use "by", but harmlessly ignores it. VATUSA expects
+        // the apikey as a query param and the rest as a form body, not JSON.
+        $request = Http::asForm()
+            ->withQueryParameters(['apikey' => config('app.vatusa_api_key')])
+            ->delete($URL, [
+                'reason' => $this->reason,
+                'by' => $this->by,
+            ]);
 
-        if ($request->failed()) {
+        // A 2xx response can still carry a JSON "error" field meaning the
+        // removal didn't actually happen on VATUSA's side.
+        $succeeded = $request->successful() && ! $request->json('error');
+
+        $requestedBy = User::find($this->by);
+
+        // Record the raw VATUSA request/response on the audit log so a failed
+        // or disputed removal can be traced back to exactly what was sent.
+        activity($isVisitor ? 'vatusa-visitor-removal' : 'vatusa-roster-removal')
+            ->causedBy($requestedBy)
+            ->performedOn($user)
+            ->withProperties([
+                'attributes' => [
+                    'endpoint' => $URL,
+                    'reason' => $this->reason,
+                    'http_status' => $request->status(),
+                    'response' => Str::limit($request->body(), 2000),
+                ],
+            ])
+            ->event($succeeded ? 'roster-removal-succeeded' : 'roster-removal-failed')
+            ->log($succeeded ? 'Removed from VATUSA roster' : 'VATUSA roster removal failed');
+
+        if (! $succeeded) {
             Log::error('Failed to remove user '.$this->userId.' from roster. Response: '.$request->body());
 
-            $requestedBy = User::find($this->by);
             if ($requestedBy) {
                 Mail::to($requestedBy->email)->queue(new RosterRemovalFailed($user, $this->reason, $request->body()));
             }

@@ -10,6 +10,7 @@ use Database\Seeders\PermissionSeeder;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
+use Spatie\Activitylog\Models\Activity;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
@@ -294,4 +295,86 @@ test('the removal job emails the requesting staff member when the VATUSA call fa
     Mail::assertQueued(RosterRemovalFailed::class, fn ($mail) => $mail->hasTo($admin->email)
         && $mail->user->id === $user->id
         && $mail->reason === 'Inactivity');
+});
+
+test('the removal job treats a 200 response carrying a JSON error field as a failure', function () {
+    Http::fake([
+        '*' => Http::response(['error' => 'CID not found on roster'], 200),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $admin = User::factory()->create();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
+
+    $user->refresh();
+
+    expect($user->rostered)->toBeTrue();
+
+    Mail::assertNotQueued(ControllerRemovedFromRoster::class);
+    Mail::assertQueued(RosterRemovalFailed::class, fn ($mail) => $mail->hasTo($admin->email)
+        && $mail->user->id === $user->id);
+});
+
+test('the removal job records the VATUSA request and response on the audit log', function () {
+    Http::fake([
+        '*' => Http::response(['status' => 'OK'], 200),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $admin = User::factory()->create();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
+
+    $log = Activity::where('subject_type', User::class)
+        ->where('subject_id', $user->id)
+        ->where('event', 'roster-removal-succeeded')
+        ->first();
+
+    expect($log)->not->toBeNull()
+        ->and($log->causer_id)->toBe($admin->id)
+        ->and($log->properties['attributes']['reason'])->toBe('Inactivity')
+        ->and($log->properties['attributes']['http_status'])->toBe(200)
+        ->and($log->properties['attributes']['response'])->toContain('OK');
+});
+
+test('the removal job records a failed VATUSA response on the audit log', function () {
+    Http::fake([
+        '*' => Http::response(['error' => 'CID not found'], 200),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $admin = User::factory()->create();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
+
+    $log = Activity::where('subject_type', User::class)
+        ->where('subject_id', $user->id)
+        ->where('event', 'roster-removal-failed')
+        ->first();
+
+    expect($log)->not->toBeNull()
+        ->and($log->properties['attributes']['response'])->toContain('CID not found');
+});
+
+test('the removal job sends the apikey as a query parameter and the rest as a form body', function () {
+    Http::fake([
+        '*' => Http::response(['status' => 'OK'], 200),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $admin = User::factory()->create();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
+
+    Http::assertSent(function ($request) use ($admin) {
+        return str_contains($request->url(), 'apikey='.config('app.vatusa_api_key'))
+            && $request->hasHeader('Content-Type', 'application/x-www-form-urlencoded')
+            && $request['reason'] === 'Inactivity'
+            && $request['by'] === $admin->id;
+    });
 });

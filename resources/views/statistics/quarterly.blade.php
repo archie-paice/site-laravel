@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-@section('title', 'Quarterly Hours Review')
+@section('title', 'Roster Purge Assistant')
 
 @section('body')
 
@@ -71,7 +71,7 @@
 
     <div class="space-y-6">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold">Quarterly Hours Review</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold">Roster Purge Assistant</h2>
             <p class="text-base-content/60 mt-1">{{ $periodLabel }} &mdash; controllers below the threshold are flagged below.</p>
         </div>
 

@@ -73,7 +73,7 @@
                             @endif
                         </a>
                     </li>
-                    <li><a href={{ route('statistics.quarterly') }}>Quarterly Hours Review</a></li>
+                    <li><a href={{ route('statistics.quarterly') }}>Roster Purge Assistant</a></li>
                     <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>
