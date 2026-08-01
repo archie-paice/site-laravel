@@ -24,25 +24,30 @@ class ControllerSchedule extends Component
 
     public ?string $editDescription = null;
 
-    public function mount() {
+    public function mount()
+    {
         $this->date = now()->toDateString();
     }
 
-    public function previousDay() {
+    public function previousDay()
+    {
         $this->date = Carbon::parse($this->date)->subDay()->toDateString();
     }
 
-    public function nextDay() {
+    public function nextDay()
+    {
         $this->date = Carbon::parse($this->date)->addDay()->toDateString();
     }
 
-    public static function canManage(AtcBooking $booking): bool {
+    public static function canManage(AtcBooking $booking): bool
+    {
         $user = auth()->user();
 
-        return !is_null($user) && ($user->id === $booking->user_id || $user->hasRole('staff'));
+        return ! is_null($user) && ($user->id === $booking->user_id || $user->hasRole('staff'));
     }
 
-    public function edit(int $bookingId) {
+    public function edit(int $bookingId)
+    {
         $booking = AtcBooking::findOrFail($bookingId);
         abort_unless(self::canManage($booking), 403);
 
@@ -56,11 +61,13 @@ class ControllerSchedule extends Component
         $this->resetValidation();
     }
 
-    public function cancelEdit() {
+    public function cancelEdit()
+    {
         $this->editingId = null;
     }
 
-    public function update() {
+    public function update()
+    {
         $booking = AtcBooking::findOrFail($this->editingId);
         abort_unless(self::canManage($booking), 403);
 
@@ -87,7 +94,8 @@ class ControllerSchedule extends Component
         $this->editingId = null;
     }
 
-    public function delete() {
+    public function delete()
+    {
         $booking = AtcBooking::findOrFail($this->editingId);
         abort_unless(self::canManage($booking), 403);
 
@@ -96,7 +104,8 @@ class ControllerSchedule extends Component
         $this->editingId = null;
     }
 
-    public function render() {
+    public function render()
+    {
         return view('livewire.controller-schedule', [
             'scheduleDate' => Carbon::parse($this->date),
             'bookings' => AtcBooking::with('user')
