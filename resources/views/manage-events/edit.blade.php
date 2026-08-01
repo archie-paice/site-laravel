@@ -10,17 +10,17 @@
             <input type="radio" name="my-accordion-1" checked="checked" />
             <div class="collapse-title font-semibold">Basic Information</div>
             <div class="collapse-content text-sm">
-                <label for="name" class="label">Event Name</label>
-                <input name="name" value="{{ old('name', $event->name) }}" required type="text"
+                <label for="title" class="label">Event Name</label>
+                <input name="title" value="{{ old('title', $event->title) }}" required type="text"
                     placeholder="Event Name" class="input" />
 
                 <br />
                 <label for="start" class="label">Event Start</label>
-                <input type="datetime-local" value="{{ old('name', $event->start) }}" name="start" class="input"
+                <input type="datetime-local" value="{{ old('start', $event->start) }}" name="start" class="input"
                     required>
 
                 <label for="end" class="label">Event End</label>
-                <input type="datetime-local" value="{{ old('name', $event->end) }}" name="end" class="input" required>
+                <input type="datetime-local" value="{{ old('end', $event->end) }}" name="end" class="input" required>
             </div>
         </div>
 

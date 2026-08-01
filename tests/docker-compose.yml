@@ -1,5 +1,6 @@
 services:
   laravel:
+    image: ${TEST_IMAGE:-zjx-laravel-test:local}
     build:
       context: ..
       dockerfile: Dockerfile
@@ -18,4 +19,7 @@ services:
       STRIPE_SECRET: fake
       AWS_ACCESS_KEY_ID: fake
       AWS_SECRET_ACCESS_KEY: fake
+      VATUSA_API_URL: https://api.vatusa.net
+      VATUSA_API_KEY: fake
+      VATUSA_FACILITY: ZJX
     command: ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8080"]

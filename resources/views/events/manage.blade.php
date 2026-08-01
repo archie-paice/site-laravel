@@ -1,6 +1,6 @@
 @extends('layouts.admin')
 
-{{-- @section('title', 'Event Manager - ' . $event->name . ' (' . $event->type->value . ')') --}}
+{{-- @section('title', 'Event Manager - ' . $event->title . ' (' . $event->type->value . ')') --}}
 @section('title', 'Event Manager')
 
 @section('body')
@@ -9,7 +9,7 @@
             @csrf
             <div class="card bg-base-100 w-full shadow-sm">
                 <div class="card-body">
-                    <h2 class="card-title">{{ $event->name }} ({{ $event->type->value }})</h2>
+                    <h2 class="card-title">{{ $event->title }} ({{ $event->type->value }})</h2>
                     <h3>Start: {{ $event->start }}</h3>
                     <h3>End: {{ $event->end }}</h3>
                     <p>{{ $event->description }}</p>
