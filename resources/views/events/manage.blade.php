@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </div>
-            <div class="card bg-base-100 w-96 shadow-sm">
+            <div class="card bg-base-100 w-full shadow-sm">
                 <div class="card-body">
                     <h2 class="card-title">Position Presets</h2>
                     <label for="positions" class="label">Positions (type and separate each position with a comma)</label>

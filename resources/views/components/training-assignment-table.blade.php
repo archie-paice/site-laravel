@@ -1,5 +1,5 @@
 @unless(sizeof($trainingAssignments) == 0)
-    <div>
+    <div class='overflow-x-auto'>
     <table class='table table-zebra table-md border-2 border-base-300 mt-5 w-full'>
         <thead>
         <tr>

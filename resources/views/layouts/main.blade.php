@@ -91,7 +91,7 @@
             <footer class="w-full bg-primary text-primary-content p-2">
                 <h1 class="text-xl font-bold">Virtual Jacksonville ARTCC</h1>
 
-                <div class="flex gap-x-10">
+                <div class="flex flex-wrap gap-x-6 sm:gap-x-10 gap-y-1">
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">Join vZJX</a>
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">GitHub</a>
                     <a class="link text-lg" href="https://vatusa.net" target="_blank">VATUSA</a>

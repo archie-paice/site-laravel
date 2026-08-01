@@ -20,7 +20,7 @@
             </video>-->
             <img src="{{ asset('images/bg.jpg') }}" class="w-full h-full absolute object-cover"/>
 
-            <div class='font-bold text-accent-content text-center z-10 w-max h-max relative p-10 flex justify-center flex-col items-center'>
+            <div class='font-bold text-accent-content text-center z-10 w-fit max-w-full h-max relative p-10 flex justify-center flex-col items-center'>
                 <div class="absolute opacity-25 rounded-2xl glass h-full w-full">
 
                 </div>

@@ -9,6 +9,7 @@
         />
     </div>
     @unless(sizeof($trainingAssignments) == 0)
+        <div class='overflow-x-auto'>
         <table class='table table-zebra table-md w-max border-2 border-base-300'>
             <thead>
             <tr>
@@ -101,11 +102,12 @@
             @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <h1>There are no training assignments.</h1>
     @endunless
 
-    <div class="w-150 mt-5">
+    <div class="w-full max-w-150 mt-5">
         {{ $trainingAssignments->links() }}
     </div>
 </div>
