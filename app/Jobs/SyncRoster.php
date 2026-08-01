@@ -51,6 +51,19 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
         ]);
     }
 
+    private function syncRosteredRole()
+    {
+        $users = User::all();
+
+        foreach ($users as $user) {
+            if ($user->rostered) {
+                $user->assignRole('rostered');
+            } else {
+                $user->removeRole('rostered');
+            }
+        }
+    }
+
     private function clearUserRoles()
     {
         $users = User::all();
@@ -139,6 +152,8 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
                     $user->save();
                 }
             }
+
+            $this->syncRosteredRole();
 
             Log::info('Roster sync completed successfully.');
         } catch (\Exception $e) {

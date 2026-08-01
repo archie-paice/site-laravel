@@ -52,6 +52,12 @@
 
         </x-card-component>
 
+        <x-card-component title="Controller Schedule">
+            <livewire:controller-schedule />
+
+            <x-atc-booking-form/>
+        </x-card-component>
+
         <x-card-component title="News">
             <ul>
                 <li class="text-lg">11-25-2025 Jud Lopez promoted to C1</li>

@@ -57,7 +57,7 @@ DB_PASSWORD=<database-password>
 ```
 
 Configure VATSIM OAuth test credentials:
-See the wiki at `https://vatsim.dev/services/connect/` in how to do this. Common issues with authentication are usually realted to the redirect URL not exactly matching the URL in your browser.
+See the wiki at `https://vatsim.dev/services/connect/` in how to do this. Common issues with authentication are usually related to the redirect URL not exactly matching the URL in your browser.
 
 ### Other Environment Secrets
 
@@ -102,13 +102,35 @@ Before opening a pull request:
 * Avoid unrelated formatting or refactoring in the same pull request.
 * Do not commit generated files, local environment files, or dependency directories unless specifically required.
 
-## Running Tests
+## Testing
 
 Run the test suite before submitting your changes:
 
 ```bash
 php artisan test
 ```
+
+You can also run Pest directly (`./vendor/bin/pest`) or via the Composer script, which clears cached config first:
+
+```bash
+composer test
+```
+
+### Conventions
+
+- Tests use [Pest](https://pestphp.com/). The base `Tests\TestCase` and the `RefreshDatabase` trait are bound to the **Feature** suite in `tests/Pest.php`, so each Feature test runs against a fresh, migrated database.
+- Model data is created with factories and `spatie/laravel-permission` helpers, e.g. `User::factory()->create()` and `$user->assignRole('staff')`. Only `UserFactory` exists today — if you test a model that has no factory, add one under `database/factories/`.
+- Authorization tests seed permissions first with `$this->seed(PermissionSeeder::class)` before assigning roles.
+- Custom expectations live in `tests/Pest.php` (e.g. `toRunInLessThan(...)` for performance-sensitive assertions).
+
+### Database engine caveat
+
+There is a known split between local and CI test databases:
+
+- **Locally**, `phpunit.xml` sets `DB_CONNECTION=pgsql` with database `zjx_test`, so `php artisan test` runs against PostgreSQL. Create that database (or adjust `phpunit.xml`) before running tests.
+- **In CI**, tests run against SQLite inside Docker (`tests/docker-compose.yml` overrides the connection). The container's environment variable takes precedence over `phpunit.xml`.
+
+Because the two environments use different engines, prefer database-agnostic queries and be cautious with engine-specific SQL. This inconsistency is tracked in [`docs/discrepancies.md`](docs/discrepancies.md).
 
 ## Database Changes
 
@@ -194,7 +216,7 @@ Please describe:
 * Any alternatives you considered.
 * Whether you are willing to help implement it.
 
-Please create an issue for any relavant features and discussion.
+Please create an issue for any relevant features and discussion.
 
 ## Security Issues
 
