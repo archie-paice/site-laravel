@@ -44,7 +44,7 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
+            'title' => 'required|string',
             'description' => 'required|string',
             'start' => 'required|date',
             'end' => 'required|date',
@@ -66,7 +66,7 @@ class EventController extends Controller
         $featuredFields = array_map('trim', $featuredFields);
 
         $event = Event::create([
-            'name' => $validated['name'],
+            'title' => $validated['title'],
             'description' => $validated['description'],
             'start' => $validated['start'],
             'end' => $validated['end'],
@@ -100,7 +100,7 @@ class EventController extends Controller
         $featuredFields = FeaturedField::pluck('name')->toArray();
 
         $validated = $request->validate([
-            'name' => 'required|string',
+            'title' => 'required|string',
             'description' => 'required|string',
             'start' => 'required|date',
             'end' => 'required|date',
