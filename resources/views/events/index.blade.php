@@ -11,11 +11,22 @@
                     <img src="{{ $event->image_url }}" class="w-full" />
                     </a>
                     <div class="absolute left-5 right-5 top-1/2 flex -translate-y-1/2 transform justify-between">
-                        <a href="#slide{{ $i === 0 ? count($events) : $i }}" class="btn btn-circle">❮</a>
-                        <a href="#slide{{ $i + 2 > count($events) ? 1 : $i + 2 }}" class="btn btn-circle">❯</a>
+                        <a href="#slide{{ $i === 0 ? count($events) : $i }}" data-carousel-nav class="btn btn-circle">❮</a>
+                        <a href="#slide{{ $i + 2 > count($events) ? 1 : $i + 2 }}" data-carousel-nav class="btn btn-circle">❯</a>
                     </div>
                 </div>
             @endforeach
         </div>
     </div>
+
+    <script>
+        document.querySelectorAll('[data-carousel-nav]').forEach((link) => {
+            link.addEventListener('click', (e) => {
+                const target = document.querySelector(link.getAttribute('href'));
+                if (!target) return;
+                e.preventDefault();
+                target.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+            });
+        });
+    </script>
 @endsection

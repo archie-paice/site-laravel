@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AtcBookingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\CertificationFacilityController;
@@ -31,6 +32,9 @@ use Illuminate\Support\Facades\Route;
 
 // Homepage
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// ATC Bookings
+Route::post('/bookings', [AtcBookingController::class, 'store'])->middleware('permission:create atc booking')->name('bookings.store');
 
 // Roster
 Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
