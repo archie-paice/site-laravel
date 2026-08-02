@@ -44,7 +44,7 @@
                                     @if($cert)
                                         <span class='badge badge-success badge-md'>{{ $cert->level->identifier }}</span>
                                     @else
-                                        <span class='text-gray-400'>Uncertified</span>
+                                        <span class='text-base-content/40'>Uncertified</span>
                                     @endif
                                 </td>
                             @endforeach
