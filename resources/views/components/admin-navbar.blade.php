@@ -3,7 +3,7 @@
     use \App\Enums\VisitRequestStatus;
 @endphp
 
-<div class="navbar bg-info text-white font-bold z-10">
+<div class="navbar bg-info text-white z-10">
     <div class="flex-1 ml-5">
         <a href='{{ route('admin.index') }}' class='text-xl'>Admin Actions</a>
     </div>
