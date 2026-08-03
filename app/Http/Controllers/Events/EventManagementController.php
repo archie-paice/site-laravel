@@ -106,7 +106,7 @@ class EventManagementController
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
             'presetPositions' => 'nullable|string',
-            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|required',
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
         ]);
 
         $presetName = $validated['presetPositions'] ?? null;
@@ -168,7 +168,7 @@ class EventManagementController
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
             'presetPositions' => 'nullable|string',
-            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|required',
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
         ]);
 
         $featuredFields = explode(', ', $validated['featured_fields']);
@@ -178,7 +178,7 @@ class EventManagementController
         $event = Event::find($id);
         $oldImagePath = $event->event_image_route;
 
-        $event->title = $validated['name'];
+        $event->title = $validated['title'];
         $event->description = $validated['description'];
         $event->start = $validated['start'];
         $event->end = $validated['end'];

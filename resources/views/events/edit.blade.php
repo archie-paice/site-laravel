@@ -3,89 +3,135 @@
 @section('title', 'Edit Event')
 
 @section('body')
-    <form method="POST" enctype="multipart/form-data" action="{{ route('admin.events.update', ['event' => $event->id]) }}" class="flex flex-col gap-5">
+
+    <form
+        method="POST"
+        enctype="multipart/form-data"
+        action="{{ route('admin.events.update', ['event' => $event->id]) }}"
+        class="w-full lg:w-1/2 mx-auto flex flex-col gap-5"
+    >
         @csrf
         @method('PUT')
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Basic Information</div>
-            <div class="collapse-content text-sm">
-                <label for="name" class="label">Event Name</label>
-                <input name="name" value="{{ old('name', $event->title) }}" required type="text"
-                    placeholder="Event Name" class="input" />
 
-                <br />
-                <label for="start" class="label">Event Start</label>
-                <input type="datetime-local" value="{{ old('name', $event->start) }}" name="start" class="input"
-                    required>
+        <div class="card bg-base-100 border border-base-300 w-full">
+            <div class="card-body">
 
-                <label for="end" class="label">Event End</label>
-                <input type="datetime-local" value="{{ old('name', $event->end) }}" name="end" class="input" required>
+                <h2 class="card-title">Basic Information</h2>
+
+                <label class="label">Event Name</label>
+                <input
+                    name="title"
+                    type="text"
+                    required
+                    class="input input-bordered w-full"
+                    value="{{ old('title', $event->title) }}"
+                />
+
+                <h2 class="card-title mt-2">Description</h2>
+
+                <textarea
+                    name="description"
+                    required
+                    class="textarea w-full"
+                    placeholder="Event description..."
+                >{{ old('description', $event->description) }}</textarea>
+
+                <div class="flex gap-4 w-full">
+                    <div class="flex-1">
+                        <label class="label">Event Start</label>
+                        <input
+                            type="datetime-local"
+                            name="start"
+                            class="input input-bordered w-full"
+                            required
+                            value="{{ old('start', $event->start) }}"
+                        >
+                    </div>
+
+                    <div class="flex-1">
+                        <label class="label">Event End</label>
+                        <input
+                            type="datetime-local"
+                            name="end"
+                            class="input input-bordered w-full"
+                            required
+                            value="{{ old('end', $event->end) }}"
+                        >
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="flex gap-4 w-full">
+                    <div class="flex-1">
+                        <h2 class="card-title">Event Type</h2>
+
+                        <select name="type" class="select select-bordered w-full">
+                            <option disabled {{ old('type', $event->type?->value) ? '' : 'selected' }}>
+                                Select type
+                            </option>
+
+                            @foreach ($types as $t)
+                                <option
+                                    value="{{ $t->value }}"
+                                    {{ old('type', $event->type?->value) === $t->value ? 'selected' : '' }}
+                                >
+                                    {{ str_replace('_', ' ', $t->name) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="flex-1">
+                        <h2 class="card-title">Featured Fields</h2>
+
+                        <input
+                            type="text"
+                            name="featured_fields"
+                            class="input input-bordered w-full"
+                            placeholder="KMCO, KJAX, KDAB"
+                            value="{{ old('featured_fields', implode(', ', $event->featured_fields)) }}"
+                        />
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div>
+                    <h2 class="card-title">Banner Image</h2>
+
+                    <input
+                        type="file"
+                        name="image"
+                        class="file-input file-input-bordered w-full rounded-full max-w-xs mb-2"
+                    />
+
+                    <p class="text-sm opacity-70">
+                        Leave blank to keep the current banner.
+                    </p>
+                </div>
+
+                <div class="divider"></div>
+
+                <p>
+                    By default, when an event is created, it is hidden from the calendar or list view.
+                    This event will be archived, not deleted, 24 hours after the published end date. This can be reverted
+                    through the event manager.
+                    Create, publish, modify, and delete positions through the Event Manager, which you will be redirected to
+                    after submission.
+                    Editing this event later on will have no impact on the Event Manager, since it only deals with
+                    positions.
+                    You can un-hide this event from the events manager among other common tasks.
+                    You will be notified of any errors in your submission after you submit the form. All changes will be
+                    saved as long as you dont leave this page or refresh.
+                </p>
+
             </div>
         </div>
 
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Event Type</div>
-            <div class="collapse-content text-sm">
-                <select name="type" class="select">
-                    <option disabled {{ old('type', $event->type?->value) ? '' : 'selected' }}>Select type</option>
-
-                    @foreach ($types as $t)
-                        <option value="{{ $t->value }}"
-                            {{ old('type', $event->type?->value) === $t->value ? 'selected' : '' }}>
-                            {{ str_replace('_', ' ', $t->name) }}
-                        </option>
-                    @endforeach
-                </select>
-            </div>
-        </div>
-
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Description</div>
-            <div class="collapse-content text-sm">
-                <textarea name="description" required class="textarea" placeholder="Event description...">{{ old('description', $event->description) }}</textarea>
-            </div>
-        </div>
-
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Banner Image</div>
-            <div class="collapse-content text-sm">
-                <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
-            </div>
-        </div>
-
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Featured Fields</div>
-            <div class="collapse-content text-sm">
-                <label class="label">Featured Fields (comma-separated)</label>
-
-                <input type="text" name="featured_fields" class="input" placeholder="KMCO, KJAX, KDAB"
-                    value="{{ old('featured_fields', isset($event) ? implode(', ', $event->featured_fields) : '') }}" />
-            </div>
-        </div>
-
-
-        <div class="collapse bg-base-100 border border-base-300">
-            <input type="radio" name="my-accordion-1" checked="checked" />
-            <div class="collapse-title font-semibold">Important Event Information</div>
-            <div class="collapse-content text-sm">
-                By default, when an event is created, it is hidden from the calendar or list view.
-                This event will be archived, not deleted, 24 hours after the published end date. This can be reverted
-                through the event manager.
-                Create, publish, modify, and delete positions through the Event Manager, which you will be redirected to
-                after submission.
-                Editing this event later on will have no impact on the Event Manager, since it only deals with
-                positions.
-                You can un-hide this event from the events manager among other common tasks.
-                You will be notified of any errors in your submission after you submit the form. All changes will be
-                saved as long as you dont leave this page or refresh.
-            </div>
-        </div>
-        <button class="btn" type="submit">Update Event</button>
+        <button class="btn btn-primary w-full mt-2" type="submit">
+            Update Event
+        </button>
     </form>
 
 @endsection
