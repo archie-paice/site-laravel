@@ -8,6 +8,7 @@ use Livewire\Component;
 class OperatingInitialsInput extends Component
 {
     public VisitorRequest $visitRequest;
+
     public ?string $operatingInitials = '';
 
     public function mount(VisitorRequest $visitRequest): void

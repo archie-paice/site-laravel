@@ -13,9 +13,9 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-Schedule::job(new SyncRoster())->everyTwoHours();
+Schedule::job(new SyncRoster)->everyTwoHours();
 
-Schedule::job(new UpdateOnlineControllers())->everyMinute();
+Schedule::job(new UpdateOnlineControllers)->everyMinute();
 
 Schedule::job(new ArchiveEvents())->everyFiveMinutes();
 Schedule::call(function () {

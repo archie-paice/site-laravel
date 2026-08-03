@@ -49,7 +49,7 @@ class UserController extends Controller
         $user = User::findOrFail($id);
         $authenticatedUser = Auth::user();
 
-        if ($authenticatedUser->id != $user->id && !$authenticatedUser->hasPermissionTo('manage users')) {
+        if ($authenticatedUser->id != $user->id && ! $authenticatedUser->hasPermissionTo('manage users')) {
             return response('Unauthorized', 403);
         }
 
@@ -65,8 +65,8 @@ class UserController extends Controller
             'operatingInitials.max' => 'Operating initials must be 2 characters long'
         ]);
 
-        if (Auth::user()->id != $id && !Auth::user()->hasPermissionTo('manage users')) {
-            return response('Unauthorized', 403 );
+        if (Auth::user()->id != $id && ! Auth::user()->hasPermissionTo('manage users')) {
+            return response('Unauthorized', 403);
         }
 
         $user = User::findOrFail($id);
@@ -97,7 +97,7 @@ class UserController extends Controller
     public function trainingAssignments(int $id) {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-assignments:read')) {
             abort(403);
         }
 
@@ -116,7 +116,7 @@ class UserController extends Controller
     public function trainingTickets(int $id) {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-tickets:read')) {
             abort(403);
         }
 
@@ -146,10 +146,11 @@ class UserController extends Controller
         ]);
     }
 
-    public function soloCerts(int $id) {
+    public function soloCerts(int $id)
+    {
         $user = User::findOrFail($id);
 
-        if (Auth::id() !== $user->id && !Auth::user()->hasRole('training')) {
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('solo-certs:read')) {
             abort(403);
         }
 

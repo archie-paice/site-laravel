@@ -22,7 +22,7 @@ class SoloCertsTableUserProfile extends Component
     public function render(): View|Closure|string
     {
         return view('components.solo-certs-table-user-profile', [
-            'soloCerts' => $this->soloCerts
+            'soloCerts' => $this->soloCerts,
         ]);
     }
 }

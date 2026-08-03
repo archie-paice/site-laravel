@@ -1,5 +1,6 @@
 <?php
 
+use MarvinLabs\DiscordLogger\Logger;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -53,9 +54,9 @@ return [
     'channels' => [
         'discord' => [
             'driver' => 'custom',
-            'via'    => MarvinLabs\DiscordLogger\Logger::class,
-            'level'  => 'debug',
-            'url'    => env('LOG_DISCORD_WEBHOOK_URL'),
+            'via' => Logger::class,
+            'level' => 'debug',
+            'url' => env('LOG_DISCORD_WEBHOOK_URL'),
             'ignore_exceptions' => env('LOG_DISCORD_IGNORE_EXCEPTIONS', false),
         ],
         'stack' => [

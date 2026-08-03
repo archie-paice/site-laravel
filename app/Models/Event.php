@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Enums\EventType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
@@ -36,7 +36,8 @@ class Event extends Model
         'archived' => 'boolean',
     ];
 
-    public function positionRequests() {
+    public function positionRequests()
+    {
         return $this->hasMany(EventPosition::class);
     }
 
@@ -49,4 +50,3 @@ class Event extends Model
 
     }
 }
-

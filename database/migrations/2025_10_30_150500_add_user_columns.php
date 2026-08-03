@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function(Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->boolean('rostered')->default(false);
             $table->integer('rating', false, false)->default(1);
             $table->string('division', 3)->nullable();
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function(Blueprint $table) {
+        Schema::table('users', function (Blueprint $table) {
             $table->dropColumn('rostered');
             $table->dropColumn('rating');
             $table->dropColumn('division');

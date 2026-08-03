@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class ControllerSession extends Model
 {
     public $timestamps = false;
+
     public $incrementing = false;
+
     protected $keyType = 'int';
 
     protected $fillable = [

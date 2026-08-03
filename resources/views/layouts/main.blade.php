@@ -72,6 +72,14 @@
                     @auth
                         <h1 class="mt-5">AUTHENTICATED USER: <strong>{{Auth::user()->id}} - {{Auth::user()->name}}</strong></h1>
                         <h1>SESSION: <strong>{{Auth::getSession()->getId()}} - {{Auth::getSession()->getName()}}</strong></h1>
+                        <span>
+                            <h1>PERMISSIONS:</h1>
+                            <p>
+                                @foreach(Auth::user()->getAllPermissions() as $perm)
+                                    {{$perm->name}} //
+                                @endforeach
+                            </p>
+                        </span>
                     @endauth
 
                     @guest

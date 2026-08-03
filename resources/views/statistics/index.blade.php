@@ -322,7 +322,10 @@
                             @foreach($stats->take(3) as $idx => $stat)
                                 <a href="{{ route('users.show', ['user' => $stat->user->id]) }}"
                                    class="no-underline text-base-content hover:bg-base-200 transition-colors p-6">
-                                    <p class="text-xl font-bold leading-snug mb-4">#{{ $idx + 1 }} &mdash; {{ $stat->user->name }} <span class="font-normal text-base-content/60">({{ $stat->user->rating->mapToString() }})</span></p>
+                                    <div class="flex items-center gap-3 mb-4">
+                                        <x-user-avatar :user="$stat->user" class="w-12 h-12" />
+                                        <p class="text-xl font-bold leading-snug">#{{ $idx + 1 }} &mdash; {{ $stat->user->name }} <span class="font-normal text-base-content/60">({{ $stat->user->rating->mapToString() }})</span></p>
+                                    </div>
                                     <p class="text-3xl font-bold">{{ number_format($stat->totalHours(), 1) }}h</p>
                                 </a>
                             @endforeach
@@ -351,9 +354,14 @@
                                     <tr>
                                         <td class="text-base-content/60 text-sm">{{ $idx + 1 }}</td>
                                         <td>
-                                            <a href="{{ route('users.show', ['user' => $stat->user->id]) }}"
-                                               class="font-medium hover:underline">{{ $stat->user->name }}</a>
-                                            <span class="text-xs text-base-content/60 ml-1">({{ $stat->user->rating->mapToString() }})</span>
+                                            <div class="flex items-center gap-2">
+                                                <x-user-avatar :user="$stat->user" class="w-8 h-8" />
+                                                <div>
+                                                    <a href="{{ route('users.show', ['user' => $stat->user->id]) }}"
+                                                       class="font-medium hover:underline">{{ $stat->user->name }}</a>
+                                                    <span class="text-xs text-base-content/60 ml-1">({{ $stat->user->rating->mapToString() }})</span>
+                                                </div>
+                                            </div>
                                         </td>
                                         <td class="text-right hidden sm:table-cell">{{ $stat->delivery_hours > 0 ? number_format($stat->delivery_hours, 1).'h' : '—' }}</td>
                                         <td class="text-right hidden sm:table-cell">{{ $stat->ground_hours > 0 ? number_format($stat->ground_hours, 1).'h' : '—' }}</td>

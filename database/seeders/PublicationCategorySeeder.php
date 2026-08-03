@@ -11,10 +11,10 @@ class PublicationCategorySeeder extends Seeder
     {
         $categories = [
             'Standard Operating Procedures' => 'Facility-wide and position-specific standard operating procedures for vZJX controllers.',
-            'Letters of Agreement'          => 'Operational agreements between vZJX and adjacent facilities governing coordination procedures.',
-            'Training Materials'            => 'Study guides, training syllabi, and reference materials for controller certification.',
-            'Quick Reference Guides'        => 'Quick reference cards and cheat sheets for use during controlling sessions.',
-            'Facility Maps & Charts'        => 'Airspace diagrams, sector maps, and facility charts for ZJX ARTCC.',
+            'Letters of Agreement' => 'Operational agreements between vZJX and adjacent facilities governing coordination procedures.',
+            'Training Materials' => 'Study guides, training syllabi, and reference materials for controller certification.',
+            'Quick Reference Guides' => 'Quick reference cards and cheat sheets for use during controlling sessions.',
+            'Facility Maps & Charts' => 'Airspace diagrams, sector maps, and facility charts for ZJX ARTCC.',
         ];
 
         $order = 0;
@@ -22,7 +22,7 @@ class PublicationCategorySeeder extends Seeder
             PublicationCategory::firstOrCreate(
                 ['title' => $title],
                 [
-                    'description'   => $description,
+                    'description' => $description,
                     'display_order' => $order,
                 ],
             );

@@ -6,16 +6,16 @@
         <table class='table table-zebra table-md w-max border-2 border-base-300'>
             <thead>
                 <tr class='text-xl font-bold'>
-                    <th colspan='4'>ZJX Roster</th>
-                    <th rowspan='1'>Certifications</th>
+                    <th colspan='3'>ZJX Roster</th>
+                    <th colspan={{ count($certificationFacilities) }}>Certifications</th>
                 </tr>
                 <tr colspan='4'>
                     <th>CID</th>
                     <th>Name</th>
                     <th>Rating</th>
-                    <th>Cert 1</th>
-                    <th>Cert 2</th>
-                    <th>Cert 3</th>
+                    @foreach($certificationFacilities as $facility)
+                        <th>{{ $facility->identifier }}</th>
+                    @endforeach
                 </tr>
             </thead>
             <tbody>
@@ -34,8 +34,20 @@
                             @endunless
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $user->rating->mapToString() }}</td>
-                        <td class='border-r-1 border-base-300'>TBD</td>
-                    </tr>
+                            @foreach($certificationFacilities as $facility)
+                                <td class='text-center'>
+                                    @php
+                                        $cert = $user->certifications->where('facility_id', $facility->id)->first();
+                                    @endphp
+
+                                    @if($cert)
+                                        <span class='badge badge-success badge-md'>{{ $cert->level->identifier }}</span>
+                                    @else
+                                        <span class='text-gray-400'>Uncertified</span>
+                                    @endif
+                                </td>
+                            @endforeach
+                        </tr>
                 @endforeach
             </tbody>
         </table>

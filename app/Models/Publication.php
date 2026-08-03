@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Support\Facades\Storage;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -40,7 +39,7 @@ class Publication extends Model
     protected function fileUrl(): Attribute
     {
         return Attribute::get(fn () => $this->file_path
-            ? Storage::disk('public')->url($this->file_path)
+            ? route('publications.file', $this)
             : null);
     }
 
