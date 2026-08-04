@@ -79,7 +79,7 @@ Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])
 
 // Users
 Route::resource('users', UserController::class, [
-    'only' => ['show', 'edit', 'update']
+    'only' => ['show', 'edit', 'update'],
 ]);
 
 Route::prefix('users/{user}')->group(function () {
@@ -139,7 +139,6 @@ Route::prefix('events')->name('events.')->group(function () {
 Route::post('/events/{event}/request-position', [EventRegistration::class, 'store'])
     ->middleware('auth')
     ->name('events.request-position.store');
-
 
 // Admin Routes
 Route::prefix('admin')->middleware('permission:view dashboard')->group(function () {
@@ -324,15 +323,15 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
                 ->name('admin.training.index');
 
             Route::resource('tickets', TrainingTicketController::class, [
-                'except' => ['show']
+                'except' => ['show'],
             ])->names('training-tickets');
 
             Route::resource('assignments', TrainingAssignmentController::class, [
-                'only' => ['update', 'edit', 'index']
+                'only' => ['update', 'edit', 'index'],
             ])->names('training-assignments');
 
             Route::resource('solo-certs', SoloCertController::class, [
-                'only' => ['index', 'create', 'update', 'destroy', 'store']
+                'only' => ['index', 'create', 'update', 'destroy', 'store'],
             ])->names('solo-certs');
 
             Route::put('assignments/claim/{assignment}',
