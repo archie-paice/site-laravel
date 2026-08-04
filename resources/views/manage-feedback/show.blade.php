@@ -10,28 +10,6 @@
 
             <div class="grow"></div>
 
-            @if ($feedback->status === \App\Enums\FeedbackStatus::STASHED)
-                <form action="{{ route('admin.feedback.unstash', [$feedback]) }}" method="POST">
-                    @method('PUT')
-                    @csrf
-                    <button type="submit" class="btn btn-warning">Unstash</button>
-                </form>
-            @elseif ($feedback->status === \App\Enums\FeedbackStatus::PENDING)
-                <form action="{{ route('admin.feedback.stash', [$feedback]) }}" method="POST">
-                    @method('PUT')
-                    @csrf
-                    <button type="submit" class="btn btn-error">Stash</button>
-                </form>
-            @endif
-
-            @unless ($feedback->status === \App\Enums\FeedbackStatus::RELEASED)
-                <form action="{{ route('admin.feedback.release', [$feedback]) }}" method="POST">
-                    @method('PUT')
-                    @csrf
-                    <button type="submit" class="btn btn-success">Release</button>
-                </form>
-            @endunless
-
             <span class="badge badge-lg
                 @if ($feedback->status === \App\Enums\FeedbackStatus::RELEASED) badge-success
                 @elseif ($feedback->status === \App\Enums\FeedbackStatus::STASHED) badge-error
@@ -96,6 +74,30 @@
                         <span class='text-error font-bold text-lg'>&cross;</span>
                     @endif
                     <span>Staff follow-up requested</span>
+                </div>
+
+                <div class="flex flex-row flex-wrap justify-end gap-2">
+                    @if ($feedback->status === \App\Enums\FeedbackStatus::STASHED)
+                        <form action="{{ route('admin.feedback.unstash', [$feedback]) }}" method="POST">
+                            @method('PUT')
+                            @csrf
+                            <button type="submit" class="btn btn-warning">Unstash</button>
+                        </form>
+                    @elseif ($feedback->status === \App\Enums\FeedbackStatus::PENDING)
+                        <form action="{{ route('admin.feedback.stash', [$feedback]) }}" method="POST">
+                            @method('PUT')
+                            @csrf
+                            <button type="submit" class="btn btn-error">Stash</button>
+                        </form>
+                    @endif
+
+                    @unless ($feedback->status === \App\Enums\FeedbackStatus::RELEASED)
+                        <form action="{{ route('admin.feedback.release', [$feedback]) }}" method="POST">
+                            @method('PUT')
+                            @csrf
+                            <button type="submit" class="btn btn-success">Release</button>
+                        </form>
+                    @endunless
                 </div>
             </div>
         </x-card-component>
