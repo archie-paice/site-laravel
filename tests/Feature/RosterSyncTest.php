@@ -1,11 +1,11 @@
 <?php
 
 use App\Jobs\SyncRoster;
+use App\Models\User;
+use Database\Seeders\PermissionSeeder;
 use Illuminate\Bus\UniqueLock;
 use Illuminate\Contracts\Broadcasting\ShouldBeUnique as BroadcastingShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldBeUnique as QueueShouldBeUnique;
-use App\Models\User;
-use Database\Seeders\PermissionSeeder;
 use Illuminate\Support\Facades\Http;
 
 test('the roster sync job is queue-unique so it cannot run twice concurrently', function () {

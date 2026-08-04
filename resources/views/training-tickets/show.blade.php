@@ -29,14 +29,13 @@
             <div id="notes" class='bg-white p-2 rounded-md min-h-50 w-full'>{!! $trainingTicket->notes !!}</div>
         </x-label-slot>
     </div>
-@endsection
 
-        <div class="mt-6">
-            <x-label-slot label="Notes">
-                <div class="bg-base-100 border border-base-300 rounded-md p-4 min-h-40 prose max-w-none">
-                    {!! $trainingTicket->notes !!}
-                </div>
-            </x-label-slot>
-        </div>
+    <div class="mt-6">
+        <x-label-slot label="Notes">
+            <div class="bg-base-100 border border-base-300 rounded-md p-4 min-h-40 prose max-w-none">
+                {!! $trainingTicket->notes !!}
+            </div>
+        </x-label-slot>
+    </div>
     </x-card-component>
 @endsection
