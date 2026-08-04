@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use App\Enums\EventType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class Event extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'title',
         'description',
         'start',
         'end',
@@ -31,8 +31,8 @@ class Event extends Model
         'presetPositions' => 'array',
     ];
 
-    public function positionRequests() {
+    public function positionRequests()
+    {
         return $this->hasMany(EventPosition::class);
     }
 }
-

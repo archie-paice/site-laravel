@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App;
+use App\Models\Staff;
 use App\Models\User;
 use DateTime;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
@@ -16,35 +16,64 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         if (App::environment('local', 'development')) {
-            $user = User::firstOrCreate([
-                'id' => 10000010
+            $admin = User::firstOrCreate([
+                'id' => 10000010,
             ], [
                 'first_name' => 'Web',
                 'last_name' => 'Ten',
                 'email' => 'web10@vatusa.net',
                 'rating' => 11,
-                'joined_at' => new DateTime(),
+                'joined_at' => new DateTime,
                 'division' => 'USA',
                 'facility' => 'ZJX',
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+            $admin->rostered = true;
+            $admin->save();
+            $admin->syncRoles(['admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core', 'rostered']);
 
-            $user = User::firstOrCreate([
+            $controller = User::firstOrCreate([
                 'id' => 10000009,
             ], [
                 'first_name' => 'Web',
                 'last_name' => 'Nine',
                 'email' => 'web09@vatusa.net',
                 'rating' => 10,
-                'joined_at' => new DateTime(),
+                'joined_at' => new DateTime,
                 'division' => 'USA',
                 'facility' => 'ZJX',
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
-        };
+            $controller->rostered = true;
+            $controller->save();
+            $controller->syncRoles(['core', 'rostered']);
+
+            $trainingAdmin = User::firstOrCreate([
+                'id' => 10000008,
+            ], [
+                'first_name' => 'Web',
+                'last_name' => 'Eight',
+                'email' => 'web08@vatusa.net',
+                'rating' => 8,
+                'joined_at' => new DateTime,
+                'division' => 'USA',
+                'facility' => 'ZJX',
+                'rostered' => true,
+            ]);
+
+            $trainingAdmin->syncRoles(['admin', 'training', 'staff', 'instructor', 'core', 'rostered']);
+
+            Staff::firstOrCreate(['title_short' => 'ATA', 'user_id' => 10000008], [
+                'title_long' => 'Training Administrator',
+                'primary_contact' => false,
+            ]);
+
+            Staff::firstOrCreate(['title_short' => 'INS', 'user_id' => 10000008], [
+                'title_long' => 'Instructor',
+                'primary_contact' => false,
+            ]);
+        }
     }
 }

@@ -9,8 +9,8 @@
             <input type="radio" name="my-accordion-1" checked="checked" />
             <div class="collapse-title font-semibold">Basic Information</div>
             <div class="collapse-content text-sm">
-                <label for="name" class="label">Event Name</label>
-                <input name="name" required type="text" placeholder="Event Name" class="input" />
+                <label for="title" class="label">Event Name</label>
+                <input name="title" required type="text" placeholder="Event Name" class="input" />
 
                 <br />
                 <label for="start" class="label">Event Start</label>
@@ -95,7 +95,7 @@
                 saved as long as you dont leave this page or refresh.
             </div>
         </div>
-        
+
         <button class="btn btn-primary" type="submit">Create Event</button>
     </form>
 

@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('staff', function (Blueprint $table) {
+            $table->id();
             $table->string('title_short');
             $table->string('title_long');
             $table->boolean('primary_contact')->default(false);

@@ -22,7 +22,7 @@ return new class extends Migration
             $table->timeStamp('end');
 
             $table->text('notes')->nullable();
-            
+
             $table->string('position_status')->default('pending');
             $table->timestamps();
 

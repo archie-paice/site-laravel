@@ -2,31 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Event;
-use Illuminate\Http\Request;
 use App\Enums\EventType;
-use App\Models\FeaturedField;
+use App\Models\Event;
 use App\Models\EventPositionPreset;
-use Illuminate\Validation\Rules\Enum;
+use App\Models\FeaturedField;
+use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Enum;
 
 class EventController extends Controller
 {
     public function manage()
     {
         $events = Event::all();
+
         return view('manage-events.index', ['events' => $events]);
     }
 
-    public function index() {
+    public function index()
+    {
         // perform some sort of calculation here to determine the next 3 upcoming events and then pass them to the view
         $events = Event::where('start', '>=', now())->orderBy('start', 'asc')->take(3)->get();
+
         return view('events.index', ['events' => $events]);
     }
 
     public function create()
     {
-        $event = new Event();
+        $event = new Event;
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
@@ -41,7 +44,7 @@ class EventController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string',
+            'title' => 'required|string',
             'description' => 'required|string',
             'start' => 'required|date',
             'end' => 'required|date',
@@ -63,7 +66,7 @@ class EventController extends Controller
         $featuredFields = array_map('trim', $featuredFields);
 
         $event = Event::create([
-            'name' => $validated['name'],
+            'title' => $validated['title'],
             'description' => $validated['description'],
             'start' => $validated['start'],
             'end' => $validated['end'],
@@ -73,10 +76,8 @@ class EventController extends Controller
             'image_url' => $validated['image_url'] ?? null,
         ]);
 
-
         return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
     }
-
 
     public function show(string $id)
     {
@@ -99,7 +100,7 @@ class EventController extends Controller
         $featuredFields = FeaturedField::pluck('name')->toArray();
 
         $validated = $request->validate([
-            'name' => 'required|string',
+            'title' => 'required|string',
             'description' => 'required|string',
             'start' => 'required|date',
             'end' => 'required|date',
@@ -119,6 +120,7 @@ class EventController extends Controller
     {
         $event = Event::find($id);
         $event->delete();
+
         return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully');
     }
 }

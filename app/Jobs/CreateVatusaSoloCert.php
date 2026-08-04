@@ -13,12 +13,13 @@ class CreateVatusaSoloCert implements ShouldQueue
     use Queueable;
 
     private readonly string $API_URL;
+
     /**
      * Create a new job instance.
      */
     public function __construct(private readonly SoloCert $soloCert)
     {
-        $this->API_URL = config('app.vatusa_api_url') . '/v2/solo';
+        $this->API_URL = config('app.vatusa_api_url').'/v2/solo';
     }
 
     /**
@@ -30,7 +31,7 @@ class CreateVatusaSoloCert implements ShouldQueue
             'apikey' => config('app.vatusa_api_key'),
             'cid' => $this->soloCert->user_id,
             'position' => $this->soloCert->position,
-            'expDate' => $this->soloCert->expires->format('Y-m-d')
+            'expDate' => $this->soloCert->expires->format('Y-m-d'),
         ]);
 
         if ($request->failed()) {

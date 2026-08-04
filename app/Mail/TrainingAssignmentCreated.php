@@ -2,9 +2,10 @@
 
 namespace App\Mail;
 
+use App\Models\TrainingAssignment;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
@@ -16,10 +17,7 @@ class TrainingAssignmentCreated extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public readonly \App\Models\TrainingAssignment $trainingAssignment)
-    {
-        
-    }
+    public function __construct(public readonly TrainingAssignment $trainingAssignment) {}
 
     /**
      * Get the message envelope.
@@ -44,7 +42,7 @@ class TrainingAssignmentCreated extends Mailable
     /**
      * Get the attachments for the message.
      *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
+     * @return array<int, Attachment>
      */
     public function attachments(): array
     {

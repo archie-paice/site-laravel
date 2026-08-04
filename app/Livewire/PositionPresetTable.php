@@ -2,16 +2,16 @@
 
 namespace App\Livewire;
 
-use App\Models\Event;
+use App\Models\EventPositionPreset;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Component;
-use App\Models\EventPositionPreset;
 
 class PositionPresetTable extends Component
 {
     private Collection $positions;
 
-    public function mount() {
+    public function mount()
+    {
         $this->positions = EventPositionPreset::all();
     }
 

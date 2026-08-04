@@ -6,34 +6,56 @@ use App\Enums\ControllerRating;
 use DateTime;
 use Exception;
 
-readonly class VatusaRosterUser {
+readonly class VatusaRosterUser
+{
     public int $cid;
+
     public string $firstName;
+
     public string $lastName;
+
     public string $email;
+
     public string $facility;
+
     public DateTime $joinedFacility;
+
     public DateTime $lastActivity;
+
     public ControllerRating $rating;
+
     public DateTime $createdAt;
+
     public DateTime $updatedAt;
-    public string|null $discordId;
+
+    public ?string $discordId;
+
     public bool $needsBasic;
+
     public bool $hasTransferOverride;
+
     public bool $isHomeController;
+
     public bool $broadcastOptIn;
+
     public bool $namePrivacy;
+
     public bool $preventStaffAssingnment;
+
     public bool $isPromotionEligible;
+
     public bool $isTransferEligible;
+
     public bool $isMentor;
+
     public bool $isSupOrIns;
+
     public DateTime $lastPromotion;
+
     public array $roles;
 
-
-
-    public function __construct(array $data) {
+    public function __construct(array $data)
+    {
         try {
             $this->cid = $data['cid'];
             $this->firstName = $data['fname'];
@@ -58,8 +80,7 @@ readonly class VatusaRosterUser {
             $this->isMentor = $data['isMentor'] || false;
             $this->isSupOrIns = $data['isSupIns'] || false;
             $this->lastPromotion = new DateTime($data['last_promotion']);
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             echo $e->getMessage();
         }
     }
