@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Events;
 
 use App\Enums\EventType;
-use App\Livewire\EventRegistrants;
 use App\Models\Event;
 use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
@@ -15,8 +14,10 @@ use Illuminate\Validation\Rules\Enum;
 
 class EventManagementController
 {
-    public function index() {
+    public function index()
+    {
         $events = Event::all();
+
         return view('events.admin', ['events' => $events]);
     }
 
@@ -61,22 +62,23 @@ class EventManagementController
         return back();
     }
 
-    public function manage(string $id) {
+    public function manage(string $id)
+    {
         $event = Event::findorFail($id);
         $registrants = EventPosition::where('event_id', $event->id)->get();
         $mostRequestedPosition = $registrants
             ->groupBy('requested_position')
-            ->map(fn($group) => $group->count())
+            ->map(fn ($group) => $group->count())
             ->sortDesc()
             ->keys()
             ->first();
 
-        return view ('events.manage', compact('event', 'registrants', 'mostRequestedPosition'));
+        return view('events.manage', compact('event', 'registrants', 'mostRequestedPosition'));
     }
 
     public function create()
     {
-        $event = new Event();
+        $event = new Event;
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
@@ -102,7 +104,7 @@ class EventManagementController
                     if ($start->diffInMinutes($end) < 60) {
                         $fail('The end time must be at least 1 hour after the start time.');
                     }
-                },],
+                }, ],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
             'presetPositions' => 'nullable|string',
@@ -112,7 +114,6 @@ class EventManagementController
         $presetName = $validated['presetPositions'] ?? null;
         $presetPositions = EventPositionPreset::where('name', $presetName)->first();
         $presetPositions = $presetPositions?->positions;
-
 
         $featuredFields = explode(', ', $validated['featured_fields']);
         $featuredFields = array_map('trim', $featuredFields);
@@ -134,7 +135,6 @@ class EventManagementController
             $event->event_image_route = 'storage/'.$path;
             $event->save();
         }
-
 
         return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
     }
@@ -164,7 +164,7 @@ class EventManagementController
                     if ($start->diffInMinutes($end) < 60) {
                         $fail('The end time must be at least 1 hour after the start time.');
                     }
-                },],
+                }, ],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'required|string',
             'presetPositions' => 'nullable|string',
@@ -173,7 +173,6 @@ class EventManagementController
 
         $featuredFields = explode(', ', $validated['featured_fields']);
         $featuredFields = array_map('trim', $featuredFields);
-
 
         $event = Event::find($id);
         $oldImagePath = $event->event_image_route;
@@ -208,6 +207,7 @@ class EventManagementController
     {
         $event = Event::find($id);
         $event->delete();
+
         return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully');
     }
 }

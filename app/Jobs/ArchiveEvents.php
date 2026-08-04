@@ -32,7 +32,7 @@ class ArchiveEvents implements ShouldQueue
                     $event->update([
                         'archived' => true,
                         'hidden' => true,
-                        'archived_at' => now()
+                        'archived_at' => now(),
                     ]);
                 }
 

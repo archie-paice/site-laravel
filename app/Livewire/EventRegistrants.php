@@ -1,28 +1,35 @@
 <?php
 
 namespace App\Livewire;
+
 use App\Models\Event;
 use App\Models\EventPosition;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Validation\ValidationException;
-
 use Livewire\Component;
 
 class EventRegistrants extends Component
 {
     public Collection $registrants;
+
     public Event $event;
+
     public array $positions = [];
+
     public array $assignments = [];
+
     public ?int $currentRegistrantId = null;
 
     // Alerts
     public bool $success = false;
+
     public bool $showPositionsPublishedAlert = false;
+
     public bool $showUnpublishedPositionsAlert = false;
+
     public bool $publishedPositions = false;
 
-    public function mount(Event $event) {
+    public function mount(Event $event)
+    {
         $this->event = $event;
         $this->registrants = EventPosition::with('user')->where('event_id', $event->id)->get();
         $this->positions = $event->presetPositions ?? [];
@@ -38,12 +45,14 @@ class EventRegistrants extends Component
         }
     }
 
-    public function dismissErrors() {
+    public function dismissErrors()
+    {
         $this->resetValidation();
         $this->currentRegistrantId = null;
     }
 
-    public function publishPositions() {
+    public function publishPositions()
+    {
         $this->event->published = true;
         $this->event->save();
 
@@ -52,14 +61,16 @@ class EventRegistrants extends Component
         $this->showPositionsPublishedAlert = true;
     }
 
-    public function unpublishPositions() {
+    public function unpublishPositions()
+    {
         $this->event->published = false;
-        $this->event->save();;
+        $this->event->save();
         $this->publishedPositions = $this->event->published;
         $this->showUnpublishedPositionsAlert = true;
     }
 
-    public function save($id) {
+    public function save($id)
+    {
         $this->currentRegistrantId = $id;
 
         $this->validate([
@@ -77,11 +88,11 @@ class EventRegistrants extends Component
             "assignments.$id.assigned_position.required" => 'Assigned position is required.',
         ]);
 
-
-
         $data = $this->assignments[$id] ?? [] ?? null;
 
-        if (!$data) return;
+        if (! $data) {
+            return;
+        }
 
         $registrant = EventPosition::findOrFail($id);
 

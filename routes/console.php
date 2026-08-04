@@ -17,7 +17,7 @@ Schedule::job(new SyncRoster)->everyTwoHours();
 
 Schedule::job(new UpdateOnlineControllers)->everyMinute();
 
-Schedule::job(new ArchiveEvents())->everyFiveMinutes();
+Schedule::job(new ArchiveEvents)->everyFiveMinutes();
 Schedule::call(function () {
     $now = Carbon::now();
     SyncStatsimSessions::dispatch($now->year, $now->month);

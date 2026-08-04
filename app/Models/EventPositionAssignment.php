@@ -2,7 +2,4 @@
 
 namespace App\Models;
 
-class EventPositionAssignment
-{
-
-}
+class EventPositionAssignment {}

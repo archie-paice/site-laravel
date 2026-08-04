@@ -54,7 +54,6 @@ class SectorMap extends Component
     {
         $this->loadFromDatabase();
 
-
     }
 
     public function render()
@@ -169,7 +168,7 @@ class SectorMap extends Component
         }
 
         if (count($this->activeSectors) >= count(self::COLORS)) {
-            $this->addError('sector', 'Cannot add more than ' . count(self::COLORS) . ' active sectors.');
+            $this->addError('sector', 'Cannot add more than '.count(self::COLORS).' active sectors.');
 
             return;
         }

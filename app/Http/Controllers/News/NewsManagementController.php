@@ -12,15 +12,19 @@ class NewsManagementController extends Controller
     public function index()
     {
         $news = News::all();
+
         return view('news.admin', ['news' => $news]);
     }
 
-    public function create() {
-        $news = new News();
+    public function create()
+    {
+        $news = new News;
+
         return view('news.create', ['news' => $news]);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validated = $request->validate([
             'title' => 'required | string',
             'content' => 'required | string | max:500',
@@ -31,7 +35,6 @@ class NewsManagementController extends Controller
             'content' => $validated['content'],
             'date' => Carbon::now(),
         ]);
-
 
     }
 }

@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Event;
 use App\Models\EventPosition;
-use Illuminate\Support\Collection;
 use Livewire\Component;
 
 class EventPositionsManagement extends Component
@@ -43,7 +42,7 @@ class EventPositionsManagement extends Component
         if ($assignedRemovedPositions->isNotEmpty()) {
             $this->addError(
                 'positions',
-                'Cannot remove assigned position(s): ' . $assignedRemovedPositions->implode(', ')
+                'Cannot remove assigned position(s): '.$assignedRemovedPositions->implode(', ')
             );
 
             $this->positions = $oldPositions->implode(', ');
@@ -52,7 +51,6 @@ class EventPositionsManagement extends Component
 
             return;
         }
-
 
         $positions = $newPositions->toArray();
 

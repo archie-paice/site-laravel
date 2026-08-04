@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Event;
 use App\Models\EventPosition;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -54,7 +55,6 @@ class EventRegistration extends Component
             ->utc()
             ->format('Y-m-d\TH:i');
 
-
         $registration = EventPosition::where('user_id', $authenticatedUser->id)
             ->where('event_id', $event->id)
             ->first();
@@ -103,8 +103,8 @@ class EventRegistration extends Component
             'end.before_or_equal' => 'The end time cannot be after the event ends.',
         ]);
 
-        $startTime = \Carbon\Carbon::parse($this->start, 'UTC');
-        $endTime = \Carbon\Carbon::parse($this->end, 'UTC');
+        $startTime = Carbon::parse($this->start, 'UTC');
+        $endTime = Carbon::parse($this->end, 'UTC');
 
         if ($startTime->diffInMinutes($endTime) < 30) {
             $this->addError(
@@ -119,8 +119,8 @@ class EventRegistration extends Component
             'user_id' => $authenticatedUser->id,
             'event_id' => $this->event->id,
             'requested_position' => $validated['selectedPosition'],
-            'start' => \Carbon\Carbon::parse($validated['start'], 'UTC'),
-            'end' => \Carbon\Carbon::parse($validated['end'], 'UTC'),
+            'start' => Carbon::parse($validated['start'], 'UTC'),
+            'end' => Carbon::parse($validated['end'], 'UTC'),
             'notes' => $validated['notes'],
         ]);
 
