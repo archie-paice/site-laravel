@@ -60,6 +60,7 @@ Route::prefix('users/{user}')->group(function () {
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
+    Route::get('registered-events', [UserController::class, 'registeredEvents'])->middleware('auth')->name('users.show.registered-events');
 });
 
 // Staff Directory
