@@ -53,7 +53,7 @@
                     <select name="experience" class="select select-bordered w-full" required>
                         <option value="" disabled @selected(old('experience') === null)>Select a rating</option>
                         @foreach ($experiences as $experience)
-                            <option value="{{ $experience }}" @selected(old('experience') === $experience)>{{ $experience }}</option>
+                            <option value="{{ $experience->value }}" @selected(old('experience') === $experience->value)>{{ $experience->value }}</option>
                         @endforeach
                     </select>
                 </label>

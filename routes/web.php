@@ -19,6 +19,7 @@ use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;

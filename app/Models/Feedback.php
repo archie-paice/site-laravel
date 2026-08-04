@@ -2,20 +2,14 @@
 
 namespace App\Models;
 
+use App\Enums\FeedbackExperience;
+use App\Enums\FeedbackStatus;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
 class Feedback extends Model
 {
     use Searchable;
-
-    public const EXPERIENCES = ['Outstanding', 'Very Good', 'Good', 'Okay', 'Poor'];
-
-    public const STATUS_PENDING = 'pending';
-
-    public const STATUS_STASHED = 'stashed';
-
-    public const STATUS_RELEASED = 'released';
 
     protected $table = 'feedback';
 
@@ -31,13 +25,17 @@ class Feedback extends Model
 
     protected $casts = [
         'staff_followup' => 'boolean',
+        'experience' => FeedbackExperience::class,
+        'status' => FeedbackStatus::class,
     ];
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function controller() {
+    public function controller()
+    {
         return $this->belongsTo(User::class, 'controller_id');
     }
 
@@ -50,8 +48,8 @@ class Feedback extends Model
             'submitter_email' => $this->user->email,
             'controller_name' => $this->controller->name,
             'position' => $this->position,
-            'experience' => $this->experience,
-            'status' => $this->status,
+            'experience' => $this->experience->value,
+            'status' => $this->status->value,
         ];
     }
 }

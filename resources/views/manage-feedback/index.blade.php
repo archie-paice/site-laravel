@@ -38,12 +38,12 @@
                         </td>
                         <td>{{ $entry->position }}</td>
                         <td>
-                            @if ($entry->status === \App\Models\Feedback::STATUS_STASHED)
-                                <span class='text-error'>Stashed</span>
-                            @elseif ($entry->status === \App\Models\Feedback::STATUS_RELEASED)
-                                <span class='text-success'>Released</span>
+                            @if ($entry->status === \App\Enums\FeedbackStatus::STASHED)
+                                <span class='text-error'>{{ $entry->status->label() }}</span>
+                            @elseif ($entry->status === \App\Enums\FeedbackStatus::RELEASED)
+                                <span class='text-success'>{{ $entry->status->label() }}</span>
                             @else
-                                {{ ucfirst($entry->status) }}
+                                {{ $entry->status->label() }}
                             @endif
                         </td>
                         <td class='text-center'>
@@ -61,7 +61,7 @@
                                         <ul class="bg-base-100 text-base-content rounded-t-none p-2 z-10">
                                             <li><a href="{{ route('admin.feedback.show', [$entry]) }}">View</a></li>
 
-                                            @if ($entry->status === \App\Models\Feedback::STATUS_STASHED)
+                                            @if ($entry->status === \App\Enums\FeedbackStatus::STASHED)
                                                 <li>
                                                     <form action="{{ route('admin.feedback.unstash', [$entry]) }}" method="POST">
                                                         @method('PUT')
@@ -69,7 +69,7 @@
                                                         <button type="submit">Unstash</button>
                                                     </form>
                                                 </li>
-                                            @elseif ($entry->status === \App\Models\Feedback::STATUS_PENDING)
+                                            @elseif ($entry->status === \App\Enums\FeedbackStatus::PENDING)
                                                 <li>
                                                     <form action="{{ route('admin.feedback.stash', [$entry]) }}" method="POST">
                                                         @method('PUT')
@@ -79,7 +79,7 @@
                                                 </li>
                                             @endif
 
-                                            @unless ($entry->status === \App\Models\Feedback::STATUS_RELEASED)
+                                            @unless ($entry->status === \App\Enums\FeedbackStatus::RELEASED)
                                                 <li>
                                                     <form action="{{ route('admin.feedback.release', [$entry]) }}" method="POST">
                                                         @method('PUT')

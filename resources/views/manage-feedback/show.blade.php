@@ -5,9 +5,39 @@
 @section('body')
     <div class="max-w-2xl">
         {{-- Manage actions --}}
-        <div class="flex flex-row gap-2 mb-5">
+        <div class="flex flex-row flex-wrap items-center gap-2 mb-5">
             <a href="{{ route('admin.feedback.index') }}" class="btn btn-ghost">&larr; Back to Feedback</a>
-            {{-- TODO: manage buttons (approve / forward to controller / delete) go here --}}
+
+            <div class="grow"></div>
+
+            @if ($feedback->status === \App\Enums\FeedbackStatus::STASHED)
+                <form action="{{ route('admin.feedback.unstash', [$feedback]) }}" method="POST">
+                    @method('PUT')
+                    @csrf
+                    <button type="submit" class="btn btn-warning">Unstash</button>
+                </form>
+            @elseif ($feedback->status === \App\Enums\FeedbackStatus::PENDING)
+                <form action="{{ route('admin.feedback.stash', [$feedback]) }}" method="POST">
+                    @method('PUT')
+                    @csrf
+                    <button type="submit" class="btn btn-error">Stash</button>
+                </form>
+            @endif
+
+            @unless ($feedback->status === \App\Enums\FeedbackStatus::RELEASED)
+                <form action="{{ route('admin.feedback.release', [$feedback]) }}" method="POST">
+                    @method('PUT')
+                    @csrf
+                    <button type="submit" class="btn btn-success">Release</button>
+                </form>
+            @endunless
+
+            <span class="badge badge-lg
+                @if ($feedback->status === \App\Enums\FeedbackStatus::RELEASED) badge-success
+                @elseif ($feedback->status === \App\Enums\FeedbackStatus::STASHED) badge-error
+                @else badge-neutral @endif">
+                {{ $feedback->status->label() }}
+            </span>
         </div>
 
         <x-card-component title="Feedback from {{ $feedback->user->name }}">
@@ -51,7 +81,7 @@
 
                 <label class="flex flex-col">
                     <span class="label-text font-semibold mb-1">Experience</span>
-                    <input type="text" class="input input-bordered w-full bg-base-300 text-base-content/60" value="{{ $feedback->experience }}" disabled>
+                    <input type="text" class="input input-bordered w-full bg-base-300 text-base-content/60" value="{{ $feedback->experience->value }}" disabled>
                 </label>
 
                 <label class="flex flex-col">

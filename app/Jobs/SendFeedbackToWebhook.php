@@ -14,10 +14,7 @@ class SendFeedbackToWebhook implements ShouldQueue
     /**
      * Create a new job instance.
      */
-    public function __construct(public Feedback $feedback)
-    {
-
-    }
+    public function __construct(public Feedback $feedback) {}
 
     /**
      * Execute the job.
@@ -40,7 +37,7 @@ class SendFeedbackToWebhook implements ShouldQueue
                         ],
                         [
                             'name' => 'Experience',
-                            'value' => $this->feedback->experience,
+                            'value' => $this->feedback->experience->value,
                             'inline' => false,
                         ],
                         [
