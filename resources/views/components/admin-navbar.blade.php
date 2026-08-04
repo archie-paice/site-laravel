@@ -34,12 +34,13 @@
                 </div>
                 <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
                     @haspermission('manage statistics prefixes')
-                        <li><a href={{ route('statistics-prefixes.index') }}>Statistics Prefixes</a></li>
+                    <li><a href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a></li>
                     @endhaspermission
 
                     @haspermission('certification-facilities:write')
                         <li><a href={{ route('certification-facilities.index') }}>Certification Facilities</a></li>
                     @endhaspermission
+                    <li><a href="{{ route('admin.publications.index') }}">Document Management</a></li>
                 </ul>
             </div>
         @endhasrole

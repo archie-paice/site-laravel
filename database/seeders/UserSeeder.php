@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         if (App::environment('local', 'development')) {
-            $user = User::firstOrCreate([
+            $admin = User::firstOrCreate([
                 'id' => 10000010,
             ], [
                 'first_name' => 'Web',
@@ -29,9 +29,11 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+            $admin->rostered = true;
+            $admin->save();
+            $admin->syncRoles(['admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core', 'rostered']);
 
-            $user = User::firstOrCreate([
+            $controller = User::firstOrCreate([
                 'id' => 10000009,
             ], [
                 'first_name' => 'Web',
@@ -44,9 +46,11 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'staff', 'training', 'events', 'facilities', 'instructor', 'core');
+            $controller->rostered = true;
+            $controller->save();
+            $controller->syncRoles(['core', 'rostered']);
 
-            $user = User::firstOrCreate([
+            $trainingAdmin = User::firstOrCreate([
                 'id' => 10000008,
             ], [
                 'first_name' => 'Web',
@@ -59,7 +63,7 @@ class UserSeeder extends Seeder
                 'rostered' => true,
             ]);
 
-            $user->assignRole('admin', 'training', 'staff', 'instructor', 'core');
+            $trainingAdmin->syncRoles(['admin', 'training', 'staff', 'instructor', 'core', 'rostered']);
 
             Staff::firstOrCreate(['title_short' => 'ATA', 'user_id' => 10000008], [
                 'title_long' => 'Training Administrator',

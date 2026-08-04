@@ -23,7 +23,7 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
     </head>
-    <body class='flex flex-col min-h-screen w-full overflow-x-hidden' data-theme='light'>
+    <body class='flex flex-col min-h-screen w-full overflow-x-hidden font-sans' data-theme='light'>
         <x-navbar/>
 
         @yield('secondary-navbar')
@@ -54,7 +54,12 @@
 
         @yield('body-nopad')
 
-        <h1 class='font-bold text-2xl ml-5 mt-5'>@yield('title')</h1>
+        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 ml-5 mt-5">
+            <h1 class='font-bold text-2xl'>@yield('title')</h1>
+            @hasSection('title-extra')
+                @yield('title-extra')
+            @endif
+        </div>
 
         <div class="p-5 flex-1">
             @yield('body')
@@ -90,6 +95,7 @@
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">GitHub</a>
                     <a class="link text-lg" href="https://vatusa.net" target="_blank">VATUSA</a>
                     <a class="link text-lg" href="https://vatsim.net" target="_blank">VATSIM</a>
+                    <a class="link text-lg" href="{{ route('contributors.index') }}">Contributors</a>
                 </div>
 
                 <p class="text-md">The content of this website was developed for the Virtual Jacksonville ARTCC (vZJX). vZJX has <strong>no affiliation</strong> to the real Jacksonville ARTCC, the Federal Aviation Administration, or any governing aviation authority, nor does vZJX intend to impersonate them in any way, shape or form. This site should never be used for purposes including flight planning, air traffic control, air traffic management, or any relavant operations</p>

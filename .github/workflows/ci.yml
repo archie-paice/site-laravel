@@ -1,0 +1,117 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  TEST_IMAGE: zjx-laravel-test:ci
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: Testing
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          build-args: |
+            INSTALL_DEV=true
+          tags: ${{ env.TEST_IMAGE }}
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Save image
+        run: docker save ${{ env.TEST_IMAGE }} -o /tmp/zjx-laravel-ci.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zjx-laravel-ci-image
+          path: /tmp/zjx-laravel-ci.tar
+          retention-days: 1
+
+  lint:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: Testing
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: zjx-laravel-ci-image
+          path: /tmp
+
+      - name: Load image
+        run: docker load -i /tmp/zjx-laravel-ci.tar
+
+      - name: Run Pint
+        run: docker run --rm ${{ env.TEST_IMAGE }} vendor/bin/pint --test
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: Testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: zjx-laravel-ci-image
+          path: /tmp
+
+      - name: Load image
+        run: docker load -i /tmp/zjx-laravel-ci.tar
+
+      - name: Start Services
+        run: |
+          docker compose -p test -f tests/docker-compose.yml up -d
+
+      - name: Show Container Status
+        run: |
+          docker compose -p test -f tests/docker-compose.yml ps
+
+      - name: Prepare SQLite Database
+        run: |
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
+            sh -c 'mkdir -p /var/www/html/storage/database && touch /var/www/html/storage/database/database.sqlite && chmod 666 /var/www/html/storage/database/database.sqlite'
+
+      - name: Generate Laravel Application Key
+        run: |
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
+            sh -c 'touch /var/www/html/.env && php artisan key:generate --force'
+
+      - name: Initialize Database
+        run: |
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
+            php artisan migrate --seed --force
+
+      - name: Execute Tests
+        run: |
+          docker compose -p test -f tests/docker-compose.yml exec -T laravel \
+            ./vendor/bin/pest
+
+      - name: Teardown
+        if: always()
+        run: |
+          docker compose -p test -f tests/docker-compose.yml down -v

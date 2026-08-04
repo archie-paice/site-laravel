@@ -3,36 +3,43 @@
 @section('title', 'Profile - '.$user->name)
 
 @section('body')
-            <div class='max-h-full w-max'>
-                <div role="tablist" class="tabs tabs-lift">
+            <div class='w-full max-w-4xl mx-auto'>
+                <div role="tablist" class="tabs tabs-lift overflow-x-auto flex-nowrap">
                     <a 
                     role="tab" 
                     href='{{ route("users.show", $user) }}' 
-                    @class(['tab', 'tab-active' => request()->routeIs('users.show')])
+                    @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show')])
                     >General Info</a>
 
-                    @if(auth()->user()?->hasRole('training'))
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.training-tickets", $user) }}' 
-                    @class(['tab', 'tab-active' => request()->routeIs('users.show.training-tickets')])
+                    @auth
+                    @php($isOwner = Auth::id() == $user->id)
+                    @if($isOwner || Auth::user()->can('training-tickets:read'))
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.training-tickets", $user) }}'
+                    @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.training-tickets')])
                     >Training Tickets</a>
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.training-assignments", $user) }}' 
-                    @class(['tab', 'tab-active' => request()->routeIs('users.show.training-assignments')])
+                    @endif
+                    @if($isOwner || Auth::user()->can('training-assignments:read'))
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.training-assignments", $user) }}'
+                    @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.training-assignments')])
                     >Training Assignments</a>
-                    <a 
-                    role="tab" 
-                    href='{{ route("users.show.solo-certs", $user) }}' 
-                    @class(['tab', 'tab-active' => request()->routeIs('users.show.solo-certs')])
+                    @endif
+                    @if($isOwner || Auth::user()->can('solo-certs:read'))
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.solo-certs", $user) }}'
+                    @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.solo-certs')])
                     >Solo Certs</a>
                     @endif
+                    @endauth
                 </div>
                 
             </div>
 
-            <div class='w-max bg-base-100 border-base-300 border-1 p-2'>
+            <div class='w-full max-w-4xl mx-auto bg-base-100 border-base-300 border p-3 sm:p-4'>
                 @yield('profile-content')
             </div>
 @endsection

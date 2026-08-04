@@ -10,11 +10,12 @@ class PermissionSeeder extends Seeder
 {
     private array $permissions = [
         'core' => ['edit own profile'],
+        'rostered' => ['create atc booking'],
         'staff' => ['view dashboard'],
-        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers', 'certifications:write'],
+        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers', 'certifications:write', 'documents:write'],
         'events' => ['manage events', 'assign event positions', 'publish events'],
-        'facilities' => ['manage statistics prefixes', 'certification-facilities:write'],
-        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs', 'training-tickets:write'],
+        'facilities' => ['manage statistics prefixes', 'certification-facilities:write', 'documents:write', 'statistics:write'],
+        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs', 'training-tickets:write', 'training-assignments:read', 'solo-certs:read'],
         'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students', 'certifications:write'],
     ];
 

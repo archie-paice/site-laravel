@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ControllerMonthlyStat;
+use App\Models\ControllerSession;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
@@ -12,8 +15,30 @@ class UserController extends Controller
     {
         $user = User::with('certifications.certificationLevel.facility')->findOrFail($id);
 
+        $now = Carbon::now();
+
+        $allStats = ControllerMonthlyStat::where('user_id', $id)->get();
+
+        $totalHours = $allStats->sum(fn ($s) => $s->totalHours());
+        $monthHours = $allStats
+            ->where('year', $now->year)
+            ->where('month', $now->month)
+            ->sum(fn ($s) => $s->totalHours());
+        $yearHours = $allStats
+            ->where('year', $now->year)
+            ->sum(fn ($s) => $s->totalHours());
+
+        $recentSessions = ControllerSession::where('user_id', $id)
+            ->orderBy('start', 'desc')
+            ->limit(10)
+            ->get();
+
         return view('users.show', [
             'user' => $user,
+            'totalHours' => $totalHours,
+            'monthHours' => $monthHours,
+            'yearHours' => $yearHours,
+            'recentSessions' => $recentSessions,
         ]);
     }
 
@@ -73,6 +98,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-assignments:read')) {
+            abort(403);
+        }
+
         if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training assignments are only available for rostered users.');
         }
@@ -89,6 +118,10 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-tickets:read')) {
+            abort(403);
+        }
+
         if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training tickets are only available for rostered users.');
         }
@@ -104,6 +137,11 @@ class UserController extends Controller
     public function soloCerts(int $id)
     {
         $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('solo-certs:read')) {
+            abort(403);
+        }
+
         if (! $user->rostered) {
             return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
         }
