@@ -39,6 +39,11 @@ class Feedback extends Model
         return $this->belongsTo(User::class, 'controller_id');
     }
 
+    public function staffComments()
+    {
+        return $this->hasMany(FeedbackComment::class)->orderBy('created_at');
+    }
+
     public function toSearchableArray(): array
     {
         return [

@@ -109,6 +109,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::put('feedback/{feedback}/stash', [FeedbackController::class, 'stash'])->name('admin.feedback.stash');
         Route::put('feedback/{feedback}/unstash', [FeedbackController::class, 'unstash'])->name('admin.feedback.unstash');
         Route::put('feedback/{feedback}/release', [FeedbackController::class, 'release'])->name('admin.feedback.release');
+        Route::post('feedback/{feedback}/comments', [FeedbackController::class, 'storeComment'])->name('admin.feedback.comments.store');
     });
 
     Route::middleware('permission:manage visiting controllers')->group(function () {

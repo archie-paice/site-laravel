@@ -58,9 +58,23 @@ class FeedbackController extends Controller
 
     public function show(Feedback $feedback)
     {
-        $feedback->load(['user', 'controller']);
+        $feedback->load(['user', 'controller', 'staffComments.user']);
 
         return view('manage-feedback.show', ['feedback' => $feedback]);
+    }
+
+    public function storeComment(Request $request, Feedback $feedback)
+    {
+        $validated = $request->validate([
+            'comment' => ['required', 'string', 'max:5000'],
+        ]);
+
+        $feedback->staffComments()->create([
+            'user_id' => $request->user()->id,
+            'comment' => $validated['comment'],
+        ]);
+
+        return redirect()->route('admin.feedback.show', [$feedback])->with('success', 'Comment posted.');
     }
 
     public function store(Request $request)
