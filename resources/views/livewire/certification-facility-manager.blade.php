@@ -25,8 +25,8 @@
                             @error('editOrder') <span class="text-error text-xs block">{{ $message }}</span> @enderror
                         </td>
                         <td class="flex gap-2">
-                            <button wire:click="updateFacility" class="btn btn-sm btn-primary">Save</button>
-                            <button wire:click="cancelEdit" class="btn btn-sm btn-ghost">Cancel</button>
+                            <button wire:key="save-{{ $facility->id }}" wire:click="updateFacility" class="btn btn-sm btn-primary">Save</button>
+                            <button wire:key="cancel-{{ $facility->id }}" wire:click="cancelEdit" class="btn btn-sm btn-ghost">Cancel</button>
                         </td>
                     @else
                         <td>
@@ -35,8 +35,9 @@
                         <td>{{ $facility->identifier }}</td>
                         <td>{{ $facility->order }}</td>
                         <td class="flex gap-2">
-                            <button wire:click="startEdit({{ $facility->id }})" class="btn btn-sm btn-accent">Edit</button>
+                            <button wire:key="edit-{{ $facility->id }}" wire:click="startEdit({{ $facility->id }})" class="btn btn-sm btn-accent">Edit</button>
                             <button
+                                wire:key="delete-{{ $facility->id }}"
                                 wire:click="deleteFacility({{ $facility->id }})"
                                 wire:confirm="Are you sure you want to delete this facility? This will delete all levels and related certifications for all users, and is irreversible."
                                 class="btn btn-sm btn-error">Delete</button>

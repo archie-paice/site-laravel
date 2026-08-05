@@ -37,5 +37,4 @@
             </div>
         </x-label-slot>
     </div>
-    </x-card-component>
 @endsection

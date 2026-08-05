@@ -9,7 +9,7 @@
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
-        @hasrole('training')
+        @if(auth()->user()?->hasRole('training'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                     <span>Training Admin</span>
@@ -19,33 +19,33 @@
                     <li><a href={{ route('training-tickets.index') }}>Training Tickets</a></li>
                     <li><a href={{ route('training-assignments.index') }}>Training Assignments</a></li>
                     <li><a href={{ route('solo-certs.index') }}>Solo Certs</a></li>
-                    @haspermission('certifications:write')
+                    @if(auth()->user()?->hasPermissionTo('certifications:write'))
                         <li><a href={{ route('certifications.index') }}>Certifications</a></li>
-                    @endhaspermission
+                    @endif
                 </ul>
             </div>
-        @endhasrole
+        @endif
 
-        @hasrole('facilities')
+        @if(auth()->user()?->hasRole('facilities'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                     <span>Data Admin</span>
                     <x-dropdown-icon/>
                 </div>
                 <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
-                    @haspermission('manage statistics prefixes')
+                    @if(auth()->user()?->hasPermissionTo('manage statistics prefixes'))
                     <li><a href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a></li>
-                    @endhaspermission
+                    @endif
 
-                    @haspermission('certification-facilities:write')
+                    @if(auth()->user()?->hasPermissionTo('certification-facilities:write'))
                         <li><a href={{ route('certification-facilities.index') }}>Certification Facilities</a></li>
-                    @endhaspermission
+                    @endif
                     <li><a href="{{ route('admin.publications.index') }}">Document Management</a></li>
                 </ul>
             </div>
-        @endhasrole
+        @endif
 
-        @hasrole('events')
+        @if(auth()->user()?->hasRole('events'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                     <span>Events Admin</span>
@@ -58,9 +58,9 @@
                     <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
                 </ul>
             </div>
-        @endhasrole
+        @endif
 
-        @hasrole('admin')
+        @if(auth()->user()?->hasRole('admin'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                     <span>Facility Admin</span>
@@ -70,7 +70,7 @@
                     <li><a href={{ route('admin.index') }}>Dashboard</a></li>
                     <li><a href={{ route('manage-users.index') }}>User Management</a></li>
                     <li>
-                        <a href={{ route('visit.manage') }}>Visitor Requests 
+                        <a href={{ route('visit.manage') }}>Visitor Requests
                             @if(VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() > 0)
                                 <span class='badge badge-primary'>{{ VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() }}</span>
                             @endif
@@ -79,6 +79,6 @@
                     <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>
-        @endhasrole
+        @endif
     </ul>
 </div>
