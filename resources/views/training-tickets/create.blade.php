@@ -96,11 +96,11 @@
 
             <label for="score" class="label">Score</label>
             <div class="rating">
-                <input type="radio" name="score" value="1" class="mask mask-star" aria-label="1 star" @selected(old('score') == 1)>
-                <input type="radio" name="score" value="2" class="mask mask-star" aria-label="2 star" @selected(old('score') == 2)>
-                <input type="radio" name="score" value="3" class="mask mask-star" aria-label="3 star" @selected(old('score') == 3)>
-                <input type="radio" name="score" value="4" class="mask mask-star" aria-label="4 star" @selected(old('score') == 4)>
-                <input type="radio" name="score" value="5" class="mask mask-star" aria-label="5 star" @selected(old('score') == 5)>
+                <input type="radio" name="score" value="1" class="mask mask-star" aria-label="1 star" @checked(old('score') == 1)>
+                <input type="radio" name="score" value="2" class="mask mask-star" aria-label="2 star" @checked(old('score') == 2)>
+                <input type="radio" name="score" value="3" class="mask mask-star" aria-label="3 star" @checked(old('score') == 3)>
+                <input type="radio" name="score" value="4" class="mask mask-star" aria-label="4 star" @checked(old('score') == 4)>
+                <input type="radio" name="score" value="5" class="mask mask-star" aria-label="5 star" @checked(old('score') == 5)>
             </div>
 
             <br>
