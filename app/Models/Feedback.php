@@ -4,12 +4,13 @@ namespace App\Models;
 
 use App\Enums\FeedbackExperience;
 use App\Enums\FeedbackStatus;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Scout\Searchable;
 
 class Feedback extends Model
 {
-    use Searchable;
+    use HasFactory, Searchable;
 
     protected $table = 'feedback';
 
