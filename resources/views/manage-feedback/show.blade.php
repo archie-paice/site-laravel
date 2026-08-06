@@ -41,7 +41,9 @@
                             </label>
 
                             <label class="flex flex-col">
-                                <span class="label-text font-semibold mb-1">Email</span>
+                                <a class="link" href="mailto:{{ $feedback->user->email }}">
+                                    <span class="label-text font-semibold mb-1">Email</span>
+                                </a>
                                 <input type="email" class="input input-bordered w-full bg-base-300 text-base-content/60" value="{{ $feedback->user->email }}" disabled>
                             </label>
                         </div>
