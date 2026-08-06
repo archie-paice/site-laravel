@@ -134,6 +134,20 @@ test('given a user with only the feedback:read permission, when stashing feedbac
     expect($feedback->fresh()->status)->toBe(FeedbackStatus::PENDING);
 });
 
+test('given a user with only the feedback:read permission, when posting a staff comment, then the request is forbidden', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo(['view dashboard', 'feedback:read']);
+
+    $feedback = Feedback::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('admin.feedback.comments.store', [$feedback]), [
+        'comment' => 'Trying to comment without write access',
+    ]);
+
+    $response->assertForbidden();
+    expect($feedback->fresh()->staffComments)->toBeEmpty();
+});
+
 test('given an admin, when searching feedback, then only matching entries are shown', function () {
     $admin = User::factory()->create();
     $admin->assignRole(['staff', 'admin']);
