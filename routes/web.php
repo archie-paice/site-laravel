@@ -30,8 +30,13 @@ use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
 use App\Livewire\EventRegistration;
+use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReceived;
+use App\Mail\FeedbackReleased;
 use App\Mail\TrainingAssignmentCreated;
 use App\Mail\Welcome;
+use App\Models\Feedback;
+use App\Models\FeedbackComment;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
@@ -221,4 +226,10 @@ if (App::environment('development', 'local')) {
 
         return new TrainingAssignmentCreated(TrainingAssignment::find(1));
     });
+
+    Route::get('/test-email/feedback-released', fn () => new FeedbackReleased(Feedback::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-comment', fn () => new FeedbackCommentPosted(FeedbackComment::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-received', fn () => new FeedbackReceived(Feedback::latest()->firstOrFail()));
 }

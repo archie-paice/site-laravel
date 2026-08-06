@@ -4,6 +4,7 @@ use App\Enums\FeedbackExperience;
 use App\Enums\FeedbackStatus;
 use App\Jobs\SendFeedbackToWebhook;
 use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReceived;
 use App\Mail\FeedbackReleased;
 use App\Models\Feedback;
 use App\Models\User;
@@ -392,4 +393,20 @@ test('given a user with feedback, when visiting the feedback page, then their fe
     $response->assertSee('A visible staff reply.');
     $response->assertDontSee('An internal staff note.');
     $response->assertDontSee('Somebody elses feedback.');
+});
+
+test('given an admin, when releasing feedback, then the controller is emailed', function () {
+    Queue::fake();
+    Mail::fake();
+
+    $admin = User::factory()->create();
+    $admin->assignRole(['staff', 'admin']);
+
+    $feedback = Feedback::factory()->create();
+
+    $this->actingAs($admin)->put(route('admin.feedback.release', [$feedback]));
+
+    Mail::assertQueued(FeedbackReceived::class, function ($mail) use ($feedback) {
+        return $mail->hasTo($feedback->controller->email) && $mail->feedback->is($feedback);
+    });
 });

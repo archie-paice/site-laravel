@@ -6,6 +6,7 @@ use App\Enums\FeedbackExperience;
 use App\Enums\FeedbackStatus;
 use App\Jobs\SendFeedbackToWebhook;
 use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReceived;
 use App\Mail\FeedbackReleased;
 use App\Models\Feedback;
 use App\Models\User;
@@ -62,6 +63,7 @@ class FeedbackController extends Controller
 
         SendFeedbackToWebhook::dispatch($feedback);
         Mail::to($feedback->user)->queue(new FeedbackReleased($feedback));
+        Mail::to($feedback->controller)->queue(new FeedbackReceived($feedback));
 
         return redirect()->route('admin.feedback.index')->with('success', 'Feedback released.');
     }
