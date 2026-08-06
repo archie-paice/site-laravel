@@ -61,6 +61,7 @@
                                         <ul class="bg-base-100 text-base-content rounded-t-none p-2 z-10">
                                             <li><a href="{{ route('admin.feedback.show', [$entry]) }}">View</a></li>
 
+                                            @haspermission('feedback:write')
                                             @if ($entry->status === \App\Enums\FeedbackStatus::STASHED)
                                                 <li>
                                                     <form action="{{ route('admin.feedback.unstash', [$entry]) }}" method="POST">
@@ -88,6 +89,7 @@
                                                     </form>
                                                 </li>
                                             @endunless
+                                            @endhaspermission
                                         </ul>
                                     </details>
                                 </li>

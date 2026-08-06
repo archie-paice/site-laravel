@@ -100,13 +100,38 @@ test('given an admin, when visiting the feedback management page, then submitted
     $response->assertSee($feedback->controller->name);
 });
 
-test('given a user without the manage feedback permission, when visiting the feedback management page, then the request is forbidden', function () {
+test('given a user without the feedback:read permission, when visiting the feedback management page, then the request is forbidden', function () {
     $user = User::factory()->create();
     $user->givePermissionTo('view dashboard');
 
     $response = $this->actingAs($user)->get(route('admin.feedback.index'));
 
     $response->assertForbidden();
+});
+
+test('given a user with only the feedback:read permission, when visiting the feedback management page, then feedback is shown without actions', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo(['view dashboard', 'feedback:read']);
+
+    $feedback = Feedback::factory()->create(['position' => 'JAX_TWR']);
+
+    $response = $this->actingAs($user)->get(route('admin.feedback.index'));
+
+    $response->assertOk();
+    $response->assertSee('JAX_TWR');
+    $response->assertDontSee('Stash');
+});
+
+test('given a user with only the feedback:read permission, when stashing feedback, then the request is forbidden', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo(['view dashboard', 'feedback:read']);
+
+    $feedback = Feedback::factory()->create();
+
+    $response = $this->actingAs($user)->put(route('admin.feedback.stash', [$feedback]));
+
+    $response->assertForbidden();
+    expect($feedback->fresh()->status)->toBe(FeedbackStatus::PENDING);
 });
 
 test('given an admin, when searching feedback, then only matching entries are shown', function () {

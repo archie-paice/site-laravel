@@ -103,9 +103,12 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     // User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
     // Feedback
-    Route::middleware('permission:manage feedback')->group(function () {
+    Route::middleware('permission:feedback:read')->group(function () {
         Route::get('feedback', [FeedbackController::class, 'manage'])->name('admin.feedback.index');
         Route::get('feedback/{feedback}', [FeedbackController::class, 'show'])->name('admin.feedback.show');
+    });
+
+    Route::middleware('permission:feedback:write')->group(function () {
         Route::put('feedback/{feedback}/stash', [FeedbackController::class, 'stash'])->name('admin.feedback.stash');
         Route::put('feedback/{feedback}/unstash', [FeedbackController::class, 'unstash'])->name('admin.feedback.unstash');
         Route::put('feedback/{feedback}/release', [FeedbackController::class, 'release'])->name('admin.feedback.release');

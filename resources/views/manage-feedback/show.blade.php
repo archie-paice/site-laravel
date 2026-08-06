@@ -78,6 +78,7 @@
                             <span>Staff follow-up requested</span>
                         </div>
 
+                        @haspermission('feedback:write')
                         <div class="flex flex-row flex-wrap justify-end gap-2">
                             @if ($feedback->status === \App\Enums\FeedbackStatus::STASHED)
                                 <form action="{{ route('admin.feedback.unstash', [$feedback]) }}" method="POST">
@@ -101,6 +102,7 @@
                                 </form>
                             @endunless
                         </div>
+                        @endhaspermission
                     </div>
                 </x-card-component>
             </div>
@@ -126,6 +128,7 @@
                         @endforelse
                     </div>
 
+                    @haspermission('feedback:write')
                     <form action="{{ route('admin.feedback.comments.store', [$feedback]) }}" method="POST" class="flex flex-col gap-y-2 mt-4">
                         @csrf
                         <textarea name="comment" rows="3" class="textarea textarea-bordered w-full resize-none"
@@ -136,6 +139,7 @@
                         @enderror
                         <span class="text-sm opacity-60">Press Enter to post &middot; Shift+Enter for a new line</span>
                     </form>
+                    @endhaspermission
                 </x-card-component>
             </div>
         </div>

@@ -40,7 +40,7 @@
             </x-card-component>
     @endrole
 
-    @haspermission('manage feedback')
+    @haspermission('feedback:read')
         <x-card-component title="Admin Quick Links">
             <a class='btn btn-primary mt-5' href="{{ route('admin.feedback.index') }}">Manage Feedback</a>
         </x-card-component>
