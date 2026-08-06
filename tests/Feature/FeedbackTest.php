@@ -3,9 +3,12 @@
 use App\Enums\FeedbackExperience;
 use App\Enums\FeedbackStatus;
 use App\Jobs\SendFeedbackToWebhook;
+use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReleased;
 use App\Models\Feedback;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
@@ -264,4 +267,129 @@ test('given an admin, when posting an empty staff comment, then a comment error 
 
     $response->assertSessionHasErrors('comment');
     expect($feedback->staffComments()->count())->toBe(0);
+});
+
+// Feedback on controller profile
+
+test('given released feedback, when visiting the controller profile, then the feedback is shown without the submitter identity', function () {
+    $feedback = Feedback::factory()->create([
+        'position' => 'JAX_TWR',
+        'comments' => 'Great service on tower frequency.',
+        'status' => FeedbackStatus::RELEASED,
+    ]);
+
+    $response = $this->get(route('users.show', [$feedback->controller_id]));
+
+    $response->assertOk();
+    $response->assertSee('Great service on tower frequency.');
+    $response->assertSee('JAX_TWR');
+    $response->assertDontSee($feedback->user->name);
+});
+
+test('given pending and stashed feedback, when visiting the controller profile, then that feedback is not shown', function () {
+    $controller = User::factory()->create();
+    Feedback::factory()->create([
+        'controller_id' => $controller->id,
+        'comments' => 'Pending feedback comment text.',
+    ]);
+    Feedback::factory()->create([
+        'controller_id' => $controller->id,
+        'comments' => 'Stashed feedback comment text.',
+        'status' => FeedbackStatus::STASHED,
+    ]);
+
+    $response = $this->get(route('users.show', [$controller->id]));
+
+    $response->assertOk();
+    $response->assertDontSee('Pending feedback comment text.');
+    $response->assertDontSee('Stashed feedback comment text.');
+});
+
+// Email notifications & user-visible comments (issue #179)
+
+test('given an admin, when releasing feedback, then the submitter is emailed', function () {
+    Queue::fake();
+    Mail::fake();
+
+    $admin = User::factory()->create();
+    $admin->assignRole(['staff', 'admin']);
+
+    $feedback = Feedback::factory()->create();
+
+    $this->actingAs($admin)->put(route('admin.feedback.release', [$feedback]));
+
+    Mail::assertQueued(FeedbackReleased::class, function ($mail) use ($feedback) {
+        return $mail->hasTo($feedback->user->email) && $mail->feedback->is($feedback);
+    });
+});
+
+test('given an admin, when posting a user-visible comment, then it is stored as visible and the submitter is emailed', function () {
+    Mail::fake();
+
+    $admin = User::factory()->create();
+    $admin->assignRole(['staff', 'admin']);
+
+    $feedback = Feedback::factory()->create();
+
+    $response = $this->actingAs($admin)->post(route('admin.feedback.comments.store', [$feedback]), [
+        'comment' => 'This will be shared with the submitter.',
+        'user_visible' => '1',
+    ]);
+
+    $response->assertRedirect(route('admin.feedback.show', [$feedback]));
+
+    $comment = $feedback->staffComments()->sole();
+    expect($comment->user_visible)->toBeTrue();
+
+    Mail::assertQueued(FeedbackCommentPosted::class, function ($mail) use ($feedback) {
+        return $mail->hasTo($feedback->user->email);
+    });
+});
+
+test('given an admin, when posting a comment without marking it visible, then it is internal and no email is sent', function () {
+    Mail::fake();
+
+    $admin = User::factory()->create();
+    $admin->assignRole(['staff', 'admin']);
+
+    $feedback = Feedback::factory()->create();
+
+    $this->actingAs($admin)->post(route('admin.feedback.comments.store', [$feedback]), [
+        'comment' => 'Internal note only.',
+    ]);
+
+    $comment = $feedback->staffComments()->sole();
+    expect($comment->user_visible)->toBeFalse();
+
+    Mail::assertNotQueued(FeedbackCommentPosted::class);
+});
+
+test('given a user with feedback, when visiting the feedback page, then their feedback and visible staff comments are shown', function () {
+    $user = User::factory()->create();
+    $staff = User::factory()->create();
+
+    $feedback = Feedback::factory()->create([
+        'user_id' => $user->id,
+        'comments' => 'My original feedback text.',
+    ]);
+    $feedback->staffComments()->create([
+        'user_id' => $staff->id,
+        'comment' => 'A visible staff reply.',
+        'user_visible' => true,
+    ]);
+    $feedback->staffComments()->create([
+        'user_id' => $staff->id,
+        'comment' => 'An internal staff note.',
+        'user_visible' => false,
+    ]);
+
+    $otherFeedback = Feedback::factory()->create(['comments' => 'Somebody elses feedback.']);
+
+    $response = $this->actingAs($user)->get(route('feedback.index'));
+
+    $response->assertOk();
+    $response->assertSee('My original feedback text.');
+    $response->assertSee('A visible staff reply.');
+    $response->assertDontSee('An internal staff note.');
+    $response->assertDontSee('Somebody elses feedback.');
 });

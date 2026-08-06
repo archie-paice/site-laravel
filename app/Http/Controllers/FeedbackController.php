@@ -5,20 +5,29 @@ namespace App\Http\Controllers;
 use App\Enums\FeedbackExperience;
 use App\Enums\FeedbackStatus;
 use App\Jobs\SendFeedbackToWebhook;
+use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReleased;
 use App\Models\Feedback;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class FeedbackController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $controllers = User::where('rostered', true)->orderBy('last_name')->get();
+
+        $myFeedback = Feedback::where('user_id', $request->user()->id)
+            ->with(['controller', 'visibleComments.user'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
         return view('feedback.index', [
             'controllers' => $controllers,
             'experiences' => FeedbackExperience::cases(),
+            'myFeedback' => $myFeedback,
         ]);
     }
 
@@ -52,6 +61,7 @@ class FeedbackController extends Controller
         $feedback->update(['status' => FeedbackStatus::RELEASED]);
 
         SendFeedbackToWebhook::dispatch($feedback);
+        Mail::to($feedback->user)->queue(new FeedbackReleased($feedback));
 
         return redirect()->route('admin.feedback.index')->with('success', 'Feedback released.');
     }
@@ -67,12 +77,18 @@ class FeedbackController extends Controller
     {
         $validated = $request->validate([
             'comment' => ['required', 'string', 'max:5000'],
+            'user_visible' => ['nullable', 'boolean'],
         ]);
 
-        $feedback->staffComments()->create([
+        $comment = $feedback->staffComments()->create([
             'user_id' => $request->user()->id,
             'comment' => $validated['comment'],
+            'user_visible' => $request->boolean('user_visible'),
         ]);
+
+        if ($comment->user_visible) {
+            Mail::to($feedback->user)->queue(new FeedbackCommentPosted($comment));
+        }
 
         return redirect()->route('admin.feedback.show', [$feedback])->with('success', 'Comment posted.');
     }

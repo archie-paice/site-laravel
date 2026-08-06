@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\FeedbackStatus;
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
+use App\Models\Feedback;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -32,12 +34,18 @@ class UserController extends Controller
             ->limit(10)
             ->get();
 
+        $releasedFeedback = Feedback::where('controller_id', $id)
+            ->where('status', FeedbackStatus::RELEASED)
+            ->orderBy('created_at', 'desc')
+            ->paginate(5);
+
         return view('users.show', [
             'user' => $user,
             'totalHours' => $totalHours,
             'monthHours' => $monthHours,
             'yearHours' => $yearHours,
             'recentSessions' => $recentSessions,
+            'releasedFeedback' => $releasedFeedback,
         ]);
     }
 
