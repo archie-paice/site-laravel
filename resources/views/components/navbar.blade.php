@@ -79,8 +79,11 @@
 
                     @hasrole('admin')
                         <li><a href={{ route('admin.index') }}>Admin</a></li>
-                        <li><a href="{{ route('admin.feedback.index') }}">Feedback Management</a></li>
                     @endhasrole
+
+                    @haspermission('manage feedback')
+                        <li><a href="{{ route('admin.feedback.index') }}">Feedback Management</a></li>
+                    @endhaspermission
                 </ul>
             </div>
         @endhasrole

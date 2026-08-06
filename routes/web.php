@@ -103,7 +103,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     // User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
     // Feedback
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('permission:manage feedback')->group(function () {
         Route::get('feedback', [FeedbackController::class, 'manage'])->name('admin.feedback.index');
         Route::get('feedback/{feedback}', [FeedbackController::class, 'show'])->name('admin.feedback.show');
         Route::put('feedback/{feedback}/stash', [FeedbackController::class, 'stash'])->name('admin.feedback.stash');
@@ -121,7 +121,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     });
 
     // Contributors
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('permission:manage contributors')->group(function () {
         Route::get('contributors', [ManualContributorController::class, 'index'])->name('admin.contributors.index');
         Route::post('contributors', [ManualContributorController::class, 'store'])->name('admin.contributors.store');
         Route::delete('contributors/{contributor}', [ManualContributorController::class, 'destroy'])->name('admin.contributors.destroy');

@@ -19,11 +19,11 @@
             </x-card-component>
         @endrole
 
-        @role('admin')
+        @haspermission('manage contributors')
         <x-card-component title="Web Quick Links">
             <a class='btn btn-primary mt-5' href="{{ route('admin.contributors.index') }}">Manage Contributors</a>
         </x-card-component>
-    @endrole
+    @endhaspermission
 
     @role('facilities')
             <x-card-component title="Facilities Quick Links">
@@ -40,11 +40,11 @@
             </x-card-component>
     @endrole
 
-    @role('admin')
+    @haspermission('manage feedback')
         <x-card-component title="Admin Quick Links">
             <a class='btn btn-primary mt-5' href="{{ route('admin.feedback.index') }}">Manage Feedback</a>
         </x-card-component>
-    @endrole
+    @endhaspermission
 
     @haspermission('statistics:write')
         <x-card-component title="Manual Statistics Sync">

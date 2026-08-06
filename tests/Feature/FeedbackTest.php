@@ -100,11 +100,11 @@ test('given an admin, when visiting the feedback management page, then submitted
     $response->assertSee($feedback->controller->name);
 });
 
-test('given a staff member without the admin role, when visiting the feedback management page, then the request is forbidden', function () {
-    $staff = User::factory()->create();
-    $staff->assignRole('staff');
+test('given a user without the manage feedback permission, when visiting the feedback management page, then the request is forbidden', function () {
+    $user = User::factory()->create();
+    $user->givePermissionTo('view dashboard');
 
-    $response = $this->actingAs($staff)->get(route('admin.feedback.index'));
+    $response = $this->actingAs($user)->get(route('admin.feedback.index'));
 
     $response->assertForbidden();
 });
