@@ -8,7 +8,7 @@ use Illuminate\Support\Carbon;
 
 class StatsSyncSeeder extends Seeder
 {
-    private const BACKFILL_MONTHS = 12;
+    private const BACKFILL_MONTHS = 1;
 
     public function run(): void
     {
