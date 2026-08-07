@@ -83,14 +83,17 @@
                     </div>
 
                     <div class="flex-1">
-                        <h2 class="card-title">Featured Fields</h2>
+                        @php
+                            $featuredFieldItems = old('featured_fields') !== null
+                                ? array_values(array_filter(array_map('trim', explode(',', old('featured_fields'))), 'strlen'))
+                                : ($event->featured_fields ?? []);
+                        @endphp
 
-                        <input
-                            type="text"
+                        <x-list-editor
                             name="featured_fields"
-                            class="input input-bordered w-full"
-                            placeholder="KMCO, KJAX, KDAB"
-                            value="{{ old('featured_fields', implode(', ', $event->featured_fields ?? [])) }}"
+                            label="Featured Fields"
+                            placeholder="Eg. KMCO"
+                            :items="$featuredFieldItems"
                         />
                     </div>
                 </div>

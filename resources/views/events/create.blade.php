@@ -77,15 +77,11 @@
                         </div>
 
                         <div class="flex-1">
-                            <h2 class="card-title">Featured Fields</h2>
-
-                            <input
+                            <x-list-editor
                                 name="featured_fields"
-                                type="text"
-                                required
-                                placeholder="Eg. KMCO, KJAX, KDAB, KORL"
-                                class="input input-bordered w-full"
-                                value="{{ old('featured_fields') }}"
+                                label="Featured Fields"
+                                placeholder="Eg. KMCO"
+                                :items="array_values(array_filter(array_map('trim', explode(',', old('featured_fields', ''))), 'strlen'))"
                             />
                         </div>
                     </div>
