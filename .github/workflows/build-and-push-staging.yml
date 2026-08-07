@@ -1,4 +1,4 @@
-name: Build and Push to GHCR (Staging)
+name: Build, Push to GHCR; Deploy (Staging)
 
 on:
   push:
