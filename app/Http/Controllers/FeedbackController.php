@@ -59,7 +59,17 @@ class FeedbackController extends Controller
 
     public function release(Feedback $feedback)
     {
-        $feedback->update(['status' => FeedbackStatus::RELEASED]);
+        // Conditional update so concurrent submits can't both win the race and
+        // double-send the webhook and emails.
+        $claimed = Feedback::whereKey($feedback->getKey())
+            ->where('status', '!=', FeedbackStatus::RELEASED)
+            ->update(['status' => FeedbackStatus::RELEASED]);
+
+        if ($claimed === 0) {
+            return redirect()->route('admin.feedback.index')->with('error', 'That feedback has already been released.');
+        }
+
+        $feedback->refresh();
 
         SendFeedbackToWebhook::dispatch($feedback);
         Mail::to($feedback->user)->queue(new FeedbackReleased($feedback));
@@ -97,6 +107,10 @@ class FeedbackController extends Controller
 
     public function store(Request $request)
     {
+        if ($request->user()->hasRole('rostered')) {
+            abort(403, 'Rostered controllers cannot submit feedback.');
+        }
+
         $validated = $request->validate([
             'controller_id' => ['required', Rule::exists('users', 'id')->where('rostered', true)],
             'position' => ['required', 'string', 'max:255'],

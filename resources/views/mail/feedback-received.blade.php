@@ -9,7 +9,7 @@
 
     <p style="background-color: #F3F4F6; padding: 16px; border-radius: 0.25rem; white-space: pre-line;">{{ $feedback->comments }}</p>
 
-    <p>You can view all of your released feedback on <a style='color: blue; text-decoration: underline;' href="{{ route('users.show', [$feedback->controller_id]) }}">your profile</a>.</p>
+    <p>You can view all of your released feedback on <a style='color: blue; text-decoration: underline;' href="{{ route('users.show.feedback', [$feedback->controller_id]) }}">your profile</a>.</p>
 
     <p>Keep up the great work!</p>
-@endsection
+@endsection2

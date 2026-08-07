@@ -5,6 +5,9 @@
 @section('body')
     <div class="max-w-2xl">
         <x-card-component title="Submit Feedback">
+            @hasrole('rostered')
+            <p class="text-lg mt-2">Rostered controllers cannot submit feedback.</p>
+            @else
             <p class="text-lg mb-4">Had a session with one of our controllers? Let us know how it went.</p>
 
             <form action="{{ route('feedback.store') }}" method="POST" class="flex flex-col gap-y-4">
@@ -71,6 +74,7 @@
 
                 <button type="submit" class="btn btn-primary w-max">Submit Feedback</button>
             </form>
+            @endhasrole
         </x-card-component>
 
         @unless ($myFeedback->isEmpty())

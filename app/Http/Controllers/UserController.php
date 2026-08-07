@@ -34,18 +34,12 @@ class UserController extends Controller
             ->limit(10)
             ->get();
 
-        $releasedFeedback = Feedback::where('controller_id', $id)
-            ->where('status', FeedbackStatus::RELEASED)
-            ->orderBy('created_at', 'desc')
-            ->paginate(5);
-
         return view('users.show', [
             'user' => $user,
             'totalHours' => $totalHours,
             'monthHours' => $monthHours,
             'yearHours' => $yearHours,
             'recentSessions' => $recentSessions,
-            'releasedFeedback' => $releasedFeedback,
         ]);
     }
 
@@ -118,6 +112,25 @@ class UserController extends Controller
         return view('users.training-assignments', [
             'user' => $user,
             'trainingAssignments' => $trainingAssignments,
+        ]);
+    }
+
+    public function feedback(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('feedback:read')) {
+            abort(403);
+        }
+
+        $releasedFeedback = Feedback::where('controller_id', $id)
+            ->where('status', FeedbackStatus::RELEASED)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('users.feedback', [
+            'user' => $user,
+            'releasedFeedback' => $releasedFeedback,
         ]);
     }
 
