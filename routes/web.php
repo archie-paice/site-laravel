@@ -30,8 +30,13 @@ use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
 use App\Livewire\EventRegistration;
+use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReceived;
+use App\Mail\FeedbackReleased;
 use App\Mail\TrainingAssignmentCreated;
 use App\Mail\Welcome;
+use App\Models\Feedback;
+use App\Models\FeedbackComment;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
@@ -65,6 +70,7 @@ Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth
 Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
 Route::prefix('users/{user}')->group(function () {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
+    Route::get('feedback', [UserController::class, 'feedback'])->middleware('auth')->name('users.show.feedback');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
@@ -221,4 +227,10 @@ if (App::environment('development', 'local')) {
 
         return new TrainingAssignmentCreated(TrainingAssignment::find(1));
     });
+
+    Route::get('/test-email/feedback-released', fn () => new FeedbackReleased(Feedback::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-comment', fn () => new FeedbackCommentPosted(FeedbackComment::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-received', fn () => new FeedbackReceived(Feedback::latest()->firstOrFail()));
 }

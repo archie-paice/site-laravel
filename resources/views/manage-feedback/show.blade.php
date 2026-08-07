@@ -122,6 +122,9 @@
                                     <a href="{{ route('users.show', [$comment->user_id]) }}" class="font-semibold link link-hover">
                                         {{ $comment->user->name }} - {{ $comment->user_id }}
                                     </a>
+                                    @if ($comment->user_visible)
+                                        <span class="badge badge-info badge-sm">Visible to submitter</span>
+                                    @endif
                                 </div>
                                 <p class="mt-1 whitespace-pre-line">{{ $comment->comment }}</p>
                             </div>
@@ -139,6 +142,10 @@
                         @error('comment')
                             <span class="text-error text-sm">{{ $message }}</span>
                         @enderror
+                        <label class="flex items-center gap-x-2 cursor-pointer w-max">
+                            <input type="checkbox" name="user_visible" value="1" class="checkbox checkbox-sm" @checked(old('user_visible'))>
+                            <span class="text-sm">Visible to submitter (sends an email notification)</span>
+                        </label>
                         <span class="text-sm opacity-60">Press Enter to post &middot; Shift+Enter for a new line</span>
                     </form>
                     @endhaspermission
