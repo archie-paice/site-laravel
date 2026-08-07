@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
+use App\Models\News;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -152,6 +153,38 @@ test('assignments cannot be saved onto a registrant from another event', functio
     )->toThrow(ModelNotFoundException::class);
 
     expect($foreign->fresh()->assigned_position)->toBeNull();
+});
+
+test('the pages touched by the events work all render', function () {
+    $staff = makeEventsStaff();
+    $staff->assignRole('admin');
+    $this->actingAs($staff);
+
+    FeaturedField::create(['name' => 'KJAX']);
+    News::create(['title' => 'Smoke News', 'content' => 'hello', 'published_at' => now()]);
+
+    $event = makeEvent(['featured_fields' => ['KJAX']]);
+
+    EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => $staff->id,
+        'requested_position' => 'JAX_CTR',
+        'start' => $event->start,
+        'end' => $event->end,
+    ]);
+
+    $this->get(route('home'))->assertOk();
+    $this->get(route('events.index'))->assertOk();
+    $this->get(route('events.show', ['event' => $event->id]))->assertOk();
+    $this->get(route('admin.events.index'))->assertOk();
+    $this->get(route('admin.events.manage', ['event' => $event->id]))->assertOk();
+    $this->get(route('admin.events.edit', ['event' => $event->id]))->assertOk();
+    $this->get(route('admin.events.create'))->assertOk();
+    $this->get(route('admin.events.event-fields.index'))->assertOk();
+    $this->get(route('admin.events.position-presets.index'))->assertOk();
+    $this->get(route('admin.news.index'))->assertOk();
+    $this->get(route('admin.news.create'))->assertOk();
+    $this->get(route('users.show.registered-events', $staff))->assertOk();
 });
 
 test('the assignment form is seeded from the saved assignment', function () {
