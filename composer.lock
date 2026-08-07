@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a51997d1ac6d495414555d603988dfeb",
+    "content-hash": "34a7c33148701daec4c8f329e7b01948",
     "packages": [
         {
             "name": "asantibanez/livewire-calendar",
@@ -11075,7 +11075,7 @@
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
-        "php": "^8.2"
+        "php": "^8.2|^8.4"
     },
     "platform-dev": {},
     "plugin-api-version": "2.9.0"
