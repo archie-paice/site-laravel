@@ -1,4 +1,4 @@
-name: Build and Push to GHCR (Production)
+name: Build, Push to GHCR; Deploy (Production)
 
 on:
   push:
