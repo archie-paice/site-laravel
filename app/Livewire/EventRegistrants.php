@@ -2,9 +2,11 @@
 
 namespace App\Livewire;
 
+use App\Mail\EventPositionAssigned;
 use App\Models\Event;
 use App\Models\EventPosition;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class EventRegistrants extends Component
@@ -69,6 +71,21 @@ class EventRegistrants extends Component
 
         $this->publishedPositions = $this->event->published;
 
+        // Notify every assigned registrant who hasn't been told about their
+        // current assignment yet — never everyone again on a repeat publish.
+        $toNotify = EventPosition::with('user')
+            ->where('event_id', $this->event->id)
+            ->whereNotNull('assigned_position')
+            ->whereNull('notified_at')
+            ->get();
+
+        foreach ($toNotify as $registrant) {
+            $registrant->notified_at = now();
+            $registrant->save();
+
+            Mail::to($registrant->user->email)->queue(new EventPositionAssigned($registrant));
+        }
+
         $this->showPositionsPublishedAlert = true;
     }
 
@@ -85,6 +102,10 @@ class EventRegistrants extends Component
     public function save($id)
     {
         $this->authorizePermission('assign event positions');
+
+        // Livewire component state can persist across requests within the same
+        // page session, so re-check the current published value from the DB.
+        $this->event->refresh();
 
         $this->currentRegistrantId = $id;
 
@@ -118,7 +139,21 @@ class EventRegistrants extends Component
         $registrant->assigned_position = $data['assigned_position'] ?? null;
         $registrant->position_status = 'assigned';
 
+        $wasChanged = $registrant->isDirty(['assigned_start', 'assigned_end', 'assigned_position']);
+
+        if ($this->event->published && $wasChanged) {
+            $registrant->notified_at = now();
+        } elseif (! $this->event->published && $wasChanged) {
+            // Changed while unpublished — any prior notification is stale, so
+            // clear it and let the next publishPositions() call re-notify.
+            $registrant->notified_at = null;
+        }
+
         $registrant->save();
+
+        if ($this->event->published && $wasChanged) {
+            Mail::to($registrant->user->email)->queue(new EventPositionAssigned($registrant, isUpdate: true));
+        }
 
         $this->success = true;
     }
