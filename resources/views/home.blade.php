@@ -63,19 +63,25 @@
 
                     <div class="py-3">
                         <h3 class="font-bold text-primary">
-                            Become a Member
+                            <a href="{{ route('events.index') }}">
+                                <i class="fa-regular fa-calendar"></i> View Events
+                            </a>
                         </h3>
                     </div>
 
                     <div class="py-3">
                         <h3 class="font-bold text-primary">
-                            View Events
+                            <a href="{{ route('roster.index') }}">
+                                <i class="fa-solid fa-users"></i> Controller Roster
+                            </a>
                         </h3>
                     </div>
 
                     <div class="py-3">
                         <h3 class="font-bold text-primary">
-                            Read FAQs
+                            <a href="{{ route('publications.index') }}">
+                                <i class="fa-regular fa-file-lines"></i> Publications &amp; Downloads
+                            </a>
                         </h3>
                     </div>
                 </div>
@@ -193,6 +199,12 @@
                 @else
                     <h1 class="text-lg">No controllers online.</h1>
                 @endunless
+            </x-card-component-2>
+
+            <x-card-component-2 title="Controller Schedule">
+                <livewire:controller-schedule/>
+
+                <x-atc-booking-form/>
             </x-card-component-2>
         </aside>
 

@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('event_positions', function (Blueprint $table) {
-            $table->timestamp('assigned_start');
-            $table->timestamp('assigned_end');
+            $table->timestamp('assigned_start')->nullable();
+            $table->timestamp('assigned_end')->nullable();
         });
     }
 
@@ -23,7 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('event_positions', function (Blueprint $table) {
-            //
+            $table->dropColumn(['assigned_start', 'assigned_end']);
         });
     }
 };

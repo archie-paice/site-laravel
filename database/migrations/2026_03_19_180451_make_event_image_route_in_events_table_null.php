@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('evens', function (Blueprint $table) {
-            //
+        Schema::table('events', function (Blueprint $table) {
+            $table->string('event_image_route')->nullable(false)->change();
         });
     }
 };

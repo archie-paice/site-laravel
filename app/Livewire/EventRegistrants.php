@@ -34,7 +34,7 @@ class EventRegistrants extends Component
         $this->registrants = EventPosition::with('user')->where('event_id', $event->id)->get();
         $this->positions = $event->presetPositions ?? [];
 
-        $this->publishedPositions = $this->event->published;
+        $this->publishedPositions = (bool) $this->event->published;
 
         foreach ($this->registrants as $registrant) {
             $this->assignments[$registrant->id] = [
@@ -51,8 +51,19 @@ class EventRegistrants extends Component
         $this->currentRegistrantId = null;
     }
 
+    /**
+     * Livewire's update endpoint does not inherit the mounting page's route
+     * middleware, so every mutator below has to re-check the permission itself.
+     */
+    private function authorizeManagement(): void
+    {
+        abort_unless(auth()->user()?->hasPermissionTo('assign event positions'), 403);
+    }
+
     public function publishPositions()
     {
+        $this->authorizeManagement();
+
         $this->event->published = true;
         $this->event->save();
 
@@ -63,6 +74,8 @@ class EventRegistrants extends Component
 
     public function unpublishPositions()
     {
+        $this->authorizeManagement();
+
         $this->event->published = false;
         $this->event->save();
         $this->publishedPositions = $this->event->published;
@@ -71,6 +84,8 @@ class EventRegistrants extends Component
 
     public function save($id)
     {
+        $this->authorizeManagement();
+
         $this->currentRegistrantId = $id;
 
         $this->validate([
@@ -88,13 +103,15 @@ class EventRegistrants extends Component
             "assignments.$id.assigned_position.required" => 'Assigned position is required.',
         ]);
 
-        $data = $this->assignments[$id] ?? [] ?? null;
+        $data = $this->assignments[$id] ?? [];
 
         if (! $data) {
             return;
         }
 
-        $registrant = EventPosition::findOrFail($id);
+        // $id arrives from the client, so scope the lookup to this event rather
+        // than letting one event's manage page write another event's assignments.
+        $registrant = EventPosition::where('event_id', $this->event->id)->findOrFail($id);
 
         $registrant->assigned_start = $data['assigned_start'] ?? null;
         $registrant->assigned_end = $data['assigned_end'] ?? null;

@@ -21,6 +21,7 @@ class Event extends Model
         'presetPositions',
         'event_image_route',
         'positions_locked',
+        'published',
         'archived',
         'archived_at',
     ];
@@ -32,8 +33,10 @@ class Event extends Model
         'featured_fields' => 'array',
         'hidden' => 'boolean',
         'positions_locked' => 'boolean',
+        'published' => 'boolean',
         'presetPositions' => 'array',
         'archived' => 'boolean',
+        'archived_at' => 'datetime',
     ];
 
     public function positionRequests()

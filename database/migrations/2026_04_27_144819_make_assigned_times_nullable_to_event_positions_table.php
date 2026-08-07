@@ -23,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('event_positions', function (Blueprint $table) {
-            //
+            $table->timestamp('assigned_start')->nullable(false)->change();
+            $table->timestamp('assigned_end')->nullable(false)->change();
         });
     }
 };

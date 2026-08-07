@@ -52,7 +52,6 @@
                     <li><a href={{ route('admin.events.index') }}>Events</a></li>
                     <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
                     <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
-                    <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
                 </ul>
             </div>
         @endhasrole

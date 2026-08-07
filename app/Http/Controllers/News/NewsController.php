@@ -10,7 +10,9 @@ class NewsController extends Controller
 {
     public function index()
     {
-        $news = News::where('published_at', '<=', now())->orderBy('published_at', 'desc')->take(3)->get();
+        // The management list shows every announcement, including ones scheduled
+        // ahead of now — unlike the homepage, which only surfaces published ones.
+        $news = News::orderBy('published_at', 'desc')->paginate(25);
 
         return view('news.admin.index', ['news' => $news]);
     }
@@ -18,13 +20,6 @@ class NewsController extends Controller
     public function create()
     {
         return view('news.admin.create');
-    }
-
-    public function show(string $id)
-    {
-        $news = News::findOrFail($id);
-
-        return view('news.show', ['news' => $news]);
     }
 
     public function store(Request $request)

@@ -23,6 +23,10 @@ class EventPositionsManagement extends Component
 
     public function save()
     {
+        // Livewire's update endpoint does not inherit the mounting page's route
+        // middleware, so mutators have to re-check the permission themselves.
+        abort_unless(auth()->user()?->hasPermissionTo('manage events'), 403);
+
         $newPositions = collect(explode(',', $this->positions))
             ->map(fn ($position) => strtoupper(trim($position)))
             ->filter()

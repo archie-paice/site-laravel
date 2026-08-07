@@ -76,11 +76,11 @@
         @endif
     @unless (sizeof($registrants) == 0)
         <div class="overflow-x-auto">
-            <table x-data='$registrants' class='table table-zebra table-md w-max border-2 border-base-300'>
+            <table class='table table-zebra table-md w-max border-2 border-base-300'>
                 <thead>
                 <tr class='text-xl font-bold'>
-                    <th colspan>Registrants</th>
-                    <th colspan>
+                    <th colspan='4'>Registrants</th>
+                    <th colspan='5'>
                         @if(!$publishedPositions)
                             <button wire:click="publishPositions" type="button" class="btn btn-primary">
                                 Publish Positions
@@ -93,7 +93,7 @@
 
                     </th>
                 </tr>
-                <tr colspan='4'>
+                <tr>
                     <th>Name</th>
                     <th>Position Requested</th>
                     <th>Requested Start (UTC)</th>
@@ -155,6 +155,7 @@
                                 Save Position
                             </button>
                         </td>
+                    </tr>
                 @endforeach
                 </tbody>
             </table>

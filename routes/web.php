@@ -355,6 +355,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
             )->name('admin.event.positions-locked');
 
             Route::resource('event-fields', EventFieldController::class)
+                ->only(['index', 'store', 'destroy'])
+                ->parameters(['event-fields' => 'eventField'])
                 ->names('admin.events.event-fields');
 
             Route::resource('position-presets', EventPositionPresetController::class)
