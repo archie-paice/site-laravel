@@ -4,7 +4,6 @@ use App\Enums\EventType;
 use App\Livewire\EventRegistrants;
 use App\Models\Event;
 use App\Models\EventPosition;
-use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
 use App\Models\News;
 use App\Models\User;
@@ -108,27 +107,6 @@ test('the edit form keeps the events existing start time', function () {
         ->assertSee($event->start->format('Y-m-d\TH:i'));
 });
 
-test('a position preset can be applied after the event is created', function () {
-    $this->actingAs(makeEventsStaff());
-
-    $event = makeEvent();
-    $preset = EventPositionPreset::create([
-        'name' => 'Full Staffing',
-        'positions' => ['JAX_CTR', 'MCO_APP'],
-    ]);
-
-    $this->put(route('admin.events.update', ['event' => $event->id]), [
-        'title' => $event->title,
-        'description' => $event->description,
-        'start' => $event->start->toDateTimeString(),
-        'end' => $event->end->toDateTimeString(),
-        'type' => EventType::HOME->value,
-        'presetPositions' => $preset->name,
-    ])->assertRedirect(route('admin.events.index'));
-
-    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
-});
-
 test('assignments cannot be saved onto a registrant from another event', function () {
     $this->actingAs(makeEventsStaff());
 
@@ -201,53 +179,6 @@ test('a hidden event is not reachable by direct link', function () {
     $this->actingAs(makeEventsStaff())
         ->get(route('events.show', ['event' => $event->id]))
         ->assertOk();
-});
-
-test('an unknown preset name is rejected instead of clearing the positions', function () {
-    $this->actingAs(makeEventsStaff());
-
-    $event = makeEvent();
-    $event->update(['presetPositions' => ['JAX_CTR']]);
-
-    $this->put(route('admin.events.update', ['event' => $event->id]), [
-        'title' => $event->title,
-        'description' => $event->description,
-        'start' => $event->start->toDateTimeString(),
-        'end' => $event->end->toDateTimeString(),
-        'type' => EventType::HOME->value,
-        'presetPositions' => 'Does Not Exist',
-    ])->assertSessionHasErrors('presetPositions');
-
-    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR']);
-});
-
-test('a preset cannot drop a position someone is already assigned to', function () {
-    $this->actingAs(makeEventsStaff());
-
-    $event = makeEvent();
-    $event->update(['presetPositions' => ['JAX_CTR', 'MCO_APP']]);
-
-    EventPosition::create([
-        'event_id' => $event->id,
-        'user_id' => User::factory()->create()->id,
-        'requested_position' => 'MCO_APP',
-        'assigned_position' => 'MCO_APP',
-        'start' => $event->start,
-        'end' => $event->end,
-    ]);
-
-    EventPositionPreset::create(['name' => 'Center Only', 'positions' => ['JAX_CTR']]);
-
-    $this->put(route('admin.events.update', ['event' => $event->id]), [
-        'title' => $event->title,
-        'description' => $event->description,
-        'start' => $event->start->toDateTimeString(),
-        'end' => $event->end->toDateTimeString(),
-        'type' => EventType::HOME->value,
-        'presetPositions' => 'Center Only',
-    ])->assertSessionHas('error');
-
-    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
 });
 
 test('an event field in use cannot be deleted', function () {

@@ -54,4 +54,13 @@ class Event extends Model
         return $this->start?->utc()->format('H:i:s').'z - '.$this->end?->utc()->format('H:i:s').'z';
 
     }
+
+    /**
+     * True only in the 24 hours before an event starts — deliberately not true
+     * once the event is already underway.
+     */
+    public function isStartingSoon(): bool
+    {
+        return $this->start !== null && $this->start->between(now(), now()->addHours(24));
+    }
 }

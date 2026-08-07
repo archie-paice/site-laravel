@@ -96,10 +96,12 @@
             </div>
             <div class="flex flex-col">
 
-                <div class="w-full pt-5">
-                    @livewire('event-positions-management', ['event' => $event])
-                </div>
-                <div class="pt-20">
+                <p class="pt-5">
+                    To add, remove, or load a preset for this event's positions, use the
+                    <a href="{{ route('admin.events.edit', $event) }}" class="link link-primary">event edit page</a>.
+                </p>
+
+                <div class="pt-10">
                     @livewire('event-registrants', ['event' => $event])
                 </div>
             </div>

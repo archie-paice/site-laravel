@@ -1,24 +1,44 @@
-<form wire:submit.prevent="save">
-    <div class="collapse bg-base-100 border border-base-300">
-        <input type="radio" name="my-accordion-1" checked="checked" />
+<div class="card bg-base-100 border border-base-300 w-full">
+    <div class="card-body">
+        <h2 class="card-title">Positions</h2>
 
-        <div class="collapse-title font-semibold">
-            Positions
+        <div class="flex flex-wrap items-end gap-3">
+            <div class="flex-1 min-w-48">
+                <label class="label">Load from a preset</label>
+                <select wire:model="selectedPreset" class="select select-bordered w-full">
+                    <option value="">Choose a preset&hellip;</option>
+                    @foreach ($presetNames as $preset)
+                        <option value="{{ $preset }}">{{ $preset }}</option>
+                    @endforeach
+                </select>
+            </div>
+
+            <button type="button" wire:click="loadPreset" class="btn btn-secondary">
+                Load Preset
+            </button>
         </div>
 
-        <div class="collapse-content text-sm">
-            <textarea
-                wire:model.defer="positions"
-                class="textarea textarea-bordered w-full"
-                rows="4"
-                placeholder="JAX_CTR, MCO_GND, MCO_TWR"
-            ></textarea>
+        <p class="text-xs opacity-70">
+            Loading a preset replaces the list below. Nothing is saved until you click Save Positions.
+        </p>
+
+        <div class="divider"></div>
+
+        <form wire:submit.prevent="save">
+            <x-list-editor
+                :items="$positions"
+                add-action="addPosition"
+                remove-action="removePosition"
+                item-model="newPosition"
+                placeholder="JAX_CTR"
+            />
 
             <button type="submit" class="btn btn-primary mt-4">
                 Save Positions
             </button>
+        </form>
 
-            @error('positions')
+        @error('positions')
             <div role="alert" class="alert alert-error alert-horizontal mt-2">
                 <span>{{ $message }}</span>
 
@@ -32,22 +52,21 @@
                     </button>
                 </div>
             </div>
-            @enderror
+        @enderror
 
-            @if($updated)
-                <div role="alert" class="alert alert-warning alert-horizontal mt-2">
-                    <span>Positions Successfully Updated</span>
-                    <div>
-                        <button
-                            type="button"
-                            wire:click="$set('updated', false)"
-                            class="btn btn-sm"
-                        >
-                            Dismiss
-                        </button>
-                    </div>
+        @if ($updated)
+            <div role="alert" class="alert alert-warning alert-horizontal mt-2">
+                <span>Positions Successfully Updated</span>
+                <div>
+                    <button
+                        type="button"
+                        wire:click="$set('updated', false)"
+                        class="btn btn-sm"
+                    >
+                        Dismiss
+                    </button>
                 </div>
-            @endif
-        </div>
+            </div>
+        @endif
     </div>
-</form>
+</div>

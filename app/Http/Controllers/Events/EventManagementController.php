@@ -162,13 +162,11 @@ class EventManagementController extends Controller
         $event = Event::findOrFail($id);
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
-        $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
 
         return view('events.edit', [
             'event' => $event,
             'types' => $types,
             'featuredFields' => $featuredFields,
-            'presetPositions' => $presetPositions,
         ]);
     }
 
@@ -189,7 +187,6 @@ class EventManagementController extends Controller
                 }, ],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'nullable|string',
-            'presetPositions' => ['nullable', 'string', Rule::exists(EventPositionPreset::class, 'name')],
             'image' => self::IMAGE_RULES,
         ], self::IMAGE_MESSAGES);
 
@@ -202,31 +199,6 @@ class EventManagementController extends Controller
         $event->end = $validated['end'];
         $event->type = $validated['type'];
         $event->featured_fields = $this->parseFeaturedFields($validated['featured_fields'] ?? null);
-
-        // A blank preset selection leaves the event's existing positions alone; picking one
-        // replaces them, so presets can still be applied after the event has been created.
-        if (filled($validated['presetPositions'] ?? null)) {
-            $newPositions = EventPositionPreset::where('name', $validated['presetPositions'])
-                ->firstOrFail()->positions ?? [];
-
-            // Same guard as EventPositionsManagement::save() — a preset must not pull a
-            // position out from under a registrant who is already assigned to it.
-            $assignedRemoved = EventPosition::where('event_id', $event->id)
-                ->whereNotNull('assigned_position')
-                ->whereNotIn('assigned_position', $newPositions)
-                ->pluck('assigned_position')
-                ->unique()
-                ->values();
-
-            if ($assignedRemoved->isNotEmpty()) {
-                return back()->withInput()->with(
-                    'error',
-                    'That preset does not include assigned position(s): '.$assignedRemoved->implode(', ')
-                );
-            }
-
-            $event->presetPositions = $newPositions;
-        }
 
         if ($request->hasFile('image')) {
             $event->event_image_route = $this->storeBanner($request, $event);

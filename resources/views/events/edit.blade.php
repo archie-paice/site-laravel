@@ -98,27 +98,6 @@
                 <div class="divider"></div>
 
                 <div>
-                    <h2 class="card-title">Position Preset</h2>
-
-                    <select name="presetPositions" class="select select-bordered w-full">
-                        <option value="" selected>Keep current positions</option>
-
-                        @foreach ($presetPositions as $preset)
-                            <option value="{{ $preset }}" {{ old('presetPositions') === $preset ? 'selected' : '' }}>
-                                {{ $preset }}
-                            </option>
-                        @endforeach
-                    </select>
-
-                    <p class="text-sm opacity-70 mt-2">
-                        Choosing a preset replaces this event's position list. Leave it on
-                        "Keep current positions" to leave them untouched.
-                    </p>
-                </div>
-
-                <div class="divider"></div>
-
-                <div>
                     <h2 class="card-title">Banner Image</h2>
 
                     @if ($event->event_image_route)
@@ -159,5 +138,14 @@
             Update Event
         </button>
     </form>
+
+    <div class="w-full lg:w-1/2 mx-auto mt-5">
+        <p class="text-sm opacity-70 mb-3">
+            The position list below saves independently of the form above — it is not affected by the
+            Update Event button, and vice versa.
+        </p>
+
+        @livewire('event-positions-management', ['event' => $event])
+    </div>
 
 @endsection
