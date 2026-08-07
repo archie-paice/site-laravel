@@ -116,7 +116,8 @@
 
                         <div class="flex-1">
                             <h2 class="card-title">Event Banner</h2>
-                            <input type="file" name="image" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-5" />
+                            <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/webp" class="file-input file-input-bordered w-full rounded-full max-w-xs mb-2" />
+                            <p class="text-sm opacity-70 mb-5">JPEG, PNG, GIF, or WebP, up to 8 MB.</p>
                         </div>
                     </div>
 

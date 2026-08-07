@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Events;
 
 use App\Enums\EventType;
+use App\Http\Controllers\Controller;
 use App\Models\Event;
 use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
@@ -12,8 +13,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rules\Enum;
 
-class EventManagementController
+class EventManagementController extends Controller
 {
+    /**
+     * Banner uploads are capped below php.ini's upload_max_filesize so that Laravel
+     * reports the size problem itself instead of PHP silently rejecting the upload
+     * and leaving the generic "The image failed to upload." message.
+     *
+     * SVG is deliberately excluded: banners are served straight from public storage,
+     * and an SVG can carry script.
+     */
+    private const IMAGE_MAX_KILOBYTES = 8192;
+
+    private const IMAGE_RULES = 'nullable|file|image|mimes:jpeg,png,jpg,gif,webp|max:'.self::IMAGE_MAX_KILOBYTES;
+
+    private const IMAGE_MESSAGES = [
+        'image.max' => 'The banner image must be 8 MB or smaller. Please compress or resize it and try again.',
+        'image.mimes' => 'The banner image must be a JPEG, PNG, GIF, or WebP file.',
+        'image.image' => 'The banner must be an image file.',
+        'image.uploaded' => 'The banner image could not be uploaded. It is most likely larger than the 8 MB limit.',
+    ];
+
     public function index()
     {
         $events = Event::all();
@@ -106,17 +126,16 @@ class EventManagementController
                     }
                 }, ],
             'type' => [new Enum(EventType::class)],
-            'featured_fields' => 'required|string',
+            'featured_fields' => 'nullable|string',
             'presetPositions' => 'nullable|string',
-            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
-        ]);
+            'image' => self::IMAGE_RULES,
+        ], self::IMAGE_MESSAGES);
 
         $presetName = $validated['presetPositions'] ?? null;
         $presetPositions = EventPositionPreset::where('name', $presetName)->first();
         $presetPositions = $presetPositions?->positions;
 
-        $featuredFields = explode(', ', $validated['featured_fields']);
-        $featuredFields = array_map('trim', $featuredFields);
+        $featuredFields = $this->parseFeaturedFields($validated['featured_fields'] ?? null);
 
         $event = Event::create([
             'title' => $validated['title'],
@@ -130,9 +149,7 @@ class EventManagementController
         ]);
 
         if ($request->hasFile('image')) {
-            $imageName = 'event_'.$event->id.'.'.$request->file('image')->getClientOriginalExtension();
-            $path = $request->file('image')->storeAs('event', $imageName, 'public');
-            $event->event_image_route = 'storage/'.$path;
+            $event->event_image_route = $this->storeBanner($request, $event);
             $event->save();
         }
 
@@ -141,17 +158,21 @@ class EventManagementController
 
     public function edit($id)
     {
-        $event = Event::find($id);
+        $event = Event::findOrFail($id);
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
+        $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
 
-        return view('events.edit', ['event' => $event, 'types' => $types, 'featuredFields' => $featuredFields]);
+        return view('events.edit', [
+            'event' => $event,
+            'types' => $types,
+            'featuredFields' => $featuredFields,
+            'presetPositions' => $presetPositions,
+        ]);
     }
 
     public function update(Request $request, $id)
     {
-        $featuredFields = FeaturedField::pluck('name')->toArray();
-
         $validated = $request->validate([
             'title' => 'required|string',
             'description' => 'required|string',
@@ -166,15 +187,12 @@ class EventManagementController
                     }
                 }, ],
             'type' => [new Enum(EventType::class)],
-            'featured_fields' => 'required|string',
+            'featured_fields' => 'nullable|string',
             'presetPositions' => 'nullable|string',
-            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
-        ]);
+            'image' => self::IMAGE_RULES,
+        ], self::IMAGE_MESSAGES);
 
-        $featuredFields = explode(', ', $validated['featured_fields']);
-        $featuredFields = array_map('trim', $featuredFields);
-
-        $event = Event::find($id);
+        $event = Event::findOrFail($id);
         $oldImagePath = $event->event_image_route;
 
         $event->title = $validated['title'];
@@ -182,13 +200,17 @@ class EventManagementController
         $event->start = $validated['start'];
         $event->end = $validated['end'];
         $event->type = $validated['type'];
-        $event->featured_fields = $featuredFields ?? [];
+        $event->featured_fields = $this->parseFeaturedFields($validated['featured_fields'] ?? null);
+
+        // A blank preset selection leaves the event's existing positions alone; picking one
+        // replaces them, so presets can still be applied after the event has been created.
+        if (filled($validated['presetPositions'] ?? null)) {
+            $event->presetPositions = EventPositionPreset::where('name', $validated['presetPositions'])
+                ->first()?->positions;
+        }
 
         if ($request->hasFile('image')) {
-            $imageName = 'event_'.$event->id.'.'.$request->file('image')->getClientOriginalExtension();
-            $path = $request->file('image')->storeAs('event', $imageName, 'public');
-
-            $event->event_image_route = 'storage/'.$path;
+            $event->event_image_route = $this->storeBanner($request, $event);
 
             // For the sake of storage, delete the old image
             if ($oldImagePath && $oldImagePath !== $event->event_image_route) {
@@ -205,9 +227,38 @@ class EventManagementController
 
     public function destroy($id)
     {
-        $event = Event::find($id);
+        $event = Event::findOrFail($id);
+
+        if ($event->event_image_route) {
+            Storage::disk('public')->delete(str_replace('storage/', '', $event->event_image_route));
+        }
+
         $event->delete();
 
         return redirect()->route('admin.events.index')->with('success', 'Event deleted successfully');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parseFeaturedFields(?string $featuredFields): array
+    {
+        if (blank($featuredFields)) {
+            return [];
+        }
+
+        return array_values(array_filter(array_map('trim', explode(',', $featuredFields)), 'strlen'));
+    }
+
+    /**
+     * Derive the stored extension from the file's contents rather than the client-supplied
+     * name, so an attacker cannot choose the extension the banner is served under.
+     */
+    private function storeBanner(Request $request, Event $event): string
+    {
+        $image = $request->file('image');
+        $imageName = 'event_'.$event->id.'.'.$image->extension();
+
+        return 'storage/'.$image->storeAs('event', $imageName, 'public');
     }
 }

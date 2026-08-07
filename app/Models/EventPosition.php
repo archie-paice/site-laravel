@@ -13,6 +13,8 @@ class EventPosition extends Model
         'assigned_position',
         'start',
         'end',
+        'assigned_start',
+        'assigned_end',
         'notes',
         'position_status',
     ];
@@ -20,6 +22,8 @@ class EventPosition extends Model
     protected $casts = [
         'start' => 'datetime',
         'end' => 'datetime',
+        'assigned_start' => 'datetime',
+        'assigned_end' => 'datetime',
     ];
 
     public function user()

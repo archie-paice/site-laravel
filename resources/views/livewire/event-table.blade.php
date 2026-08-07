@@ -12,7 +12,7 @@
                     <th>Type</th>
                     <th>Start (GMT)</th>
                     <th>End (GMT)</th>
-                    <th>Hidden</th>
+                    <th>Visibility</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -26,9 +26,19 @@
                         <td class='border-r-1 border-base-300'>{{ $event->type }}</td>
                         <td class='border-r-1 border-base-300'>{{ $event->start }}</td>
                         <td class='border-r-1 border-base-300'>{{ $event->end }}</td>
-                        <td class='border-r-1 border-base-300'>{{ $event->hidden ? 'Yes' : 'No' }}</td>
                         <td class='border-r-1 border-base-300'>
-                            <a href="{{ route('admin.events.edit', ['event' => $event->id]) }}" class="btn btn-primary">
+                            <form action="{{ route('admin.event.visibility', ['event' => $event->id]) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit"
+                                    class="btn btn-sm {{ $event->hidden ? 'btn-neutral' : 'btn-success' }}"
+                                    @disabled($event->archived)>
+                                    {{ $event->hidden ? 'Hidden' : 'Visible' }}
+                                </button>
+                            </form>
+                        </td>
+                        <td class='border-r-1 border-base-300'>
+                            <a href="{{ route('admin.events.manage', ['event' => $event->id]) }}" class="btn btn-primary">
                                 Manage
                             </a>
                             <a href="{{ route('admin.events.edit', ['event' => $event->id]) }}" class="btn btn-accent">

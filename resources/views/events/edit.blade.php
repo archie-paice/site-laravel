@@ -44,7 +44,7 @@
                             name="start"
                             class="input input-bordered w-full"
                             required
-                            value="{{ old('start', $event->start) }}"
+                            value="{{ old('start', $event->start?->format('Y-m-d\TH:i')) }}"
                         >
                     </div>
 
@@ -55,7 +55,7 @@
                             name="end"
                             class="input input-bordered w-full"
                             required
-                            value="{{ old('end', $event->end) }}"
+                            value="{{ old('end', $event->end?->format('Y-m-d\TH:i')) }}"
                         >
                     </div>
                 </div>
@@ -90,7 +90,7 @@
                             name="featured_fields"
                             class="input input-bordered w-full"
                             placeholder="KMCO, KJAX, KDAB"
-                            value="{{ old('featured_fields', implode(', ', $event->featured_fields)) }}"
+                            value="{{ old('featured_fields', implode(', ', $event->featured_fields ?? [])) }}"
                         />
                     </div>
                 </div>
@@ -98,30 +98,56 @@
                 <div class="divider"></div>
 
                 <div>
+                    <h2 class="card-title">Position Preset</h2>
+
+                    <select name="presetPositions" class="select select-bordered w-full">
+                        <option value="" selected>Keep current positions</option>
+
+                        @foreach ($presetPositions as $preset)
+                            <option value="{{ $preset }}" {{ old('presetPositions') === $preset ? 'selected' : '' }}>
+                                {{ $preset }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <p class="text-sm opacity-70 mt-2">
+                        Choosing a preset replaces this event's position list. Leave it on
+                        "Keep current positions" to leave them untouched.
+                    </p>
+                </div>
+
+                <div class="divider"></div>
+
+                <div>
                     <h2 class="card-title">Banner Image</h2>
+
+                    @if ($event->event_image_route)
+                        <img
+                            src="{{ asset($event->event_image_route) }}"
+                            alt="Current banner for {{ $event->title }}"
+                            class="rounded-box max-h-48 w-auto mb-3"
+                        />
+                    @endif
 
                     <input
                         type="file"
                         name="image"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
                         class="file-input file-input-bordered w-full rounded-full max-w-xs mb-2"
                     />
 
                     <p class="text-sm opacity-70">
-                        Leave blank to keep the current banner.
+                        Leave blank to keep the current banner. JPEG, PNG, GIF, or WebP, up to 8 MB.
                     </p>
                 </div>
 
                 <div class="divider"></div>
 
                 <p>
-                    By default, when an event is created, it is hidden from the calendar or list view.
                     This event will be archived, not deleted, 24 hours after the published end date. This can be reverted
                     through the event manager.
-                    Create, publish, modify, and delete positions through the Event Manager, which you will be redirected to
-                    after submission.
-                    Editing this event later on will have no impact on the Event Manager, since it only deals with
-                    positions.
-                    You can un-hide this event from the events manager among other common tasks.
+                    Assign, publish, and unpublish individual positions through the Event Manager.
+                    You can hide or un-hide this event from the events list among other common tasks.
                     You will be notified of any errors in your submission after you submit the form. All changes will be
                     saved as long as you dont leave this page or refresh.
                 </p>

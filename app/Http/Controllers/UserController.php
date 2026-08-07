@@ -135,7 +135,11 @@ class UserController extends Controller
 
     public function registeredEvents(int $id)
     {
-        $user = User::findorFail($id);
+        $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('assign event positions')) {
+            abort(403);
+        }
 
         $registeredEvents = $user->events()
             ->withPivot('requested_position', 'start', 'end', 'position_status', 'assigned_position', 'assigned_start', 'assigned_end')

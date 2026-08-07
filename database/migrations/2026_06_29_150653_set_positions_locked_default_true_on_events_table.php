@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('events', function (Blueprint $table) {
-            $table->boolean('published')
+            $table->boolean('positions_locked')
                 ->default(true)
                 ->change();
         });
@@ -18,7 +18,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('events', function (Blueprint $table) {
-            $table->boolean('published')
+            $table->boolean('positions_locked')
                 ->default(false)
                 ->change();
         });

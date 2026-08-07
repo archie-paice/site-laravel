@@ -38,8 +38,8 @@ class EventRegistrants extends Component
 
         foreach ($this->registrants as $registrant) {
             $this->assignments[$registrant->id] = [
-                'assigned_start' => $registrant->start->utc()->format('Y-m-d\TH:i'),
-                'assigned_end' => $registrant->end->utc()->format('Y-m-d\TH:i'),
+                'assigned_start' => ($registrant->assigned_start ?? $registrant->start)->utc()->format('Y-m-d\TH:i'),
+                'assigned_end' => ($registrant->assigned_end ?? $registrant->end)->utc()->format('Y-m-d\TH:i'),
                 'assigned_position' => $registrant->assigned_position,
             ];
         }

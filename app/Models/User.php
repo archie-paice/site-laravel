@@ -7,6 +7,7 @@ namespace App\Models;
 use App\DTOs\VatusaRosterUser;
 use App\Enums\ControllerRating;
 use Database\Factories\UserFactory;
+use Http;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -22,6 +23,13 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, LogsActivity, Notifiable, Searchable;
+
+    /**
+     * The primary key is the VATSIM CID, assigned explicitly rather than auto-incremented.
+     */
+    public $incrementing = false;
+
+    protected $keyType = 'int';
 
     /**
      * The attributes that are mass assignable.
@@ -43,7 +51,10 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * Authentication is exclusively via VATSIM Connect (OAuth). This application
+     * stores no local passwords and there is no password column. The hidden
+     * attributes below and the 'password' => 'hashed' cast are retained only as
+     * standard-Laravel safety nets should password-based auth ever be introduced.
      *
      * @var list<string>
      */
@@ -166,7 +177,7 @@ class User extends Authenticatable
 
     public function trainingTicketsAsInstructor(): HasMany
     {
-        return $this->hasMany(TrainingAssignment::class, 'instructor_id');
+        return $this->hasMany(TrainingTicket::class, 'instructor_id');
     }
 
     public function soloCerts(): HasMany
@@ -185,6 +196,11 @@ class User extends Authenticatable
             ->logOnly(['rating', 'email', 'first_name', 'last_name', 'id', 'operating_initials']);
     }
 
+    public function certifications(): HasMany
+    {
+        return $this->hasMany(UserCertification::class, 'user_id');
+    }
+
     public function toSearchableArray(): array
     {
         return [
@@ -199,7 +215,7 @@ class User extends Authenticatable
     public function events()
     {
         return $this->belongsToMany(Event::class, 'event_positions')
-            ->withPivot('requested_position', 'start', 'end', 'notes', 'position_status', 'position_status')
+            ->withPivot('requested_position', 'assigned_position', 'start', 'end', 'assigned_start', 'assigned_end', 'notes', 'position_status')
             ->withTimestamps();
     }
 

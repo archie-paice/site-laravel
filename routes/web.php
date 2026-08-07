@@ -91,6 +91,7 @@ Route::prefix('users/{user}')->group(function () {
         ->name('users.show.training-tickets');
 
     Route::get('registered-events', [UserController::class, 'registeredEvents'])
+        ->middleware('auth')
         ->name('users.show.registered-events');
 
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])
@@ -148,7 +149,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         ->name('admin.index');
 
     // News
-    Route::prefix('/news')->group(function () {
+    Route::middleware('role:admin')->prefix('/news')->group(function () {
         Route::get('/', [NewsController::class, 'index'])
             ->name('admin.news.index');
 
@@ -192,35 +193,6 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
             ->name('admin.contributors.destroy');
     });
 
-    // Facilities Data
-    Route::prefix('data')->group(function () {
-
-        Route::middleware('permission:manage statistics prefixes')
-            ->resource('statistics-prefixes', StatisticsPrefixesController::class);
-
-        Route::middleware('permission:manage certification facilities')
-            ->prefix('certification-facilities')
-            ->group(function () {
-
-                Route::get('/', [CertificationFacilityController::class, 'index'])
-                    ->name('certification-facilities.index');
-
-                Route::post('/', [CertificationFacilityController::class, 'store'])
-                    ->name('certification-facilities.store');
-
-                Route::prefix('/{facility}')->group(function () {
-
-                    Route::get('/', [CertificationFacilityController::class, 'show'])
-                        ->name('certification-facilities.show');
-
-                    Route::delete('/', [CertificationFacilityController::class, 'destroy'])
-                        ->name('certification-facilities.destroy');
-
-                    Route::post('/certification-levels', [CertificationLevelController::class, 'store'])
-                        ->name('certification-levels.store');
-                });
-            });
-    });
     // Facilities Dept.
     Route::prefix('data')->group(function () {
         Route::middleware('permission:manage statistics prefixes')
