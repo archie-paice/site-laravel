@@ -44,7 +44,9 @@
                 @foreach ($featuredFields as $field)
                     <tr>
                         <td class="py-3 border-r-1 border-base-300 font-medium">{{ $field->name }}</td>
-                        <td class="py-3 border-r-1 border-base-300">{{ $field->events()->count() }}</td>
+                        <td class="py-3 border-r-1 border-base-300">
+                            {{ \App\Models\Event::whereJsonContains('featured_fields', $field->name)->count() }}
+                        </td>
                         <td class="py-3">
                             <form
                                 action="{{ route('admin.events.event-fields.destroy', ['eventField' => $field->id]) }}"

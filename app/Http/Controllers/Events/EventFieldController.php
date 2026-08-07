@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Events;
 
 use App\Http\Controllers\Controller;
+use App\Models\Event;
 use App\Models\FeaturedField;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -30,10 +31,12 @@ class EventFieldController extends Controller
 
     public function destroy(FeaturedField $eventField)
     {
-        // Detaching first would silently drop the field from past events, so refuse
-        // instead and let the operator decide.
-        if ($eventField->events()->exists()) {
-            return back()->with('error', 'This field is still attached to an event and cannot be removed.');
+        // Events record their fields in the events.featured_fields JSON column, not
+        // through the event_featured_field pivot, so that is what has to be checked.
+        $inUse = Event::whereJsonContains('featured_fields', $eventField->name)->exists();
+
+        if ($inUse) {
+            return back()->with('error', 'This field is still used by an event and cannot be removed.');
         }
 
         $eventField->delete();

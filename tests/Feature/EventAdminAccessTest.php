@@ -187,6 +187,111 @@ test('the pages touched by the events work all render', function () {
     $this->get(route('users.show.registered-events', $staff))->assertOk();
 });
 
+test('a hidden event is not reachable by direct link', function () {
+    $event = makeEvent(['hidden' => true]);
+
+    $this->get(route('events.show', ['event' => $event->id]))->assertNotFound();
+
+    $viewer = User::factory()->create();
+    $viewer->assignRole('core');
+    $this->actingAs($viewer)
+        ->get(route('events.show', ['event' => $event->id]))
+        ->assertNotFound();
+
+    $this->actingAs(makeEventsStaff())
+        ->get(route('events.show', ['event' => $event->id]))
+        ->assertOk();
+});
+
+test('an unknown preset name is rejected instead of clearing the positions', function () {
+    $this->actingAs(makeEventsStaff());
+
+    $event = makeEvent();
+    $event->update(['presetPositions' => ['JAX_CTR']]);
+
+    $this->put(route('admin.events.update', ['event' => $event->id]), [
+        'title' => $event->title,
+        'description' => $event->description,
+        'start' => $event->start->toDateTimeString(),
+        'end' => $event->end->toDateTimeString(),
+        'type' => EventType::HOME->value,
+        'presetPositions' => 'Does Not Exist',
+    ])->assertSessionHasErrors('presetPositions');
+
+    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR']);
+});
+
+test('a preset cannot drop a position someone is already assigned to', function () {
+    $this->actingAs(makeEventsStaff());
+
+    $event = makeEvent();
+    $event->update(['presetPositions' => ['JAX_CTR', 'MCO_APP']]);
+
+    EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create()->id,
+        'requested_position' => 'MCO_APP',
+        'assigned_position' => 'MCO_APP',
+        'start' => $event->start,
+        'end' => $event->end,
+    ]);
+
+    EventPositionPreset::create(['name' => 'Center Only', 'positions' => ['JAX_CTR']]);
+
+    $this->put(route('admin.events.update', ['event' => $event->id]), [
+        'title' => $event->title,
+        'description' => $event->description,
+        'start' => $event->start->toDateTimeString(),
+        'end' => $event->end->toDateTimeString(),
+        'type' => EventType::HOME->value,
+        'presetPositions' => 'Center Only',
+    ])->assertSessionHas('error');
+
+    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
+});
+
+test('an event field in use cannot be deleted', function () {
+    $this->actingAs(makeEventsStaff());
+
+    $field = FeaturedField::create(['name' => 'KJAX']);
+    makeEvent(['featured_fields' => ['KJAX']]);
+
+    $this->delete(route('admin.events.event-fields.destroy', ['eventField' => $field->id]))
+        ->assertSessionHas('error');
+
+    expect(FeaturedField::whereKey($field->id)->exists())->toBeTrue();
+
+    $unused = FeaturedField::create(['name' => 'KDAB']);
+
+    $this->delete(route('admin.events.event-fields.destroy', ['eventField' => $unused->id]))
+        ->assertRedirect(route('admin.events.event-fields.index'));
+
+    expect(FeaturedField::whereKey($unused->id)->exists())->toBeFalse();
+});
+
+test('publishing positions requires the publish events permission', function () {
+    $event = makeEvent();
+
+    $assigner = User::factory()->create();
+    $assigner->assignRole('staff');
+    $assigner->givePermissionTo('assign event positions');
+
+    $this->actingAs($assigner);
+
+    Livewire::test(EventRegistrants::class, ['event' => $event])
+        ->call('publishPositions')
+        ->assertForbidden();
+
+    expect($event->fresh()->published)->toBeFalse();
+
+    $this->actingAs(makeEventsStaff());
+
+    Livewire::test(EventRegistrants::class, ['event' => $event])
+        ->call('publishPositions');
+
+    expect($event->fresh()->published)->toBeTrue();
+});
+
 test('the assignment form is seeded from the saved assignment', function () {
     $this->actingAs(makeEventsStaff());
 

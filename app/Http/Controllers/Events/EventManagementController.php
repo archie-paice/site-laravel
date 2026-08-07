@@ -11,6 +11,7 @@ use App\Models\FeaturedField;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
 
 class EventManagementController extends Controller
@@ -127,7 +128,7 @@ class EventManagementController extends Controller
                 }, ],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'nullable|string',
-            'presetPositions' => 'nullable|string',
+            'presetPositions' => ['nullable', 'string', Rule::exists(EventPositionPreset::class, 'name')],
             'image' => self::IMAGE_RULES,
         ], self::IMAGE_MESSAGES);
 
@@ -188,7 +189,7 @@ class EventManagementController extends Controller
                 }, ],
             'type' => [new Enum(EventType::class)],
             'featured_fields' => 'nullable|string',
-            'presetPositions' => 'nullable|string',
+            'presetPositions' => ['nullable', 'string', Rule::exists(EventPositionPreset::class, 'name')],
             'image' => self::IMAGE_RULES,
         ], self::IMAGE_MESSAGES);
 
@@ -205,8 +206,26 @@ class EventManagementController extends Controller
         // A blank preset selection leaves the event's existing positions alone; picking one
         // replaces them, so presets can still be applied after the event has been created.
         if (filled($validated['presetPositions'] ?? null)) {
-            $event->presetPositions = EventPositionPreset::where('name', $validated['presetPositions'])
-                ->first()?->positions;
+            $newPositions = EventPositionPreset::where('name', $validated['presetPositions'])
+                ->firstOrFail()->positions ?? [];
+
+            // Same guard as EventPositionsManagement::save() — a preset must not pull a
+            // position out from under a registrant who is already assigned to it.
+            $assignedRemoved = EventPosition::where('event_id', $event->id)
+                ->whereNotNull('assigned_position')
+                ->whereNotIn('assigned_position', $newPositions)
+                ->pluck('assigned_position')
+                ->unique()
+                ->values();
+
+            if ($assignedRemoved->isNotEmpty()) {
+                return back()->withInput()->with(
+                    'error',
+                    'That preset does not include assigned position(s): '.$assignedRemoved->implode(', ')
+                );
+            }
+
+            $event->presetPositions = $newPositions;
         }
 
         if ($request->hasFile('image')) {

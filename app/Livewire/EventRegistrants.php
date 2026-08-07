@@ -53,16 +53,16 @@ class EventRegistrants extends Component
 
     /**
      * Livewire's update endpoint does not inherit the mounting page's route
-     * middleware, so every mutator below has to re-check the permission itself.
+     * middleware, so every mutator below has to re-check its permission itself.
      */
-    private function authorizeManagement(): void
+    private function authorizePermission(string $permission): void
     {
-        abort_unless(auth()->user()?->hasPermissionTo('assign event positions'), 403);
+        abort_unless(auth()->user()?->hasPermissionTo($permission), 403);
     }
 
     public function publishPositions()
     {
-        $this->authorizeManagement();
+        $this->authorizePermission('publish events');
 
         $this->event->published = true;
         $this->event->save();
@@ -74,7 +74,7 @@ class EventRegistrants extends Component
 
     public function unpublishPositions()
     {
-        $this->authorizeManagement();
+        $this->authorizePermission('publish events');
 
         $this->event->published = false;
         $this->event->save();
@@ -84,7 +84,7 @@ class EventRegistrants extends Component
 
     public function save($id)
     {
-        $this->authorizeManagement();
+        $this->authorizePermission('assign event positions');
 
         $this->currentRegistrantId = $id;
 
