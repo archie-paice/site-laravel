@@ -52,6 +52,38 @@
             </div>
         </div>
 
+        <div class="card bg-base-100 w-full max-w-xl shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title">Staffing</h2>
+
+                @if (! $event->published)
+                    <p class="text-sm opacity-70">Positions not yet published.</p>
+                @elseif ($roster->isEmpty())
+                    <p class="text-sm opacity-70">No positions have been set up for this event.</p>
+                @else
+                    <ul class="divide-y divide-base-300">
+                        @foreach ($roster as $row)
+                            <li class="py-2 flex items-center justify-between gap-3">
+                                <span class="font-mono">{{ $row['position'] }}</span>
+
+                                @if ($row['assignees']->isNotEmpty())
+                                    @auth
+                                        <span class="text-sm text-right">
+                                            {{ $row['assignees']->map(fn ($user) => $user ? "{$user->first_name} {$user->last_name}" : 'Unknown')->implode(', ') }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-success badge-sm">Assigned</span>
+                                    @endauth
+                                @else
+                                    <span class="badge badge-ghost badge-sm">Open</span>
+                                @endif
+                            </li>
+                        @endforeach
+                    </ul>
+                @endif
+            </div>
+        </div>
+
         @auth
             @if(!$event->positions_locked)
                 <div class="card bg-base-100 w-xl shadow-sm">
