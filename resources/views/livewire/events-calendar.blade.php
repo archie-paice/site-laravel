@@ -94,7 +94,12 @@
                                class="flex items-start gap-2 p-2 rounded-lg bg-base-200/50 hover:bg-base-200 transition active:scale-[0.98]">
                                 <div class="w-1 self-stretch rounded-full bg-primary shrink-0"></div>
                                 <div class="min-w-0 flex-1">
-                                    <p class="text-sm font-medium truncate">{{ $event->title }}</p>
+                                    <p class="text-sm font-medium truncate">
+                                        {{ $event->title }}
+                                        @if($event->isStartingSoon())
+                                            <span class="badge badge-primary badge-xs ml-1">Starting Soon</span>
+                                        @endif
+                                    </p>
                                     <p class="text-xs text-base-content/60">
                                         {{ $event->start->format('g:i A') }}
                                         @if($event->end) – {{ $event->end->format('g:i A') }} @endif

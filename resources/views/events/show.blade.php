@@ -26,6 +26,9 @@
                 <div class="flex flex-wrap items-start gap-2">
                     <h1 class="card-title text-lg sm:text-xl leading-snug">{{ $event->title }}</h1>
                     <div class="badge badge-secondary badge-sm sm:badge-md">{{ $event->type }}</div>
+                    @if($event->isStartingSoon())
+                        <div class="badge badge-primary badge-sm sm:badge-md">Starting Soon</div>
+                    @endif
                 </div>
 
                 <div class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-sm text-base-content/70 mt-1">

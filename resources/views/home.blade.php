@@ -118,6 +118,9 @@
                                     <div class="p-3 flex-1 min-w-0">
                                         <h3 class="font-bold text-base sm:text-lg truncate">
                                             {{ $event->title }}
+                                            @if($event->isStartingSoon())
+                                                <span class="badge badge-primary badge-xs ml-1">Starting Soon</span>
+                                            @endif
                                         </h3>
 
                                         <p class="text-sm text-base-content/70 mt-1">
