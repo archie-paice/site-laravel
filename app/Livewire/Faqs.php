@@ -18,10 +18,16 @@ class Faqs extends Component
 
         $search = trim($this->search);
         if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('question', 'like', "%{$search}%")
-                    ->orWhere('answer', 'like', "%{$search}%")
-                    ->orWhere('category', 'like', "%{$search}%");
+            $words = preg_split('/\s+/', $search);
+
+            $query->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->where(function ($sub) use ($word) {
+                        $sub->where('question', 'like', "%{$word}%")
+                            ->orWhere('answer', 'like', "%{$word}%")
+                            ->orWhere('category', 'like', "%{$word}%");
+                    });
+                }
             });
         }
 

@@ -15,14 +15,12 @@ class DatabaseSeeder extends Seeder
         PermissionSeeder $permissionSeeder,
         UserSeeder $userSeeder,
         StatisticsPrefixesSeeder $statisticsPrefixes,
-        FaqSeeder $faqSeeder,
         PublicationCategorySeeder $publicationCategorySeeder,
         StatsSyncSeeder $statsSyncSeeder,
     ): void {
         $permissionSeeder->run();
         $userSeeder->run();
         $statisticsPrefixes->run();
-        $faqSeeder->run();
         $publicationCategorySeeder->run();
 
         if (App::environment() === 'development') {

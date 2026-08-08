@@ -29,7 +29,7 @@
                     <input type="checkbox" />
                     <div class="collapse-title font-medium">{{ $faq->question }}</div>
                     <div class="collapse-content">
-                        <div class="max-w-none pt-2 text-base-content/90 [&_a]:link [&_a]:link-primary [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ml-5 [&_ol]:list-decimal [&_ol]:ml-5 [&_strong]:font-semibold">
+                        <div class="markdown-content pt-2 text-base-content/90">
                             {!! $faq->rendered_answer !!}
                         </div>
                         <p class="text-xs text-base-content/50 mt-3">

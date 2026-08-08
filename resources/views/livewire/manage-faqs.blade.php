@@ -190,7 +190,7 @@
 
                         <div class="form-control">
                             <label class="label"><span class="label-text">Preview</span></label>
-                            <div class="border border-base-300 rounded-box p-3 min-h-[12rem] bg-base-50 text-base-content/90 [&_a]:link [&_a]:link-primary [&_p]:mb-2 [&_ul]:list-disc [&_ul]:ml-5 [&_ol]:list-decimal [&_ol]:ml-5 [&_strong]:font-semibold">
+                            <div class="markdown-content border border-base-300 rounded-box p-3 min-h-[12rem] bg-base-50 text-base-content/90">
                                 @if($answerPreview)
                                     {!! $answerPreview !!}
                                 @else

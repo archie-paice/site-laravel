@@ -55,6 +55,7 @@
         </div>
 
         <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
+        <a href="{{ route('faq.index') }}" role="button" class="m-1">FAQ &amp; Help</a>
 
         @hasrole('staff')
             <div class="dropdown dropdown-end">
@@ -129,6 +130,9 @@
             @foreach($mobilePublicationCategories as $publicationCategory)
                 <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
             @endforeach
+
+            <li><a href="{{ route('feedback.index') }}">Feedback</a></li>
+            <li><a href="{{ route('faq.index') }}">FAQ &amp; Help</a></li>
 
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>
