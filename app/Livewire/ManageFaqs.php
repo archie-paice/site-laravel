@@ -52,7 +52,6 @@ class ManageFaqs extends Component
         FaqSetting::set('faq_intro', trim($this->pageIntro));
 
         $this->editingHeader = false;
-        $this->dispatch('flash-message', message: 'FAQ page header updated.');
     }
 
     public function cancelHeader(): void
@@ -106,12 +105,10 @@ class ManageFaqs extends Component
 
         if ($this->editingId) {
             Faq::findOrFail($this->editingId)->update($validated);
-            $this->dispatch('flash-message', message: 'FAQ updated successfully.');
         } else {
             // New FAQs go to the bottom of their category.
             $validated['sort_order'] = (int) Faq::where('category', $this->category)->max('sort_order') + 1;
             Faq::create($validated);
-            $this->dispatch('flash-message', message: 'FAQ created successfully.');
         }
 
         $this->resetForm();
@@ -126,7 +123,6 @@ class ManageFaqs extends Component
     public function delete(int $id): void
     {
         Faq::destroy($id);
-        $this->dispatch('flash-message', message: 'FAQ deleted.');
 
         if ($this->editingId === $id) {
             $this->resetForm();
@@ -202,7 +198,6 @@ class ManageFaqs extends Component
 
         if ($old !== null && $new !== '' && $new !== $old) {
             Faq::where('category', $old)->get()->each->update(['category' => $new]);
-            $this->dispatch('flash-message', message: "Category renamed to \"{$new}\".");
         }
 
         $this->cancelRename();
@@ -211,7 +206,6 @@ class ManageFaqs extends Component
     public function deleteCategory(string $category): void
     {
         Faq::where('category', $category)->get()->each->delete();
-        $this->dispatch('flash-message', message: "Category \"{$category}\" and its FAQs were deleted.");
 
         if ($this->renamingCategory === $category) {
             $this->cancelRename();

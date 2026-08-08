@@ -52,15 +52,6 @@
             </div>
         @endif
 
-        {{-- Flash messages dispatched from Livewire actions (no full page reload) --}}
-        <div x-data="{ show: false, message: '' }"
-             x-on:flash-message.window="message = $event.detail.message; show = true"
-             x-show='show' style="display: none"
-             class="alert alert-success alert-dismissible fade show" role="alert">
-            <span x-text="message"></span>
-            <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='show = false'>Close</button>
-        </div>
-
         @yield('body-nopad')
 
         <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 ml-5 mt-5">
