@@ -4,7 +4,6 @@ namespace App\Livewire;
 
 use App\Models\Faq;
 use App\Models\FaqSetting;
-use Illuminate\Support\Str;
 use Livewire\Component;
 
 class ManageFaqs extends Component
@@ -238,10 +237,16 @@ class ManageFaqs extends Component
 
         $search = trim($this->search);
         if ($search !== '') {
-            $query->where(function ($q) use ($search) {
-                $q->where('question', 'like', "%{$search}%")
-                    ->orWhere('answer', 'like', "%{$search}%")
-                    ->orWhere('category', 'like', "%{$search}%");
+            $words = preg_split('/\s+/', mb_strtolower($search));
+
+            $query->where(function ($q) use ($words) {
+                foreach ($words as $word) {
+                    $q->where(function ($sub) use ($word) {
+                        $sub->whereRaw('LOWER(question) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(answer) LIKE ?', ["%{$word}%"])
+                            ->orWhereRaw('LOWER(category) LIKE ?', ["%{$word}%"]);
+                    });
+                }
             });
         }
 
@@ -260,9 +265,6 @@ class ManageFaqs extends Component
             'categories' => $categories,
             'total' => Faq::count(),
             'publishedCount' => Faq::published()->count(),
-            'answerPreview' => trim($this->answer) !== ''
-                ? Str::markdown($this->answer, ['html_input' => 'strip', 'allow_unsafe_links' => false])
-                : null,
         ]);
     }
 }

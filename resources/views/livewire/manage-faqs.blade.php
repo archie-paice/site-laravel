@@ -171,33 +171,32 @@
                         @error('question') <span class="text-error text-xs">{{ $message }}</span> @enderror
                     </div>
 
-                    {{-- Answer editor + live preview --}}
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
-                        <div class="form-control">
-                            <label class="label" for="answer">
-                                <span class="label-text">Answer</span>
-                                <span class="label-text-alt text-base-content/60">Markdown</span>
-                            </label>
-                            <textarea id="answer" wire:model.live.debounce.400ms="answer" rows="12"
-                                      class="textarea textarea-bordered w-full font-mono text-sm"></textarea>
-                            <p class="text-xs text-base-content/70 mt-2">
-                                Uses <strong>Markdown</strong>. Add a link with <code>[text](https://url)</code>, bold with <code>**text**</code>.
-                                Check the live preview, or see the
-                                <a href="https://commonmark.org/help/" target="_blank" rel="noopener" class="link link-primary">formatting guide ↗</a>.
-                            </p>
-                            @error('answer') <span class="text-error text-xs">{{ $message }}</span> @enderror
-                        </div>
-
-                        <div class="form-control">
-                            <label class="label"><span class="label-text">Preview</span></label>
-                            <div class="markdown-content border border-base-300 rounded-box p-3 min-h-[12rem] bg-base-50 text-base-content/90">
-                                @if($answerPreview)
-                                    {!! $answerPreview !!}
-                                @else
-                                    <span class="text-base-content/40">Start typing to see a preview…</span>
-                                @endif
-                            </div>
-                        </div>
+                    {{-- Answer editor --}}
+                    <div class="form-control mt-3"
+                         wire:ignore
+                         wire:key="faq-answer-editor-{{ $editingId ?? 'new' }}"
+                         x-data="{
+                            quill: null,
+                            init() {
+                                this.quill = new Quill(this.$refs.editor, {
+                                    theme: 'snow',
+                                    modules: {
+                                        toolbar: [['bold', 'italic', 'underline', 'strike'], ['link'], [{list: 'ordered'}, {list: 'bullet'}]],
+                                    },
+                                });
+                                new QuillMarkdown(this.quill);
+                                this.quill.root.innerHTML = @js($answer);
+                                this.quill.on('text-change', () => {
+                                    $wire.set('answer', this.quill.root.innerHTML);
+                                });
+                            },
+                         }">
+                        <label class="label" for="answer"><span class="label-text">Answer</span></label>
+                        <div x-ref="editor" class="bg-base-100 text-base-content min-h-50"></div>
+                        <p class="text-xs text-base-content/70 mt-2">
+                            Formatting shortcuts work as you type (e.g. <code>**bold**</code>, <code>- list item</code>), or use the toolbar.
+                        </p>
+                        @error('answer') <span class="text-error text-xs">{{ $message }}</span> @enderror
                     </div>
                 </div>
 

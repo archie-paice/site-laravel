@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -24,20 +22,6 @@ class Faq extends Model
         'is_published' => 'boolean',
         'sort_order' => 'integer',
     ];
-
-    /**
-     * Render the Markdown answer to safe HTML.
-     * Raw HTML is stripped; only Markdown syntax (including links) is allowed.
-     */
-    protected function renderedAnswer(): Attribute
-    {
-        return Attribute::make(
-            get: fn () => Str::markdown($this->answer ?? '', [
-                'html_input' => 'strip',
-                'allow_unsafe_links' => false,
-            ]),
-        );
-    }
 
     /**
      * Only published FAQs.

@@ -2,17 +2,6 @@
 
 [x-cloak] { display: none !important; }
 
-.markdown-content {
-    line-height: 1.65;
-}
-.markdown-content p { margin-bottom: 0.6rem; }
-.markdown-content p:last-child { margin-bottom: 0; }
-.markdown-content ul { list-style-type: disc; margin-left: 1.25rem; margin-bottom: 0.6rem; }
-.markdown-content ol { list-style-type: decimal; margin-left: 1.25rem; margin-bottom: 0.6rem; }
-.markdown-content strong { font-weight: 600; }
-.markdown-content a { color: var(--color-primary); text-decoration: underline; text-underline-offset: 2px; }
-.markdown-content a:hover { text-decoration: none; }
-
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 

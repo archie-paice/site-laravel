@@ -25,13 +25,14 @@
             <h3 class="text-xl font-semibold mb-3 border-b border-base-300 pb-1">{{ $category }}</h3>
 
             @foreach($faqs as $faq)
-                <div class="collapse collapse-arrow bg-base-100 border border-base-300 mb-2">
+                <div class="collapse collapse-arrow bg-base-100 border border-base-300 mb-2" wire:key="faq-{{ $faq->id }}">
                     <input type="checkbox" />
                     <div class="collapse-title font-medium">{{ $faq->question }}</div>
                     <div class="collapse-content">
-                        <div class="markdown-content pt-2 text-base-content/90">
-                            {!! $faq->rendered_answer !!}
-                        </div>
+                        <div class="pt-2 text-base-content/90"
+                             wire:ignore
+                             x-data
+                             x-init="new Quill($el, { theme: 'snow', modules: { toolbar: false }, readOnly: true })">{!! $faq->answer !!}</div>
                         <p class="text-xs text-base-content/50 mt-3">
                             Updated {{ $faq->updated_at->utc()->format('d/m/Y Hi') }}z
                         </p>

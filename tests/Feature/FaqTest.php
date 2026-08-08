@@ -182,19 +182,18 @@ test('staff can edit the public page header and it appears publicly', function (
 
 /*
 |--------------------------------------------------------------------------
-| Markdown rendering
+| Answer rendering
 |--------------------------------------------------------------------------
 */
 
-test('markdown answers render links but strip raw html', function () {
-    $faq = Faq::create([
+test('answer html authored in the editor is rendered on the public page', function () {
+    Faq::create([
         'category' => 'Training',
-        'question' => 'Markdown?',
-        'answer' => '[Academy](https://academy.vatusa.net) <script>alert(1)</script>',
+        'question' => 'Where do I find the academy?',
+        'answer' => '<p>Check the <a href="https://academy.vatusa.net">Academy</a>.</p>',
         'is_published' => true,
     ]);
 
-    expect($faq->rendered_answer)
-        ->toContain('<a href="https://academy.vatusa.net"')
-        ->not->toContain('<script>');
+    $this->get(route('faq.index'))
+        ->assertSee('<a href="https://academy.vatusa.net">Academy</a>', false);
 });
