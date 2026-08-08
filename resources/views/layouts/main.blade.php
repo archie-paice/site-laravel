@@ -75,7 +75,7 @@
         </div>
 
         <div class="footer gap-y-0 p-0">
-            @env('development')
+            @env('development', 'staging')
                 <div class="footer-center w-full p-2 bg-warning">
                     <h1>DEVELOPMENT BUILD - THE FUNCTIONS OF THIS SITE ARE NOT INDICATIVE OF THE PRODUCTION WEBSITE AND MAY BE CHANGED AT ANY TIME. SENSITIVE DATA IS ENTERED AT YOUR OWN RISK.</h1>
                     @auth
