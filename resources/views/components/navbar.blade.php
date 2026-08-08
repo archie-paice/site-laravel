@@ -49,6 +49,8 @@
             </ul>
         </div>
 
+        <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
+
         @if(auth()->user()?->hasRole('staff'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
@@ -72,6 +74,10 @@
 
                     @if(auth()->user()?->hasRole('admin'))
                         <li><a href={{ route('admin.index') }}>Admin</a></li>
+                    @endif
+
+                    @if(auth()->user()?->can('feedback:read'))
+                        <li><a href="{{ route('admin.feedback.index') }}">Feedback Management</a></li>
                     @endif
                 </ul>
             </div>

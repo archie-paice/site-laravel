@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\FeedbackStatus;
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
+use App\Models\Feedback;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -111,6 +113,25 @@ class UserController extends Controller
         return view('users.training-assignments', [
             'user' => $user,
             'trainingAssignments' => $trainingAssignments,
+        ]);
+    }
+
+    public function feedback(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('feedback:read')) {
+            abort(403);
+        }
+
+        $releasedFeedback = Feedback::where('controller_id', $id)
+            ->where('status', FeedbackStatus::RELEASED)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('users.feedback', [
+            'user' => $user,
+            'releasedFeedback' => $releasedFeedback,
         ]);
     }
 
