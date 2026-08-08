@@ -83,9 +83,8 @@ class EventManagementController extends Controller
         return back();
     }
 
-    public function manage(string $id)
+    public function manage(Event $event)
     {
-        $event = Event::findorFail($id);
         $registrants = EventPosition::where('event_id', $event->id)->get();
         $mostRequestedPosition = $registrants
             ->groupBy('requested_position')
@@ -94,7 +93,9 @@ class EventManagementController extends Controller
             ->keys()
             ->first();
 
-        return view('events.manage', compact('event', 'registrants', 'mostRequestedPosition'));
+        $positionsAccess = $this->positionsAccessFor();
+
+        return view('events.manage', compact('event', 'registrants', 'mostRequestedPosition', 'positionsAccess'));
     }
 
     public function create()
@@ -157,17 +158,36 @@ class EventManagementController extends Controller
         return redirect()->route('admin.events.index')->with('success', 'Event created successfully!');
     }
 
-    public function edit($id)
+    public function edit(Event $event)
     {
-        $event = Event::findOrFail($id);
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
+        $positionsAccess = $this->positionsAccessFor();
 
         return view('events.edit', [
             'event' => $event,
             'types' => $types,
             'featuredFields' => $featuredFields,
+            'positionsAccess' => $positionsAccess,
         ]);
+    }
+
+    public function positions(Event $event)
+    {
+        $positionsAccess = $this->positionsAccessFor();
+
+        abort_if($positionsAccess === 'hidden', 403);
+
+        return view('events.positions', compact('event', 'positionsAccess'));
+    }
+
+    private function positionsAccessFor(): string
+    {
+        return match (true) {
+            auth()->user()?->can('assign event positions') => 'full',
+            auth()->user()?->can('manage events') => 'readonly',
+            default => 'hidden',
+        };
     }
 
     public function update(Request $request, $id)

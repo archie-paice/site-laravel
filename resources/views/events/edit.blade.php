@@ -1,8 +1,6 @@
-@extends('layouts.admin')
+@extends('layouts.event-manage')
 
-@section('title', 'Edit Event')
-
-@section('body')
+@section('event-content')
 
     <form
         method="POST"
@@ -141,14 +139,5 @@
             Update Event
         </button>
     </form>
-
-    <div class="w-full lg:w-1/2 mx-auto mt-5">
-        <p class="text-sm opacity-70 mb-3">
-            The position list below saves independently of the form above — it is not affected by the
-            Update Event button, and vice versa.
-        </p>
-
-        @livewire('event-positions-management', ['event' => $event])
-    </div>
 
 @endsection

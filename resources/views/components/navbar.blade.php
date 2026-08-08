@@ -57,35 +57,7 @@
         <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
 
         @hasrole('staff')
-            <div class="dropdown dropdown-end">
-                <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
-                    <span>Facility Admin</span>
-                    <x-dropdown-icon/>
-                </div>
-                <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-sm">
-                    <li><a href="{{ route('admin.index') }}">Dashboard</a></li>
-
-                    @hasrole('training')
-                        <li><a href={{ route('admin.index') }}>Training Management</a></li>
-                    @endhasrole
-
-                    @hasrole('facilities')
-                        <li><a href={{ route('admin.index') }}>Data Management</a></li>
-                    @endhasrole
-
-                    @hasrole('events')
-                        <li><a href={{ route('admin.index') }}>Events Management</a></li>
-                    @endhasrole
-
-                    @hasrole('admin')
-                        <li><a href={{ route('admin.index') }}>Admin</a></li>
-                    @endhasrole
-
-                    @haspermission('feedback:read')
-                        <li><a href="{{ route('admin.feedback.index') }}">Feedback Management</a></li>
-                    @endhaspermission
-                </ul>
-            </div>
+            <a href="{{ route('admin.index') }}" class="m-1 font-medium">Facility Admin</a>
         @endhasrole
 
         @if(auth()->user())
@@ -133,18 +105,6 @@
             @hasrole('staff')
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>
                 <li><a href="{{ route('admin.index') }}">Dashboard</a></li>
-                @hasrole('training')
-                    <li><a href={{ route('admin.index') }}>Training Management</a></li>
-                @endhasrole
-                @hasrole('facilities')
-                    <li><a href={{ route('admin.index') }}>Data Management</a></li>
-                @endhasrole
-                @hasrole('events')
-                    <li><a href={{ route('admin.index') }}>Events Management</a></li>
-                @endhasrole
-                @hasrole('admin')
-                    <li><a href={{ route('admin.index') }}>Admin</a></li>
-                @endhasrole
             @endhasrole
 
             <div class="divider my-1"></div>

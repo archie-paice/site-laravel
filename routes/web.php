@@ -381,6 +381,10 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
                 [EventManagementController::class, 'edit']
             )->name('admin.events.edit');
 
+            Route::get('{event}/positions',
+                [EventManagementController::class, 'positions']
+            )->name('admin.events.positions');
+
             Route::put('{event}',
                 [EventManagementController::class, 'update']
             )->name('admin.events.update');

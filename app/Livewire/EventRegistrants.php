@@ -62,6 +62,11 @@ class EventRegistrants extends Component
         abort_unless(auth()->user()?->hasPermissionTo($permission), 403);
     }
 
+    public function getCanAssignProperty(): bool
+    {
+        return (bool) auth()->user()?->can('assign event positions');
+    }
+
     public function publishPositions()
     {
         $this->authorizePermission('publish events');

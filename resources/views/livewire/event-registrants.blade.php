@@ -140,7 +140,7 @@
 
                         </td>
                         <td class='border-r-1 border-base-300'>
-                            <select name="presetPositions" class="select"  wire:model="assignments.{{ $registrant->id }}.assigned_position">
+                            <select name="presetPositions" class="select"  wire:model="assignments.{{ $registrant->id }}.assigned_position" @disabled(!$this->canAssign)>
                                 <option disabled selected>Select position</option>
                                 <option value="">No position</option>
                                 @foreach ($positions as $p)
@@ -151,7 +151,7 @@
                             </select>
                         </td>
                         <td>
-                            <button wire:click="save({{ $registrant->id }})" type="button" class="btn btn-warning">
+                            <button wire:click="save({{ $registrant->id }})" type="button" class="btn btn-warning" @disabled(!$this->canAssign)>
                                 Save Position
                             </button>
                         </td>

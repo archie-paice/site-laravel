@@ -135,9 +135,10 @@ test('loading a narrower preset then saving is rejected and reverts to the saved
     expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
 });
 
-test('save requires the manage events permission', function () {
+test('save requires the assign event positions permission', function () {
     $viewer = User::factory()->create();
     $viewer->assignRole('staff');
+    $viewer->givePermissionTo('manage events');
     $this->actingAs($viewer);
 
     $event = Event::create([
@@ -156,6 +157,30 @@ test('save requires the manage events permission', function () {
         ->assertForbidden();
 
     expect($event->fresh()->presetPositions)->toBeNull();
+});
+
+test('a manage events-only user gets a read-only positions component and cannot mutate it', function () {
+    $viewer = User::factory()->create();
+    $viewer->assignRole('staff');
+    $viewer->givePermissionTo('manage events');
+    $this->actingAs($viewer);
+
+    $event = Event::create([
+        'title' => 'Test Event',
+        'description' => 'desc',
+        'start' => now()->addDay(),
+        'end' => now()->addDay()->addHours(2),
+        'type' => EventType::HOME,
+        'featured_fields' => [],
+        'hidden' => false,
+        'presetPositions' => ['JAX_CTR'],
+    ]);
+
+    Livewire::test(EventPositionsManagement::class, ['event' => $event, 'readOnly' => true])
+        ->assertSee('JAX_CTR')
+        ->assertDontSee('Save Positions')
+        ->call('addPosition')
+        ->assertForbidden();
 });
 
 test('a drifted assignment outside the current list still blocks a save that omits it', function () {

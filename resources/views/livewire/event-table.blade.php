@@ -41,9 +41,6 @@
                             <a href="{{ route('admin.events.manage', ['event' => $event->id]) }}" class="btn btn-primary">
                                 Manage
                             </a>
-                            <a href="{{ route('admin.events.edit', ['event' => $event->id]) }}" class="btn btn-accent">
-                                Edit
-                            </a>
                             <form action="{{ route('admin.events.destroy', ['event' => $event->id]) }}" method="POST"
                                 class="inline">
                                 @csrf

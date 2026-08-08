@@ -1,8 +1,6 @@
-@extends('layouts.admin')
+@extends('layouts.event-manage')
 
-@section('title', 'Manage Event')
-
-@section('body')
+@section('event-content')
     <div class="flex gap-6 w-full">
         <div class="flex flex-col gap-10 flex-1 min-w-0">
             <div class="bg-base-100 rounded-md p-6 w-full border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
@@ -98,7 +96,7 @@
 
                 <p class="pt-5">
                     To add, remove, or load a preset for this event's positions, use the
-                    <a href="{{ route('admin.events.edit', $event) }}" class="link link-primary">event edit page</a>.
+                    <a href="{{ route('admin.events.positions', $event) }}" class="link link-primary">Positions tab</a>.
                 </p>
 
                 <div class="pt-10">
@@ -108,7 +106,7 @@
         </div>
 
         <div class="w-1/3 flex flex-col justify-start items-center gap-6">
-            <div class="card card-dash bg-base-100 w-xl shadow-sm">
+            <div class="card card-dash bg-base-100 w-full max-w-xl shadow-sm overflow-hidden">
                 @if ($event->event_image_route)
                     <figure>
                         <img class='' src="{{ asset($event->event_image_route) }}" alt=""/>

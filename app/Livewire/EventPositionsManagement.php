@@ -21,15 +21,20 @@ class EventPositionsManagement extends Component
 
     public bool $updated = false;
 
-    public function mount(Event $event)
+    public bool $readOnly = false;
+
+    public function mount(Event $event, bool $readOnly = false)
     {
         $this->event = $event;
+        $this->readOnly = $readOnly;
         $this->positions = $event->presetPositions ?? [];
         $this->presetNames = EventPositionPreset::orderBy('name')->pluck('name')->all();
     }
 
     public function addPosition()
     {
+        abort_unless(auth()->user()?->can('assign event positions'), 403);
+
         $position = strtoupper(trim($this->newPosition));
         $this->newPosition = '';
 
@@ -42,6 +47,8 @@ class EventPositionsManagement extends Component
 
     public function removePosition(string $position)
     {
+        abort_unless(auth()->user()?->can('assign event positions'), 403);
+
         $this->positions = collect($this->positions)
             ->reject(fn ($p) => strtoupper($p) === strtoupper($position))
             ->values()
@@ -50,6 +57,8 @@ class EventPositionsManagement extends Component
 
     public function loadPreset()
     {
+        abort_unless(auth()->user()?->can('assign event positions'), 403);
+
         if ($this->selectedPreset === '') {
             return;
         }
@@ -73,7 +82,7 @@ class EventPositionsManagement extends Component
     {
         // Livewire's update endpoint does not inherit the mounting page's route
         // middleware, so mutators have to re-check the permission themselves.
-        abort_unless(auth()->user()?->hasPermissionTo('manage events'), 403);
+        abort_unless(auth()->user()?->hasPermissionTo('assign event positions'), 403);
 
         $newPositions = collect($this->positions)
             ->map(fn ($position) => strtoupper(trim($position)))

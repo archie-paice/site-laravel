@@ -157,6 +157,7 @@ test('the pages touched by the events work all render', function () {
     $this->get(route('admin.events.index'))->assertOk();
     $this->get(route('admin.events.manage', ['event' => $event->id]))->assertOk();
     $this->get(route('admin.events.edit', ['event' => $event->id]))->assertOk();
+    $this->get(route('admin.events.positions', ['event' => $event->id]))->assertOk();
     $this->get(route('admin.events.create'))->assertOk();
     $this->get(route('admin.events.event-fields.index'))->assertOk();
     $this->get(route('admin.events.position-presets.index'))->assertOk();
@@ -244,4 +245,55 @@ test('the assignment form is seeded from the saved assignment', function () {
             "assignments.{$registrant->id}.assigned_start",
             $event->start->copy()->addHour()->utc()->format('Y-m-d\TH:i')
         );
+});
+
+test('the positions tab is hidden entirely from a user without the manage events permission', function () {
+    $bareStaff = User::factory()->create();
+    $bareStaff->assignRole('staff');
+    $this->actingAs($bareStaff);
+
+    $event = makeEvent();
+
+    $this->get(route('admin.events.positions', ['event' => $event->id]))->assertForbidden();
+});
+
+test('a manage events-only user sees the positions tab as read-only', function () {
+    $viewer = User::factory()->create();
+    $viewer->assignRole('staff');
+    $viewer->givePermissionTo('manage events');
+    $this->actingAs($viewer);
+
+    $event = makeEvent();
+
+    $this->get(route('admin.events.positions', ['event' => $event->id]))
+        ->assertOk()
+        ->assertSee('read-only');
+
+    $this->get(route('admin.events.manage', ['event' => $event->id]))
+        ->assertOk()
+        ->assertSee('Positions');
+});
+
+test('a manage events-only user cannot assign a final position from the roster', function () {
+    $viewer = User::factory()->create();
+    $viewer->assignRole('staff');
+    $viewer->givePermissionTo('manage events');
+    $this->actingAs($viewer);
+
+    $event = makeEvent();
+
+    $registrant = EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create()->id,
+        'requested_position' => 'JAX_CTR',
+        'start' => $event->start,
+        'end' => $event->end,
+    ]);
+
+    Livewire::test(EventRegistrants::class, ['event' => $event])
+        ->set("assignments.{$registrant->id}.assigned_position", 'JAX_CTR')
+        ->call('save', $registrant->id)
+        ->assertForbidden();
+
+    expect($registrant->fresh()->assigned_position)->toBeNull();
 });
