@@ -21,7 +21,12 @@
             </div>
 
             <img class='col-span-2 border-2 w-24 h-24 sm:w-36 sm:h-36 mb-5 rounded-full' src="{{ asset($user->profile_image_route) }}" alt=""/>
-            <input type="file" name="image" class="file-input file-input-bordered w-full max-w-xs mb-5" />
+            <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/svg+xml" class="file-input file-input-bordered w-full max-w-xs" />
+            <p class="text-xs text-base-content/60 mt-1 max-w-xs">JPEG, PNG, GIF, or SVG, up to 2MB. Square images work best since they're displayed in a circle.</p>
+            @error('image')
+                <p class="text-error text-sm mt-1 max-w-xs">{{ $message }}</p>
+            @enderror
+            <div class="mb-5"></div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
                 <a href="{{ route('users.show', $user) }}" class="link mb-3 sm:absolute sm:top-5 sm:right-5">View User</a>
