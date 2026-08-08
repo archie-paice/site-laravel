@@ -8,6 +8,7 @@
         @if ($checklist->error)
             <p class='text-lg'>It appears you are not a member of VATUSA. Please read <a class='link link-primary' href="https://www.vatusa.net/help/kb#q12">this FAQ</a> on how to join as an out-of-division controller.</p>
         @else
+            <div class='overflow-x-auto'>
             <table class='table w-full table-auto'>
                 <tr>
                     <td>You are not a member of vZJX</td>
@@ -53,6 +54,7 @@
                 </tr>
     
             </table>
+            </div>
 
             <p>For more detailed information, please check your <a class='link link-primary' href="https://www.vatusa.net/my/profile">VATUSA profile.</a></p>
 

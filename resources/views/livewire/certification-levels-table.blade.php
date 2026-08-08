@@ -1,3 +1,4 @@
+<div class='overflow-x-auto'>
 <table class='table table-compact w-full mt-5'>
     <thead>
         <tr>
@@ -17,3 +18,4 @@
         @livewire('certification-level-row', ['certificationLevel' => $level], key($level->id))
     @endforeach
 </table>
+</div>

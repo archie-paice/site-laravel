@@ -285,6 +285,9 @@
                             @hasrole('admin')
                                 <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Admin</a></li>
                             @endhasrole
+                            @haspermission('feedback:read')
+                                <li><a href="{{ route('admin.feedback.index') }}" class="rounded-none px-3 py-3.5 text-lg">Feedback Management</a></li>
+                            @endhaspermission
                         </ul>
                     </div>
                 @endhasrole

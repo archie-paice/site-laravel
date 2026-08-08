@@ -3,6 +3,7 @@
 @section('title', 'Certification Facilities')
 
 @section('body')
+    <div class="overflow-x-auto">
     <table class="table table-zebra">
         <thead>
             <tr>
@@ -34,6 +35,7 @@
             @endif
         </thead>
     </table>
+    </div>
 
     <form method="POST" action="{{ route('certification-facilities.store') }}" class="mt-10 border-t-1 border-base-300 pt-5">
         @csrf
