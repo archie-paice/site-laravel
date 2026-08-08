@@ -194,6 +194,8 @@
                             </button>
                         </li>
 
+                        <li><a href="{{ route('feedback.index') }}" class="rounded-none px-3 py-3.5 text-lg">Feedback</a></li>
+
                         @hasrole('staff')
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'facility-admin'">
