@@ -41,7 +41,7 @@ class ManageFaqs extends Component
         $this->pageIntro = FaqSetting::get('faq_intro');
     }
 
-    public function savePageHeader(): void
+    public function savePageHeader()
     {
         $this->validate([
             'pageHeading' => 'required|string|max:255',
@@ -52,6 +52,10 @@ class ManageFaqs extends Component
         FaqSetting::set('faq_intro', trim($this->pageIntro));
 
         $this->editingHeader = false;
+
+        session()->flash('success', 'FAQ page header updated.');
+
+        return redirect()->route('admin.faqs.index');
     }
 
     public function cancelHeader(): void
@@ -90,7 +94,7 @@ class ManageFaqs extends Component
         $this->showForm = true;
     }
 
-    public function save(): void
+    public function save()
     {
         // Resolve a freshly-typed category before validating the rest.
         if ($this->category === '__new__') {
@@ -105,13 +109,17 @@ class ManageFaqs extends Component
 
         if ($this->editingId) {
             Faq::findOrFail($this->editingId)->update($validated);
+            session()->flash('success', 'FAQ updated successfully.');
         } else {
             // New FAQs go to the bottom of their category.
             $validated['sort_order'] = (int) Faq::where('category', $this->category)->max('sort_order') + 1;
             Faq::create($validated);
+            session()->flash('success', 'FAQ created successfully.');
         }
 
         $this->resetForm();
+
+        return redirect()->route('admin.faqs.index');
     }
 
     public function togglePublished(int $id): void
@@ -120,13 +128,17 @@ class ManageFaqs extends Component
         $faq->update(['is_published' => ! $faq->is_published]);
     }
 
-    public function delete(int $id): void
+    public function delete(int $id)
     {
         Faq::destroy($id);
 
         if ($this->editingId === $id) {
             $this->resetForm();
         }
+
+        session()->flash('success', 'FAQ deleted.');
+
+        return redirect()->route('admin.faqs.index');
     }
 
     public function moveUp(int $id): void
@@ -186,7 +198,7 @@ class ManageFaqs extends Component
         $this->resetValidation();
     }
 
-    public function saveRename(): void
+    public function saveRename()
     {
         $this->validate(
             ['categoryNewName' => 'required|string|max:255'],
@@ -198,18 +210,25 @@ class ManageFaqs extends Component
 
         if ($old !== null && $new !== '' && $new !== $old) {
             Faq::where('category', $old)->get()->each->update(['category' => $new]);
+            session()->flash('success', "Category renamed to \"{$new}\".");
         }
 
         $this->cancelRename();
+
+        return redirect()->route('admin.faqs.index');
     }
 
-    public function deleteCategory(string $category): void
+    public function deleteCategory(string $category)
     {
         Faq::where('category', $category)->get()->each->delete();
 
         if ($this->renamingCategory === $category) {
             $this->cancelRename();
         }
+
+        session()->flash('success', "Category \"{$category}\" and its FAQs were deleted.");
+
+        return redirect()->route('admin.faqs.index');
     }
 
     public function cancel(): void
