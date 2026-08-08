@@ -64,12 +64,14 @@
 
         @yield('body-nopad')
 
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 ml-5 mt-5">
-            <h1 class='font-bold text-2xl'>@yield('title')</h1>
-            @hasSection('title-extra')
-                @yield('title-extra')
-            @endif
-        </div>
+        @unless($__env->hasSection('hide-heading'))
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 ml-5 mt-5">
+                <h1 class='font-bold text-2xl'>@yield('title')</h1>
+                @hasSection('title-extra')
+                    @yield('title-extra')
+                @endif
+            </div>
+        @endunless
 
         <div class="p-5 flex-1">
             @yield('body')

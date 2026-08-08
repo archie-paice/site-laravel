@@ -1,5 +1,7 @@
 @extends('layouts.main')
 
+@section('title', $event->hidden ? 'Event Not Public' : $event->title)
+
 @section('body')
     @if($event->hidden)
         <div class="flex items-center justify-center">
@@ -56,7 +58,7 @@
         </div>
 
         <div class="card bg-base-100 w-full max-w-xl shadow-sm">
-            <div class="card-body">
+            <div class="card-body bg-neutral">
                 <h2 class="card-title">Staffing</h2>
 
                 @if (! $event->published)
@@ -98,7 +100,7 @@
 
         @auth
             @if(!$event->positions_locked)
-                <div class="card bg-base-100 w-xl shadow-sm">
+                <div class="card bg-base-100 w-full max-w-xl shadow-sm">
                     @livewire('event-registration', ['event' => $event])
                 </div>
             @endif

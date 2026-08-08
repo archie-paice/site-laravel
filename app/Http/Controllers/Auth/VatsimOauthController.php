@@ -11,6 +11,20 @@ class VatsimOauthController extends Controller
 {
     public function redirect()
     {
+        // Preserve whatever page the user was on before leaving for VATSIM Connect, unless
+        // the auth middleware already captured the actual protected route they were after.
+        // Never let an auth route, or an off-site URL, become the stored destination.
+        if (! session()->has('url.intended')) {
+            $previous = url()->previous();
+            $parsed = parse_url($previous);
+            $path = $parsed['path'] ?? '';
+            $sameHost = ! isset($parsed['host']) || $parsed['host'] === request()->getHost();
+
+            if ($sameHost && ! str_contains($path, '/auth/') && ! str_contains($path, '/login')) {
+                session(['url.intended' => $previous]);
+            }
+        }
+
         return Socialite::driver('vatsim')->redirect();
     }
 
@@ -30,13 +44,14 @@ class VatsimOauthController extends Controller
 
         Auth::login(User::find($user->cid));
 
-        return redirect()->back(fallback: route('home'));
+        return redirect()->intended(route('home'));
     }
 
     public function logout()
     {
         Auth::logout();
+        session()->forget('url.intended');
 
-        return redirect()->back(fallback: route('home'));
+        return redirect()->route('home');
     }
 }

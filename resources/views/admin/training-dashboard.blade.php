@@ -1,5 +1,8 @@
 @extends('layouts.main')
 
+@section('title', 'Training Dashboard')
+@section('hide-heading')@endsection
+
 @section('body-nopad')
 
     <div class="drawer lg:drawer-open">
