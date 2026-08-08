@@ -74,6 +74,54 @@ test('any logged in user sees assignee names on the roster', function () {
         ->assertSee('Jamie Doe');
 });
 
+test('an assignee working outside the event window has their actual times shown', function () {
+    $event = rosterEvent(['published' => true]);
+
+    EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create(['first_name' => 'Early', 'last_name' => 'Bird'])->id,
+        'requested_position' => 'JAX_CTR',
+        'assigned_position' => 'JAX_CTR',
+        'start' => $event->start,
+        'end' => $event->end,
+        'assigned_start' => $event->start->copy()->subHour(),
+        'assigned_end' => $event->end->copy(),
+    ]);
+
+    $viewer = User::factory()->create();
+    $viewer->assignRole('core');
+
+    $this->actingAs($viewer)
+        ->get(route('events.show', ['event' => $event->id]))
+        ->assertOk()
+        ->assertSee('Early Bird')
+        ->assertSee($event->start->copy()->subHour()->format('H:i'));
+});
+
+test('an assignee working the exact event window has no extra times shown', function () {
+    $event = rosterEvent(['published' => true]);
+
+    EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create(['first_name' => 'OnTime', 'last_name' => 'Controller'])->id,
+        'requested_position' => 'JAX_CTR',
+        'assigned_position' => 'JAX_CTR',
+        'start' => $event->start,
+        'end' => $event->end,
+        'assigned_start' => $event->start,
+        'assigned_end' => $event->end,
+    ]);
+
+    $viewer = User::factory()->create();
+    $viewer->assignRole('core');
+
+    $this->actingAs($viewer)
+        ->get(route('events.show', ['event' => $event->id]))
+        ->assertOk()
+        ->assertSee('OnTime Controller')
+        ->assertDontSee('('.$event->start->format('H:i'));
+});
+
 test('an assignment that has drifted off the position list still appears on the roster', function () {
     $event = rosterEvent(['published' => true, 'presetPositions' => ['JAX_CTR']]);
 

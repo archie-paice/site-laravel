@@ -13,7 +13,7 @@ beforeEach(function () {
     $this->seed(PermissionSeeder::class);
 });
 
-test('loading a preset seeds the list without persisting', function () {
+test('loading a preset replaces the list and persists it immediately', function () {
     $staff = User::factory()->create();
     $staff->assignRole('staff', 'events');
     $this->actingAs($staff);
@@ -34,9 +34,10 @@ test('loading a preset seeds the list without persisting', function () {
     Livewire::test(EventPositionsManagement::class, ['event' => $event])
         ->set('selectedPreset', 'Full Staffing')
         ->call('loadPreset')
-        ->assertSet('positions', ['JAX_CTR', 'MCO_APP']);
+        ->assertSet('positions', ['JAX_CTR', 'MCO_APP'])
+        ->assertDispatched('notify', type: 'success');
 
-    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR']);
+    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
 });
 
 test('save normalizes and persists the list', function () {
@@ -58,9 +59,58 @@ test('save normalizes and persists the list', function () {
         ->set('positions', [' jax_ctr ', 'MCO_APP', 'mco_app'])
         ->call('save')
         ->assertSet('positions', ['JAX_CTR', 'MCO_APP'])
-        ->assertSet('updated', true);
+        ->assertDispatched('notify', type: 'success');
 
     expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
+});
+
+test('adding a position persists it immediately without a separate save', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole('staff', 'events');
+    $this->actingAs($staff);
+
+    $event = Event::create([
+        'title' => 'Test Event',
+        'description' => 'desc',
+        'start' => now()->addDay(),
+        'end' => now()->addDay()->addHours(2),
+        'type' => EventType::HOME,
+        'featured_fields' => [],
+        'hidden' => false,
+        'presetPositions' => ['JAX_CTR'],
+    ]);
+
+    Livewire::test(EventPositionsManagement::class, ['event' => $event])
+        ->set('newPosition', 'mco_app')
+        ->call('addPosition')
+        ->assertSet('positions', ['JAX_CTR', 'MCO_APP'])
+        ->assertDispatched('notify', type: 'success');
+
+    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
+});
+
+test('removing an unassigned position persists immediately without a separate save', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole('staff', 'events');
+    $this->actingAs($staff);
+
+    $event = Event::create([
+        'title' => 'Test Event',
+        'description' => 'desc',
+        'start' => now()->addDay(),
+        'end' => now()->addDay()->addHours(2),
+        'type' => EventType::HOME,
+        'featured_fields' => [],
+        'hidden' => false,
+        'presetPositions' => ['JAX_CTR', 'MCO_APP'],
+    ]);
+
+    Livewire::test(EventPositionsManagement::class, ['event' => $event])
+        ->call('removePosition', 'MCO_APP')
+        ->assertSet('positions', ['JAX_CTR'])
+        ->assertDispatched('notify', type: 'success');
+
+    expect($event->fresh()->presetPositions)->toBe(['JAX_CTR']);
 });
 
 test('a freeform removal of an assigned position is rejected', function () {
@@ -91,13 +141,13 @@ test('a freeform removal of an assigned position is rejected', function () {
     Livewire::test(EventPositionsManagement::class, ['event' => $event])
         ->set('positions', ['JAX_CTR'])
         ->call('save')
-        ->assertHasErrors('positions')
+        ->assertDispatched('notify', type: 'error')
         ->assertSet('positions', ['JAX_CTR', 'MCO_APP']);
 
     expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
 });
 
-test('loading a narrower preset then saving is rejected and reverts to the saved list', function () {
+test('loading a preset that would drop an assigned position is rejected and reverts', function () {
     $staff = User::factory()->create();
     $staff->assignRole('staff', 'events');
     $this->actingAs($staff);
@@ -127,9 +177,7 @@ test('loading a narrower preset then saving is rejected and reverts to the saved
     Livewire::test(EventPositionsManagement::class, ['event' => $event])
         ->set('selectedPreset', 'Narrow')
         ->call('loadPreset')
-        ->assertSet('positions', ['JAX_CTR']) // in-memory load succeeds, nothing persisted yet
-        ->call('save')
-        ->assertHasErrors('positions')
+        ->assertDispatched('notify', type: 'error')
         ->assertSet('positions', ['JAX_CTR', 'MCO_APP']); // reverted to DB truth
 
     expect($event->fresh()->presetPositions)->toBe(['JAX_CTR', 'MCO_APP']);
@@ -178,7 +226,7 @@ test('a manage events-only user gets a read-only positions component and cannot 
 
     Livewire::test(EventPositionsManagement::class, ['event' => $event, 'readOnly' => true])
         ->assertSee('JAX_CTR')
-        ->assertDontSee('Save Positions')
+        ->assertDontSee('Load Preset')
         ->call('addPosition')
         ->assertForbidden();
 });
@@ -213,7 +261,7 @@ test('a drifted assignment outside the current list still blocks a save that omi
     Livewire::test(EventPositionsManagement::class, ['event' => $event])
         ->set('positions', ['JAX_CTR'])
         ->call('save')
-        ->assertHasErrors('positions');
+        ->assertDispatched('notify', type: 'error');
 
     expect($event->fresh()->presetPositions)->toBe(['JAX_CTR']);
 });
@@ -245,9 +293,37 @@ test('removing an assigned position is blocked regardless of case', function () 
 
     Livewire::test(EventPositionsManagement::class, ['event' => $event])
         ->call('removePosition', 'jax_ctr')
-        ->assertSet('positions', [])
-        ->call('save')
-        ->assertHasErrors('positions');
+        ->assertDispatched('notify', type: 'error')
+        ->assertSet('positions', ['JAX_CTR']);
 
     expect($event->fresh()->presetPositions)->toBe(['JAX_CTR']);
+});
+
+test('getAssignedPositions reflects who currently has a final position assigned', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole('staff', 'events');
+    $this->actingAs($staff);
+
+    $event = Event::create([
+        'title' => 'Test Event',
+        'description' => 'desc',
+        'start' => now()->addDay(),
+        'end' => now()->addDay()->addHours(2),
+        'type' => EventType::HOME,
+        'featured_fields' => [],
+        'hidden' => false,
+        'presetPositions' => ['JAX_CTR', 'MCO_APP'],
+    ]);
+
+    EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create()->id,
+        'requested_position' => 'JAX_CTR',
+        'assigned_position' => 'JAX_CTR',
+        'start' => $event->start,
+        'end' => $event->end,
+    ]);
+
+    Livewire::test(EventPositionsManagement::class, ['event' => $event])
+        ->assertSet('assignedPositions', ['JAX_CTR']);
 });

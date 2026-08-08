@@ -100,8 +100,8 @@
                     <h1 class="text-lg">No upcoming events.</h1>
                 @else
                     @foreach($events as $event)
-                        <div class="flex flex-col my-2">
-                            <div class="bg-base-300 rounded-xl shadow-sm overflow-hidden">
+                        <a href="{{ route('events.show', $event->id) }}" class="flex flex-col my-2">
+                            <div class="bg-base-300 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition">
                                 <div class="flex">
                                     <div
                                         class="bg-primary text-primary-content w-14 sm:w-16 shrink-0 flex flex-col items-center justify-center py-2"
@@ -129,7 +129,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endforeach
                 @endif
             </x-card-component-2>

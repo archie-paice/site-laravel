@@ -7,6 +7,7 @@ use App\Models\Event;
 use App\Models\EventPosition;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 use Livewire\Component;
 
 class EventRegistrants extends Component
@@ -19,14 +20,15 @@ class EventRegistrants extends Component
 
     public array $assignments = [];
 
-    public ?int $currentRegistrantId = null;
-
-    // Alerts
-    public bool $success = false;
-
-    public bool $showPositionsPublishedAlert = false;
-
-    public bool $showUnpublishedPositionsAlert = false;
+    /**
+     * A snapshot of $assignments as loaded from the DB, so saveAll() can tell
+     * which rows the admin actually touched without relying on Eloquent's
+     * isDirty() — which would be true for every row once assigned_start/end
+     * fall back to the event's own start/end (see mount()), even ones nobody
+     * edited. Must be public: Livewire only persists public properties across
+     * requests, and this needs to survive from mount() to saveAll().
+     */
+    public array $originalAssignments = [];
 
     public bool $publishedPositions = false;
 
@@ -45,12 +47,8 @@ class EventRegistrants extends Component
                 'assigned_position' => $registrant->assigned_position,
             ];
         }
-    }
 
-    public function dismissErrors()
-    {
-        $this->resetValidation();
-        $this->currentRegistrantId = null;
+        $this->originalAssignments = $this->assignments;
     }
 
     /**
@@ -91,7 +89,7 @@ class EventRegistrants extends Component
             Mail::to($registrant->user->email)->queue(new EventPositionAssigned($registrant));
         }
 
-        $this->showPositionsPublishedAlert = true;
+        $this->dispatch('notify', type: 'success', message: 'Positions published.');
     }
 
     public function unpublishPositions()
@@ -101,10 +99,15 @@ class EventRegistrants extends Component
         $this->event->published = false;
         $this->event->save();
         $this->publishedPositions = $this->event->published;
-        $this->showUnpublishedPositionsAlert = true;
+
+        $this->dispatch('notify', type: 'warning', message: 'Positions unpublished.');
     }
 
-    public function save($id)
+    /**
+     * Persist every registrant's assignment in one action, skipping rows
+     * nobody has touched (never assigned in the DB, still blank on the form).
+     */
+    public function saveAll()
     {
         $this->authorizePermission('assign event positions');
 
@@ -112,55 +115,89 @@ class EventRegistrants extends Component
         // page session, so re-check the current published value from the DB.
         $this->event->refresh();
 
-        $this->currentRegistrantId = $id;
+        $errors = [];
+        $savedCount = 0;
 
-        $this->validate([
-            "assignments.$id.assigned_start" => ['required', 'date'],
-            "assignments.$id.assigned_end" => ['required', 'date', "after:assignments.$id.assigned_start"],
-            "assignments.$id.assigned_position" => ['required', 'string'],
-        ], [
-            "assignments.$id.assigned_start.required" => 'Assigned start is required.',
-            "assignments.$id.assigned_start.date" => 'Assigned start must be a valid date.',
+        foreach ($this->registrants as $registrant) {
+            $result = $this->persistAssignment($registrant->id);
 
-            "assignments.$id.assigned_end.required" => 'Assigned end is required.',
-            "assignments.$id.assigned_end.date" => 'Assigned end must be a valid date.',
-            "assignments.$id.assigned_end.after" => 'Assigned end must be after assigned start.',
+            if ($result === true) {
+                $savedCount++;
+            } elseif (is_string($result)) {
+                $errors[] = $result;
+            }
+        }
 
-            "assignments.$id.assigned_position.required" => 'Assigned position is required.',
-        ]);
+        if (! empty($errors)) {
+            $this->dispatch('notify', type: 'error', message: implode(' ', $errors));
+        }
 
-        $data = $this->assignments[$id] ?? [];
+        if ($savedCount > 0) {
+            $this->dispatch('notify', type: 'success', message: $savedCount === 1
+                ? 'Saved 1 position assignment.'
+                : "Saved {$savedCount} position assignments.");
+        } elseif (empty($errors)) {
+            $this->dispatch('notify', type: 'info', message: 'No changes to save.');
+        }
+    }
+
+    /**
+     * @return true|string|null true if persisted with a real change, an error
+     *                          message if the row is invalid, or null if there
+     *                          was nothing to do for this row.
+     */
+    private function persistAssignment(int $id): true|string|null
+    {
+        $data = $this->assignments[$id] ?? null;
 
         if (! $data) {
-            return;
+            return null;
         }
 
-        // $id arrives from the client, so scope the lookup to this event rather
-        // than letting one event's manage page write another event's assignments.
+        // Nothing changed on the form for this row since it was loaded — skip
+        // it rather than re-touching (and re-notifying about) an untouched row.
+        if (($this->originalAssignments[$id] ?? null) === $data) {
+            return null;
+        }
+
+        $validator = Validator::make($data, [
+            'assigned_start' => ['required', 'date'],
+            'assigned_end' => ['required', 'date', 'after:assigned_start'],
+            'assigned_position' => ['required', 'string'],
+        ]);
+
+        if ($validator->fails()) {
+            $registrant = $this->registrants->firstWhere('id', $id);
+            $name = $registrant?->user
+                ? "{$registrant->user->first_name} {$registrant->user->last_name}"
+                : "registrant #{$id}";
+
+            return "{$name}: ".implode(' ', $validator->errors()->all());
+        }
+
+        // $id always comes from $this->registrants (this event's own rows), so
+        // this lookup can never cross into another event's data.
         $registrant = EventPosition::where('event_id', $this->event->id)->findOrFail($id);
 
-        $registrant->assigned_start = $data['assigned_start'] ?? null;
-        $registrant->assigned_end = $data['assigned_end'] ?? null;
-        $registrant->assigned_position = $data['assigned_position'] ?? null;
+        $registrant->assigned_start = $data['assigned_start'];
+        $registrant->assigned_end = $data['assigned_end'];
+        $registrant->assigned_position = $data['assigned_position'];
         $registrant->position_status = 'assigned';
 
-        $wasChanged = $registrant->isDirty(['assigned_start', 'assigned_end', 'assigned_position']);
-
-        if ($this->event->published && $wasChanged) {
-            $registrant->notified_at = now();
-        } elseif (! $this->event->published && $wasChanged) {
-            // Changed while unpublished — any prior notification is stale, so
-            // clear it and let the next publishPositions() call re-notify.
-            $registrant->notified_at = null;
-        }
-
+        // Changed while unpublished — any prior notification is stale, so
+        // clear it and let the next publishPositions() call re-notify.
+        $registrant->notified_at = $this->event->published ? now() : null;
         $registrant->save();
 
-        if ($this->event->published && $wasChanged) {
+        if ($this->event->published) {
             Mail::to($registrant->user->email)->queue(new EventPositionAssigned($registrant, isUpdate: true));
         }
 
-        $this->success = true;
+        // Move the baseline forward so re-clicking Save All without further
+        // edits in the same session is a no-op instead of re-notifying.
+        $this->originalAssignments[$id] = $data;
+
+        return true;
     }
 
     public function render()

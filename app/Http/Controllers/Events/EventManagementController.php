@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Enum;
+use Stevebauman\Purify\Facades\Purify;
 
 class EventManagementController extends Controller
 {
@@ -141,7 +142,7 @@ class EventManagementController extends Controller
 
         $event = Event::create([
             'title' => $validated['title'],
-            'description' => $validated['description'],
+            'description' => Purify::clean($validated['description']),
             'start' => $validated['start'],
             'end' => $validated['end'],
             'type' => $validated['type'],
@@ -214,7 +215,7 @@ class EventManagementController extends Controller
         $oldImagePath = $event->event_image_route;
 
         $event->title = $validated['title'];
-        $event->description = $validated['description'];
+        $event->description = Purify::clean($validated['description']);
         $event->start = $validated['start'];
         $event->end = $validated['end'];
         $event->type = $validated['type'];

@@ -2,15 +2,7 @@
     <div class="card-body">
         <h2 class="card-title">Positions</h2>
 
-        @if ($readOnly)
-            <div class="flex flex-wrap gap-2">
-                @forelse ($positions as $position)
-                    <span class="badge badge-outline">{{ $position }}</span>
-                @empty
-                    <span class="text-sm opacity-60">No positions added yet.</span>
-                @endforelse
-            </div>
-        @else
+        @unless ($readOnly)
             <div class="flex flex-wrap items-end gap-3">
                 <div class="flex-1 min-w-48">
                     <label class="label">Load from a preset</label>
@@ -28,55 +20,46 @@
             </div>
 
             <p class="text-xs opacity-70">
-                Loading a preset replaces the list below. Nothing is saved until you click Save Positions.
+                Loading a preset replaces the list below and saves it immediately.
             </p>
 
             <div class="divider"></div>
+        @endunless
 
-            <form wire:submit.prevent="save">
-                <x-list-editor
-                    :items="$positions"
-                    add-action="addPosition"
-                    remove-action="removePosition"
-                    item-model="newPosition"
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+            @forelse ($positions as $position)
+                @php($isAssigned = in_array(strtoupper($position), $this->assignedPositions, true))
+                <div class="flex items-center justify-between gap-2 rounded-box border border-base-300 bg-base-200 py-2 px-3 text-sm font-mono">
+                    <span>{{ $position }}</span>
+                    @unless ($readOnly)
+                        @if ($isAssigned)
+                            <x-locked-badge tip="A controller is already assigned to this position." />
+                        @else
+                            <button
+                                type="button"
+                                wire:click="removePosition('{{ $position }}')"
+                                class="text-error"
+                                aria-label="Remove {{ $position }}"
+                            >&times;</button>
+                        @endif
+                    @endunless
+                </div>
+            @empty
+                <span class="text-sm opacity-60 col-span-full">No positions added yet.</span>
+            @endforelse
+        </div>
+
+        @unless ($readOnly)
+            <div class="flex gap-2 mt-4">
+                <input
+                    type="text"
+                    wire:model="newPosition"
+                    wire:keydown.enter.prevent="addPosition"
                     placeholder="JAX_CTR"
+                    class="input input-bordered flex-1"
                 />
-
-                <button type="submit" class="btn btn-primary mt-4">
-                    Save Positions
-                </button>
-            </form>
-        @endif
-
-        @error('positions')
-            <div role="alert" class="alert alert-error alert-horizontal mt-2">
-                <span>{{ $message }}</span>
-
-                <div>
-                    <button
-                        type="button"
-                        wire:click="dismissPositionsError"
-                        class="btn btn-sm"
-                    >
-                        Dismiss
-                    </button>
-                </div>
+                <button type="button" wire:click="addPosition" class="btn btn-secondary">Add</button>
             </div>
-        @enderror
-
-        @if ($updated)
-            <div role="alert" class="alert alert-warning alert-horizontal mt-2">
-                <span>Positions Successfully Updated</span>
-                <div>
-                    <button
-                        type="button"
-                        wire:click="$set('updated', false)"
-                        class="btn btn-sm"
-                    >
-                        Dismiss
-                    </button>
-                </div>
-            </div>
-        @endif
+        @endunless
     </div>
 </div>

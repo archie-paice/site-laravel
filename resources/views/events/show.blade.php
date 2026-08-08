@@ -50,7 +50,7 @@
 
                 @if($event->description)
                     <div class="divider my-1"></div>
-                    <p class="text-sm leading-relaxed">{{ $event->description }}</p>
+                    <div class="text-sm leading-relaxed">{!! \Stevebauman\Purify\Facades\Purify::clean($event->description) !!}</div>
                 @endif
             </div>
         </div>
@@ -71,9 +71,18 @@
 
                                 @if ($row['assignees']->isNotEmpty())
                                     @auth
-                                        <span class="text-sm text-right">
-                                            {{ $row['assignees']->map(fn ($user) => $user ? "{$user->first_name} {$user->last_name}" : 'Unknown')->implode(', ') }}
-                                        </span>
+                                        <div class="text-sm text-right">
+                                            @foreach ($row['assignees'] as $assignee)
+                                                <div>
+                                                    {{ $assignee['user'] ? "{$assignee['user']->first_name} {$assignee['user']->last_name}" : 'Unknown' }}
+                                                    @if ($assignee['start'] && $assignee['end'] && ($assignee['start']->ne($event->start) || $assignee['end']->ne($event->end)))
+                                                        <span class="text-xs opacity-70">
+                                                            ({{ $assignee['start']->format('H:i') }}&ndash;{{ $assignee['end']->format('H:i') }}Z)
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     @else
                                         <span class="badge badge-success badge-sm">Assigned</span>
                                     @endauth

@@ -135,7 +135,7 @@ test('saving an assignment while unpublished sends nothing and leaves it armed f
             'assigned_end' => $event->end->utc()->format('Y-m-d\TH:i'),
             'assigned_position' => 'JAX_CTR',
         ])
-        ->call('save', $registrant->id);
+        ->call('saveAll');
 
     Mail::assertNothingQueued();
     expect($registrant->fresh()->notified_at)->toBeNull();
@@ -172,7 +172,7 @@ test('saving an assignment while published sends exactly one email to that one u
             'assigned_end' => $event->end->utc()->format('Y-m-d\TH:i'),
             'assigned_position' => 'JAX_CTR',
         ])
-        ->call('save', $registrantOne->id);
+        ->call('saveAll');
 
     Mail::assertQueuedCount(1);
     Mail::assertQueued(
@@ -217,7 +217,7 @@ test('a later publish does not re-notify someone a prior save already notified',
             'assigned_end' => $event->end->utc()->format('Y-m-d\TH:i'),
             'assigned_position' => 'JAX_CTR',
         ])
-        ->call('save', $notified->id);
+        ->call('saveAll');
 
     Mail::assertQueuedCount(1);
 
@@ -254,13 +254,13 @@ test('an unchanged re save while published sends nothing', function () {
 
     Livewire::test(EventRegistrants::class, ['event' => $event])
         ->set("assignments.{$registrant->id}", $payload)
-        ->call('save', $registrant->id);
+        ->call('saveAll');
 
     Mail::assertQueuedCount(1);
 
     Livewire::test(EventRegistrants::class, ['event' => $event])
         ->set("assignments.{$registrant->id}", $payload)
-        ->call('save', $registrant->id);
+        ->call('saveAll');
 
     Mail::assertQueuedCount(1);
 });

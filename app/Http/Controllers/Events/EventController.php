@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Events;
 
 use App\Http\Controllers\Controller;
 use App\Models\Event;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,7 +44,7 @@ class EventController extends Controller
      * drifted off it (legacy data, or an assignment made before a since-removed
      * position was dropped), so a real assignment is never hidden from the roster.
      *
-     * @return Collection<int, array{position: string, assignees: Collection}>
+     * @return Collection<int, array{position: string, assignees: Collection<int, array{user: ?User, start: ?Carbon, end: ?Carbon}>}>
      */
     private function buildRoster(Event $event): Collection
     {
@@ -60,7 +62,11 @@ class EventController extends Controller
 
         return $allPositions->map(fn ($position) => [
             'position' => $position,
-            'assignees' => $assignedByPosition->get(strtoupper($position), collect())->map->user,
+            'assignees' => $assignedByPosition->get(strtoupper($position), collect())->map(fn ($registrant) => [
+                'user' => $registrant->user,
+                'start' => $registrant->assigned_start,
+                'end' => $registrant->assigned_end,
+            ]),
         ])->values();
     }
 }

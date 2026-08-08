@@ -8,7 +8,6 @@ use App\Models\FeaturedField;
 use App\Models\News;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -107,7 +106,7 @@ test('the edit form keeps the events existing start time', function () {
         ->assertSee($event->start->format('Y-m-d\TH:i'));
 });
 
-test('assignments cannot be saved onto a registrant from another event', function () {
+test('an injected assignment key for another event is never processed by saveAll', function () {
     $this->actingAs(makeEventsStaff());
 
     $shownEvent = makeEvent(['title' => 'Shown Event']);
@@ -121,14 +120,16 @@ test('assignments cannot be saved onto a registrant from another event', functio
         'end' => $otherEvent->end,
     ]);
 
-    expect(fn () => Livewire::test(EventRegistrants::class, ['event' => $shownEvent])
+    // saveAll() only loops over $this->registrants (the mounted event's own
+    // rows), so an extra key for another event's registrant — however it got
+    // into component state — is simply never iterated, let alone persisted.
+    Livewire::test(EventRegistrants::class, ['event' => $shownEvent])
         ->set("assignments.{$foreign->id}", [
             'assigned_start' => $otherEvent->start->format('Y-m-d\TH:i'),
             'assigned_end' => $otherEvent->end->format('Y-m-d\TH:i'),
             'assigned_position' => 'JAX_CTR',
         ])
-        ->call('save', $foreign->id)
-    )->toThrow(ModelNotFoundException::class);
+        ->call('saveAll');
 
     expect($foreign->fresh()->assigned_position)->toBeNull();
 });
@@ -180,6 +181,29 @@ test('a hidden event is not reachable by direct link', function () {
     $this->actingAs(makeEventsStaff())
         ->get(route('events.show', ['event' => $event->id]))
         ->assertOk();
+});
+
+test('the registrant roster lives on the positions tab, not the overview tab', function () {
+    $this->actingAs(makeEventsStaff());
+
+    $event = makeEvent();
+
+    EventPosition::create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create()->id,
+        'requested_position' => 'JAX_CTR',
+        'start' => $event->start,
+        'end' => $event->end,
+    ]);
+
+    $this->get(route('admin.events.manage', ['event' => $event->id]))
+        ->assertOk()
+        ->assertDontSee('Registrants');
+
+    $this->get(route('admin.events.positions', ['event' => $event->id]))
+        ->assertOk()
+        ->assertSee('Registrants')
+        ->assertSee('Positions Locked');
 });
 
 test('an event field in use cannot be deleted', function () {
@@ -292,7 +316,7 @@ test('a manage events-only user cannot assign a final position from the roster',
 
     Livewire::test(EventRegistrants::class, ['event' => $event])
         ->set("assignments.{$registrant->id}.assigned_position", 'JAX_CTR')
-        ->call('save', $registrant->id)
+        ->call('saveAll')
         ->assertForbidden();
 
     expect($registrant->fresh()->assigned_position)->toBeNull();

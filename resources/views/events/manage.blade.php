@@ -2,10 +2,11 @@
 
 @section('event-content')
     <div class="flex gap-6 w-full">
-        <div class="flex flex-col gap-10 flex-1 min-w-0">
-            <div class="bg-base-100 rounded-md p-6 w-full border-2 border-base-300 hover:shadow-2xl transition-all duration-300">
+        <div class="flex flex-col gap-10 flex-1 min-w-0 max-w-2xl">
+            <div class="card bg-base-100 border border-base-300 w-full">
+                <div class="card-body">
 
-                <h2 class="text-2xl font-light mb-3">
+                <h2 class="card-title">
                     Event Overview
                 </h2>
 
@@ -91,18 +92,13 @@
 
                 </div>
 
-            </div>
-            <div class="flex flex-col">
-
-                <p class="pt-5">
-                    To add, remove, or load a preset for this event's positions, use the
-                    <a href="{{ route('admin.events.positions', $event) }}" class="link link-primary">Positions tab</a>.
-                </p>
-
-                <div class="pt-10">
-                    @livewire('event-registrants', ['event' => $event])
                 </div>
             </div>
+
+            <p>
+                To view or assign this event's roster and positions, use the
+                <a href="{{ route('admin.events.positions', $event) }}" class="link link-primary">Positions tab</a>.
+            </p>
         </div>
 
         <div class="w-1/3 flex flex-col justify-start items-center gap-6">
@@ -126,7 +122,7 @@
                         <p>No fields</p>
                     @endif
                     <br />
-                    <p>{{ $event->description }}</p>
+                    <div>{!! \Stevebauman\Purify\Facades\Purify::clean($event->description) !!}</div>
                 </div>
             </div>
         </div>

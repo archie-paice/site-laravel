@@ -27,11 +27,11 @@
 
                     <h2 class="card-title">Description</h2>
 
-                    <textarea name="description" required class="textarea w-full" placeholder="Event description..." >{{ old('description') }}</textarea>
+                    <x-markdown-editor name="description" :content="old('description')" />
 
                     <div class="flex gap-4 w-full">
                         <div class="flex-1">
-                            <label class="label">Event Start</label>
+                            <label class="label">Event Start (Zulu)</label>
                             <input
                                 type="datetime-local"
                                 name="start"
@@ -42,7 +42,7 @@
                         </div>
 
                         <div class="flex-1">
-                            <label class="label">Event End</label>
+                            <label class="label">Event End (Zulu)</label>
                             <input
                                 type="datetime-local"
                                 name="end"

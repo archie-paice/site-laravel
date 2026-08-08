@@ -19,8 +19,6 @@ class EventPositionsManagement extends Component
 
     public string $selectedPreset = '';
 
-    public bool $updated = false;
-
     public bool $readOnly = false;
 
     public function mount(Event $event, bool $readOnly = false)
@@ -29,6 +27,16 @@ class EventPositionsManagement extends Component
         $this->readOnly = $readOnly;
         $this->positions = $event->presetPositions ?? [];
         $this->presetNames = EventPositionPreset::orderBy('name')->pluck('name')->all();
+    }
+
+    /**
+     * Positions with at least one registrant assigned — removing these is blocked.
+     *
+     * @return array<int, string>
+     */
+    public function getAssignedPositionsProperty(): array
+    {
+        return EventPosition::assignedPositionsOutsideOf($this->event->id, [])->all();
     }
 
     public function addPosition()
@@ -43,16 +51,28 @@ class EventPositionsManagement extends Component
         }
 
         $this->positions[] = $position;
+
+        // Adding can never remove an assigned position, so it's safe to persist
+        // immediately instead of waiting on a separate Save click.
+        $this->save();
     }
 
     public function removePosition(string $position)
     {
         abort_unless(auth()->user()?->can('assign event positions'), 403);
 
+        if (in_array(strtoupper($position), $this->assignedPositions, true)) {
+            $this->dispatch('notify', type: 'error', message: "Can't remove {$position} — a controller is already assigned to it.");
+
+            return;
+        }
+
         $this->positions = collect($this->positions)
             ->reject(fn ($p) => strtoupper($p) === strtoupper($position))
             ->values()
             ->all();
+
+        $this->save();
     }
 
     public function loadPreset()
@@ -67,7 +87,6 @@ class EventPositionsManagement extends Component
 
         abort_if($preset === null, 404);
 
-        // In-memory only — nothing is persisted until save().
         $this->positions = collect($preset->positions ?? [])
             ->map(fn ($p) => strtoupper(trim($p)))
             ->filter()
@@ -76,6 +95,8 @@ class EventPositionsManagement extends Component
             ->all();
 
         $this->selectedPreset = '';
+
+        $this->save();
     }
 
     public function save()
@@ -93,13 +114,9 @@ class EventPositionsManagement extends Component
         $blockedPositions = EventPosition::assignedPositionsOutsideOf($this->event->id, $newPositions->all());
 
         if ($blockedPositions->isNotEmpty()) {
-            $this->addError(
-                'positions',
-                'Cannot remove assigned position(s): '.$blockedPositions->implode(', ')
-            );
-
             $this->positions = $this->event->fresh()->presetPositions ?? [];
-            $this->updated = false;
+
+            $this->dispatch('notify', type: 'error', message: 'Cannot remove assigned position(s): '.$blockedPositions->implode(', '));
 
             return;
         }
@@ -109,14 +126,8 @@ class EventPositionsManagement extends Component
         $this->event->update(['presetPositions' => $positions]);
 
         $this->positions = $positions;
-        $this->updated = true;
 
-        session()->flash('success', 'Positions updated.');
-    }
-
-    public function dismissPositionsError()
-    {
-        $this->resetErrorBag('positions');
+        $this->dispatch('notify', type: 'success', message: 'Positions updated.');
     }
 
     private function hasPosition(string $position): bool

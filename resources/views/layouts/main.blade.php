@@ -28,29 +28,39 @@
 
         @yield('secondary-navbar')
 
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div x-data="{open: true}" x-show='open' class="alert alert-error alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div x-data="{open: true}" x-show='open' class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
-            </div>
-        @endif
+        <div
+            x-data="{
+                alerts: [
+                    @if ($errors->any())
+                        { id: 'validation', type: 'error', message: @js(implode(' ', $errors->all())) },
+                    @endif
+                    @if (session('error'))
+                        { id: 'session-error', type: 'error', message: @js(session('error')) },
+                    @endif
+                    @if (session('success'))
+                        { id: 'session-success', type: 'success', message: @js(session('success')) },
+                    @endif
+                ]
+            }"
+            x-on:notify.window="alerts.push({ id: Date.now() + '-' + Math.random(), type: $event.detail.type ?? 'info', message: $event.detail.message })"
+            class="flex flex-col gap-2 px-2 sm:px-0"
+        >
+            <template x-for="alert in alerts" :key="alert.id">
+                <div
+                    role="alert"
+                    class="alert"
+                    :class="{
+                        'alert-error': alert.type === 'error',
+                        'alert-success': alert.type === 'success',
+                        'alert-warning': alert.type === 'warning',
+                        'alert-info': alert.type === 'info',
+                    }"
+                >
+                    <span x-text="alert.message"></span>
+                    <button type="button" class="btn btn-ghost btn-sm" @click="alerts = alerts.filter(a => a.id !== alert.id)">Close</button>
+                </div>
+            </template>
+        </div>
 
         @yield('body-nopad')
 

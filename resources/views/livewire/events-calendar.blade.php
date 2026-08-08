@@ -105,7 +105,7 @@
                                         @if($event->end) – {{ $event->end->format('g:i A') }} @endif
                                     </p>
                                     @if($event->description)
-                                        <p class="text-xs text-base-content/50 line-clamp-2 mt-0.5">{{ $event->description }}</p>
+                                        <p class="text-xs text-base-content/50 line-clamp-2 mt-0.5">{{ strip_tags($event->description) }}</p>
                                     @endif
                                 </div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-base-content/30 shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
