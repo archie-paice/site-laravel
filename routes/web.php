@@ -13,12 +13,14 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventFieldController;
 use App\Http\Controllers\EventPositionPresetController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoaController;
 use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StatisticsController;
+use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
 use App\Http\Controllers\Training\TrainingAssignmentController;
 use App\Http\Controllers\Training\TrainingTicketController;
@@ -29,8 +31,13 @@ use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
 use App\Livewire\EventRegistration;
+use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReceived;
+use App\Mail\FeedbackReleased;
 use App\Mail\TrainingAssignmentCreated;
 use App\Mail\Welcome;
+use App\Models\Feedback;
+use App\Models\FeedbackComment;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
@@ -64,6 +71,7 @@ Route::get('/auth/logout', [VatsimOauthController::class, 'logout'])->name('auth
 Route::resource('users', UserController::class, ['only' => ['show', 'edit', 'update']]);
 Route::prefix('users/{user}')->group(function () {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
+    Route::get('feedback', [UserController::class, 'feedback'])->middleware('auth')->name('users.show.feedback');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
@@ -79,6 +87,10 @@ Route::prefix('loa')->middleware('auth')->name('loa.')->group(function () {
     Route::put('{loa}', [LoaController::class, 'update'])->name('update');
     Route::delete('{loa}', [LoaController::class, 'destroy'])->name('destroy');
 });
+
+// Feedback
+Route::get('/feedback', [FeedbackController::class, 'index'])->middleware('auth')->name('feedback.index');
+Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('auth')->name('feedback.store');
 
 // Controller Statistics
 Route::get('controllers/statistics', [StatisticsController::class, 'index'])->name('statistics.index');
@@ -105,6 +117,19 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
 
     // User Management
     Route::get('users', [UserManagementController::class, 'index'])->name('manage-users.index');
+    // Feedback
+    Route::middleware('permission:feedback:read')->group(function () {
+        Route::get('feedback', [FeedbackController::class, 'manage'])->name('admin.feedback.index');
+        Route::get('feedback/{feedback}', [FeedbackController::class, 'show'])->name('admin.feedback.show');
+    });
+
+    Route::middleware('permission:feedback:write')->group(function () {
+        Route::put('feedback/{feedback}/stash', [FeedbackController::class, 'stash'])->name('admin.feedback.stash');
+        Route::put('feedback/{feedback}/unstash', [FeedbackController::class, 'unstash'])->name('admin.feedback.unstash');
+        Route::put('feedback/{feedback}/release', [FeedbackController::class, 'release'])->name('admin.feedback.release');
+        Route::post('feedback/{feedback}/comments', [FeedbackController::class, 'storeComment'])->name('admin.feedback.comments.store');
+    });
+
     Route::middleware('permission:manage visiting controllers')->group(function () {
         Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])->name('visit.show');
         Route::get('visit-requests', [VisitFacilityController::class, 'manage'])->name('visit.manage');
@@ -122,7 +147,7 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     });
 
     // Contributors
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('permission:manage contributors')->group(function () {
         Route::get('contributors', [ManualContributorController::class, 'index'])->name('admin.contributors.index');
         Route::post('contributors', [ManualContributorController::class, 'store'])->name('admin.contributors.store');
         Route::delete('contributors/{contributor}', [ManualContributorController::class, 'destroy'])->name('admin.contributors.destroy');
@@ -219,4 +244,10 @@ if (App::environment('development', 'local')) {
 
         return new TrainingAssignmentCreated(TrainingAssignment::find(1));
     });
+
+    Route::get('/test-email/feedback-released', fn () => new FeedbackReleased(Feedback::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-comment', fn () => new FeedbackCommentPosted(FeedbackComment::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-received', fn () => new FeedbackReceived(Feedback::latest()->firstOrFail()));
 }
