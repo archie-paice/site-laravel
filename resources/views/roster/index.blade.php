@@ -3,7 +3,7 @@
 @section('title', 'Roster')
 @section('body')
     @unless(sizeof($users) == 0)
-        <div class='overflow-x-auto'>
+        <div class='overflow-x-auto overscroll-x-contain'>
         <table class='table table-zebra table-md w-max border-2 border-base-300'>
             <thead>
                 <tr class='text-xl font-bold'>

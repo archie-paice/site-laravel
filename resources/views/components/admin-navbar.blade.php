@@ -179,6 +179,9 @@
                             <li><a href={{ route('training-tickets.index') }} class="rounded-none px-3 py-3.5 text-lg">Training Tickets</a></li>
                             <li><a href={{ route('training-assignments.index') }} class="rounded-none px-3 py-3.5 text-lg">Training Assignments</a></li>
                             <li><a href={{ route('solo-certs.index') }} class="rounded-none px-3 py-3.5 text-lg">Solo Certs</a></li>
+                            @haspermission('certifications:write')
+                                <li><a href={{ route('certifications.index') }} class="rounded-none px-3 py-3.5 text-lg">Certifications</a></li>
+                            @endhaspermission
                         </ul>
                     </div>
                 @endhasrole
@@ -196,7 +199,7 @@
                             @haspermission('manage statistics prefixes')
                                 <li><a href="{{ route('statistics-prefixes.index') }}" class="rounded-none px-3 py-3.5 text-lg">Statistics Prefixes</a></li>
                             @endhaspermission
-                            @haspermission('manage certification facilities')
+                            @haspermission('certification-facilities:write')
                                 <li><a href={{ route('certification-facilities.index') }} class="rounded-none px-3 py-3.5 text-lg">Certification Facilities</a></li>
                             @endhaspermission
                             <li><a href="{{ route('admin.publications.index') }}" class="rounded-none px-3 py-3.5 text-lg">Document Management</a></li>
