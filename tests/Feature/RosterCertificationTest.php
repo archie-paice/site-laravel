@@ -1,0 +1,28 @@
+<?php
+
+use App\Models\CertificationFacility;
+use App\Models\CertificationLevel;
+use App\Models\User;
+use App\Models\UserCertification;
+use Database\Seeders\PermissionSeeder;
+
+beforeEach(fn () => $this->seed(PermissionSeeder::class));
+
+test('the roster shows the highest held abbreviation and uncertified otherwise', function () {
+    $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX', 'order' => 1]);
+    $ground = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'level' => 1, 'abbreviation' => 'GND']);
+    $tower = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'level' => 2, 'abbreviation' => 'TWR']);
+
+    $certified = User::factory()->create(['first_name' => 'Cert', 'last_name' => 'Ified']);
+    User::factory()->create(['first_name' => 'Un', 'last_name' => 'Certified']);
+
+    UserCertification::create(['user_id' => $certified->id, 'certification_level_id' => $ground->id]);
+    UserCertification::create(['user_id' => $certified->id, 'certification_level_id' => $tower->id]);
+
+    $response = $this->get(route('roster.index'));
+
+    $response->assertStatus(200);
+    $response->assertSee('TWR');        // highest level shown for the certified user
+    $response->assertDontSee('GND');    // the lower level is not surfaced
+    $response->assertSee('Uncertified');
+});

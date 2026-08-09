@@ -7,7 +7,6 @@ use App\Http\Controllers\AtcBookingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\CertificationFacilityController;
-use App\Http\Controllers\CertificationLevelController;
 use App\Http\Controllers\ContributorsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EventController;
@@ -150,15 +149,10 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     Route::prefix('data')->group(function () {
         Route::middleware('permission:manage statistics prefixes')->resource('statistics-prefixes', StatisticsPrefixesController::class);
 
-        Route::middleware('permission:manage certification facilities')->prefix('certification-facilities')->group(function () {
+        Route::middleware('permission:certification-facilities:write')->prefix('certification-facilities')->group(function () {
+            // Facility + level CRUD is handled by Livewire components on these pages.
             Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
-            Route::post('/', [CertificationFacilityController::class, 'store'])->name('certification-facilities.store');
-
-            Route::prefix('/{facility}')->group(function () {
-                Route::get('/', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
-                Route::delete('/', [CertificationFacilityController::class, 'destroy'])->name('certification-facilities.destroy');
-                Route::post('/certification-levels', [CertificationLevelController::class, 'store'])->name('certification-levels.store');
-            });
+            Route::get('/{facility}', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
         });
     });
 
@@ -215,6 +209,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::put('{event}', [EventController::class, 'update'])->name('admin.events.update');
         Route::delete('{event}', [EventController::class, 'destroy'])->name('admin.events.destroy');
     });
+});
+
+// Certification Management (instructors + admins; gated only by certifications:write)
+Route::prefix('admin')->middleware('permission:certifications:write')->group(function () {
+    Route::get('certifications', fn () => view('certifications.index'))->name('certifications.index');
 });
 
 // Dev Only Routes
