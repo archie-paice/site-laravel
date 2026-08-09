@@ -9,7 +9,6 @@
     <x-card-component>
         <div class='flex flex-col'>
             <a class='text-xl font-bold' href="{{ route('users.show', [$loa->user->id]) }}">{{ $loa->user->name }}</a>
-            <a class='link link-primary' target='_blank' href="https://www.vatusa.net/mgt/controller/{{ $loa->user->id }}">View VATUSA History</a>
             <br>
 
             <label class='label'>Status</label>

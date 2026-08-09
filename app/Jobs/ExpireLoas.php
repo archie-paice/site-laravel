@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Enums\LoaStatus;
 use App\Mail\LoaExpired;
 use App\Models\Loa;
+use App\Models\Staff;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -20,11 +21,17 @@ class ExpireLoas implements ShouldQueue
             ->where('end_date', '<', now()->toDateString())
             ->get();
 
+        $staffToNotify = Staff::whereIn('title_short', ['ATM', 'DATM'])
+            ->with('user')
+            ->get()
+            ->pluck('user')
+            ->filter();
+
         foreach ($expiredLoas as $loa) {
             $loa->status = LoaStatus::INACTIVE;
             $loa->save();
 
-            Mail::to($loa->user->email)->queue(new LoaExpired($loa));
+            Mail::to($loa->user->email)->bcc($staffToNotify)->queue(new LoaExpired($loa));
             Log::info('LOA #'.$loa->id.' for user '.$loa->user_id.' expired.');
         }
     }
