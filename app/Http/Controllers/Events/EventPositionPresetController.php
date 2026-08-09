@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Events;
 
+use App\Http\Controllers\Controller;
 use App\Models\EventPositionPreset;
 use Illuminate\Http\Request;
 
@@ -37,12 +38,9 @@ class EventPositionPresetController extends Controller
             'positions' => 'required|string',
         ]);
 
-        $positions = explode(',', $validated['positions']);
-        $positions = array_map('trim', $positions);
-
         EventPositionPreset::create([
             'name' => $validated['name'],
-            'positions' => $positions,
+            'positions' => $this->parsePositions($validated['positions']),
         ]);
 
         return redirect()->route('admin.events.position-presets.index')
@@ -79,11 +77,9 @@ class EventPositionPresetController extends Controller
             'positions' => 'required|string',
         ]);
 
-        $positions = array_filter(array_map('trim', explode(',', $validated['positions'])));
-
         $position->update([
             'name' => $validated['name'],
-            'positions' => $positions,
+            'positions' => $this->parsePositions($validated['positions']),
         ]);
 
         return redirect()->route('admin.events.position-presets.index')
@@ -99,5 +95,18 @@ class EventPositionPresetController extends Controller
         $position->delete();
 
         return redirect()->route('admin.events.position-presets.index')->with('success', 'Preset deleted successfully');
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function parsePositions(string $raw): array
+    {
+        return collect(explode(',', $raw))
+            ->map(fn ($position) => strtoupper(trim($position)))
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
     }
 }
