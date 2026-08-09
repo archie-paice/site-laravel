@@ -99,18 +99,18 @@
     --color-base-300: oklch(31% 0.014 264.531);
     --color-base-content: oklch(97% 0.002 264.531);
 
-    /* Primary: reuse the light theme's blue/white pairing, already WCAG AA on white text
-       (used on the navbar, so nav text should stay white in dark mode too) */
-    --color-primary: oklch(55% 0.15 240.88);
+    /* Primary, secondary, accent, and semantic colors match the light theme exactly
+       (only the base/neutral surface colors differ between themes) */
+    --color-primary: oklch(0.426 0.139 255);
     --color-primary-content: #ffffff;
 
     /* Secondary */
-    --color-secondary: oklch(70% 0.14 80);
-    --color-secondary-content: oklch(15% 0.03 80);
+    --color-secondary: oklch(75% 0.15 80);
+    --color-secondary-content: oklch(25% 0.05 80);
 
     /* Accent */
-    --color-accent: oklch(70% 0.12 190);
-    --color-accent-content: oklch(15% 0.03 190);
+    --color-accent: oklch(65% 0.12 190);
+    --color-accent-content: oklch(20% 0.04 190);
 
     /* Neutral */
     --color-neutral: oklch(28% 0.014 255.508);
@@ -118,17 +118,17 @@
 
     /* --- Semantic Colors --- */
 
-    --color-info: oklch(72% 0.10 220);
-    --color-info-content: oklch(15% 0.03 220);
+    --color-info: oklch(70% 0.1 220);
+    --color-info-content: oklch(20% 0.05 220);
 
-    --color-success: oklch(68% 0.15 150);
-    --color-success-content: oklch(15% 0.03 150);
+    --color-success: oklch(70% 0.16 150);
+    --color-success-content: #ffffff;
 
-    --color-warning: oklch(80% 0.17 84.429);
-    --color-warning-content: oklch(20% 0.05 84.429);
+    --color-warning: oklch(82% 0.189 84.429);
+    --color-warning-content: oklch(27% 0.077 45.635);
 
-    --color-error: oklch(65% 0.19 30);
-    --color-error-content: oklch(97% 0.01 30);
+    --color-error: oklch(60% 0.2 30);
+    --color-error-content: #ffffff;
 
     /* --- UI Variables --- */
 
@@ -144,4 +144,12 @@
 
 :root {
     background-color: var(--color-base-100);
+}
+
+/* Plain text-primary (links/headings on a base-100 surface) is unreadable in dark mode
+   now that primary matches light mode's darker blue; render it as regular light text
+   instead. Elements pairing primary as a background (bg-primary + text-primary-content)
+   are unaffected. */
+[data-theme="dark"] .text-primary {
+    color: var(--color-base-content);
 }
