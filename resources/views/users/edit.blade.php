@@ -22,7 +22,7 @@
 
             <img class='col-span-2 border-2 w-24 h-24 sm:w-36 sm:h-36 mb-5 rounded-full' src="{{ asset($user->profile_image_route) }}" alt=""/>
             <input type="file" name="image" accept="image/jpeg,image/png,image/gif,image/svg+xml" class="file-input file-input-bordered w-full max-w-xs" />
-            <p class="text-xs text-base-content/60 mt-1 mb-5 max-w-xs">JPEG, PNG, GIF, or SVG, up to 2MB. Use a square image if possible — non-square photos will be cropped into a circle.</p>
+            <p class="text-xs text-base-content/60 mt-1 mb-5 max-w-xs">JPEG, PNG, GIF, or SVG, up to 2MB.</p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8">
                 <a href="{{ route('users.show', $user) }}" class="link mb-3 sm:absolute sm:top-5 sm:right-5">View User</a>
