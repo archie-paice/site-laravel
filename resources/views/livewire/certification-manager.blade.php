@@ -10,6 +10,7 @@
     </div>
 
     @unless(sizeof($users) == 0)
+        <div class="overflow-x-auto">
         <table class='table table-zebra table-md w-max border-2 rounded-md border-base-300 mt-5'>
             <thead>
                 <tr class='text-xl font-bold'>
@@ -46,11 +47,12 @@
                 @endforeach
             </tbody>
         </table>
+        </div>
     @else
         <h1>There are no rostered users.</h1>
     @endunless
 
-    <div class="w-150 mt-5">
+    <div class="w-full max-w-150 mt-5">
         {{ $users->links() }}
     </div>
 
