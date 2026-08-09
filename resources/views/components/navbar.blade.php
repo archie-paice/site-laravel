@@ -51,9 +51,9 @@
 
         <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
 
-        @hasrole('staff')
+        @if(auth()->user()?->hasRole('staff'))
             <a href="{{ route('admin.index') }}" class="m-1 font-medium">Facility Admin</a>
-        @endhasrole
+        @endif
 
         @if(auth()->user())
             <div class="dropdown dropdown-end">

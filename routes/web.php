@@ -208,12 +208,6 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::middleware('permission:manage statistics prefixes')
             ->resource('statistics-prefixes', StatisticsPrefixesController::class);
 
-        Route::middleware('permission:manage certification facilities')
-            ->prefix('certification-facilities')
-            ->group(function () {
-                Route::get('/', [CertificationFacilityController::class, 'index'])
-                    ->name('certification-facilities.index');
-
         Route::middleware('permission:certification-facilities:write')->prefix('certification-facilities')->group(function () {
             // Facility + level CRUD is handled by Livewire components on these pages.
             Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
