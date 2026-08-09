@@ -202,6 +202,27 @@ class User extends Authenticatable
         return $this->hasMany(UserCertification::class, 'user_id');
     }
 
+    /**
+     * The highest certification level (by `level` tier) this user holds in the
+     * given facility, or null if uncertified there. Operates on the loaded
+     * `certifications.certificationLevel` collection to avoid per-cell queries
+     * when the relation is eager-loaded (e.g. on the roster).
+     */
+    public function highestCertificationLevelFor(int $facilityId): ?CertificationLevel
+    {
+        return $this->certifications
+            ->map(fn (UserCertification $c) => $c->certificationLevel)
+            ->filter(fn (?CertificationLevel $level) => $level && $level->facility_id === $facilityId)
+            ->sortByDesc('level')
+            ->first();
+    }
+
+    public function hasCertificationLevel(int $certificationLevelId): bool
+    {
+        return $this->certifications
+            ->contains('certification_level_id', $certificationLevelId);
+    }
+
     public function toSearchableArray(): array
     {
         return [

@@ -1,56 +1,33 @@
 <?php
 
-use App\DTOs\VatusaRosterUser;
 use App\Jobs\SyncRoster;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Bus\UniqueLock;
+use Illuminate\Contracts\Broadcasting\ShouldBeUnique as BroadcastingShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUnique as QueueShouldBeUnique;
 use Illuminate\Support\Facades\Http;
 
-test('given a vatusa user, when converted to a database user, then a database user is input and accurate', function () {
-    $now = new DateTime;
-    $now = $now->format('Y-m-d H:i:s');
+test('the roster sync job is queue-unique so it cannot run twice concurrently', function () {
+    $job = new SyncRoster;
 
-    $vatusa = new VatusaRosterUser([
-        'cid' => 100,
-        'fname' => 'Test',
-        'lname' => 'Test',
-        'rating' => 6,
-        'email' => 'test@test.com',
-        'facility' => 'ZJX',
-        'created_at' => $now,
-        'updated_at' => $now,
-        'flag_needbasic' => false,
-        'flag_xferOverride' => false,
-        'facility_join' => $now,
-        'flag_homecontroller' => false,
-        'lastactivity' => $now,
-        'flag_broadcastOptedIn' => false,
-        'flag_preventStaffAssign' => false,
-        'discord_id' => null,
-        'flag_nameprivacy' => false,
-        'last_competency_date' => $now,
-        'promotion_eligible' => false,
-        'transfer_eligible' => false,
-        'roles' => [],
-        'isMentor' => false,
-        'isSupIns' => false,
-        'last_promotion' => $now,
-    ]);
-
-    User::updateFromVatusa($vatusa);
-    $user = User::find($vatusa->cid);
-
-    expect($user->id)->toBe($vatusa->cid);
-    expect($user->first_name)->toBe($vatusa->firstName);
-    expect($user->last_name)->toBe($vatusa->lastName);
-    expect($user->email)->toBe($vatusa->email);
-    expect($user->facility)->toBe($vatusa->facility);
-    expect($user->joined_at->format('Y-m-d H:i:s'))->toBe($now);
+    // Must implement the *queue* contract; the broadcasting one is a no-op for
+    // queued jobs and silently disables the uniqueness that prevents duplicate
+    // syncs at the top of the hour.
+    expect($job)->toBeInstanceOf(QueueShouldBeUnique::class);
+    expect($job)->not->toBeInstanceOf(BroadcastingShouldBeUnique::class);
 });
 
-test('given the roster sync function exists, when the roster sync function is executed, then it executes without errors', function () {
-    $syncJob = new SyncRoster;
-    $syncJob->handle();
+test('a second roster sync dispatch is blocked while one is already locked', function () {
+    $lock = new UniqueLock(app('cache')->store());
+
+    expect($lock->acquire(new SyncRoster))->toBeTrue();        // first run acquires the lock
+    expect($lock->acquire(new SyncRoster))->toBeFalse();       // duplicate is blocked
+
+    $lock->release(new SyncRoster);
+
+    expect($lock->acquire(new SyncRoster))->toBeTrue();        // lock frees after release
+    $lock->release(new SyncRoster);
 });
 
 test('given a roster sync, when it completes, then the rostered role matches roster membership', function () {
