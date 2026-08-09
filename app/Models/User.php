@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
@@ -237,7 +236,7 @@ class User extends Authenticatable
     public function events()
     {
         return $this->belongsToMany(Event::class, 'event_positions')
-            ->withPivot('requested_position', 'start', 'end', 'note', 'position_status')
+            ->withPivot('requested_position', 'assigned_position', 'start', 'end', 'assigned_start', 'assigned_end', 'notes', 'position_status')
             ->withTimestamps();
     }
 

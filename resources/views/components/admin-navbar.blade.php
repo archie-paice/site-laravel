@@ -55,7 +55,6 @@
                     <li><a href={{ route('admin.events.index') }}>Events</a></li>
                     <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
                     <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
-                    <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
                 </ul>
             </div>
         @endif
@@ -76,6 +75,7 @@
                             @endif
                         </a>
                     </li>
+                    <li><a href="{{ route('admin.news.index') }}">News Management</a></li>
                     <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>
