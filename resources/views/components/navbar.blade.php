@@ -1,8 +1,3 @@
-@php
-    $publicationCategories = \App\Models\PublicationCategory::forNavbar();
-    $mobilePublicationCategories = \App\Models\PublicationCategory::forMobileNav();
-@endphp
-
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20 px-3 sm:px-5">
     {{-- Logo + Home --}}
     <div class="flex-1 min-w-0">
@@ -102,10 +97,22 @@
                 <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
             @endforeach
 
-            @hasrole('staff')
+            @if(auth()->user()?->hasRole('staff'))
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>
                 <li><a href="{{ route('admin.index') }}">Dashboard</a></li>
-            @endhasrole
+                @if(auth()->user()?->hasRole('training'))
+                    <li><a href={{ route('admin.index') }}>Training Management</a></li>
+                @endif
+                @if(auth()->user()?->hasRole('facilities'))
+                    <li><a href={{ route('admin.index') }}>Data Management</a></li>
+                @endif
+                @if(auth()->user()?->hasRole('events'))
+                    <li><a href={{ route('admin.index') }}>Events Management</a></li>
+                @endif
+                @if(auth()->user()?->hasRole('admin'))
+                    <li><a href={{ route('admin.index') }}>Admin</a></li>
+                @endif
+            @endif
 
             <div class="divider my-1"></div>
 

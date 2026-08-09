@@ -10,6 +10,11 @@ class FeedbackComment extends Model
         'feedback_id',
         'user_id',
         'comment',
+        'user_visible',
+    ];
+
+    protected $casts = [
+        'user_visible' => 'boolean',
     ];
 
     public function feedback()

@@ -45,6 +45,11 @@ class Feedback extends Model
         return $this->hasMany(FeedbackComment::class)->orderBy('created_at');
     }
 
+    public function visibleComments()
+    {
+        return $this->hasMany(FeedbackComment::class)->where('user_visible', true)->orderBy('created_at');
+    }
+
     public function toSearchableArray(): array
     {
         return [

@@ -7,7 +7,6 @@ use App\Http\Controllers\AtcBookingController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\Auth\VatsimOauthController;
 use App\Http\Controllers\CertificationFacilityController;
-use App\Http\Controllers\CertificationLevelController;
 use App\Http\Controllers\ContributorsController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Events\EventController;
@@ -33,8 +32,13 @@ use App\Jobs\SyncRoster;
 use App\Jobs\SyncTrainingTickets;
 use App\Jobs\UpdateOnlineControllers;
 use App\Livewire\EventRegistration;
+use App\Mail\FeedbackCommentPosted;
+use App\Mail\FeedbackReceived;
+use App\Mail\FeedbackReleased;
 use App\Mail\TrainingAssignmentCreated;
 use App\Mail\Welcome;
+use App\Models\Feedback;
+use App\Models\FeedbackComment;
 use App\Models\TrainingAssignment;
 use App\Models\User;
 use Illuminate\Support\Facades\App;
@@ -84,24 +88,12 @@ Route::resource('users', UserController::class, [
 ]);
 
 Route::prefix('users/{user}')->group(function () {
-    Route::get('/', [UserController::class, 'show'])
-        ->name('users.show');
-
-    Route::get('training-tickets', [UserController::class, 'trainingTickets'])
-        ->middleware('auth')
-        ->name('users.show.training-tickets');
-
-    Route::get('registered-events', [UserController::class, 'registeredEvents'])
-        ->middleware('auth')
-        ->name('users.show.registered-events');
-
-    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])
-        ->middleware('auth')
-        ->name('users.show.training-assignments');
-
-    Route::get('solo-certs', [UserController::class, 'soloCerts'])
-        ->middleware('auth')
-        ->name('users.show.solo-certs');
+    Route::get('/', [UserController::class, 'show'])->name('users.show');
+    Route::get('feedback', [UserController::class, 'feedback'])->middleware('auth')->name('users.show.feedback');
+    Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
+    Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
+    Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
+    Route::get('registered-events', [UserController::class, 'registeredEvents'])->middleware('auth')->name('users.show.registered-events');
 });
 
 // Staff Directory
@@ -222,20 +214,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
                 Route::get('/', [CertificationFacilityController::class, 'index'])
                     ->name('certification-facilities.index');
 
-                Route::post('/', [CertificationFacilityController::class, 'store'])
-                    ->name('certification-facilities.store');
-
-                Route::prefix('/{facility}')->group(function () {
-                    Route::get('/', [CertificationFacilityController::class, 'show'])
-                        ->name('certification-facilities.show');
-
-                    Route::delete('/', [CertificationFacilityController::class, 'destroy'])
-                        ->name('certification-facilities.destroy');
-
-                    Route::post('/certification-levels', [CertificationLevelController::class, 'store'])
-                        ->name('certification-levels.store');
-                });
-            });
+        Route::middleware('permission:certification-facilities:write')->prefix('certification-facilities')->group(function () {
+            // Facility + level CRUD is handled by Livewire components on these pages.
+            Route::get('/', [CertificationFacilityController::class, 'index'])->name('certification-facilities.index');
+            Route::get('/{facility}', [CertificationFacilityController::class, 'show'])->name('certification-facilities.show');
+        });
     });
 
     // Senior Staff / Web Team
@@ -395,6 +378,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         });
 });
 
+// Certification Management (instructors + admins; gated only by certifications:write)
+Route::prefix('admin')->middleware('permission:certifications:write')->group(function () {
+    Route::get('certifications', fn () => view('certifications.index'))->name('certifications.index');
+});
+
 // Dev Only Routes
 if (App::environment('development', 'local')) {
 
@@ -419,4 +407,10 @@ if (App::environment('development', 'local')) {
             TrainingAssignment::find(1)
         );
     });
+
+    Route::get('/test-email/feedback-released', fn () => new FeedbackReleased(Feedback::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-comment', fn () => new FeedbackCommentPosted(FeedbackComment::latest()->firstOrFail()));
+
+    Route::get('/test-email/feedback-received', fn () => new FeedbackReceived(Feedback::latest()->firstOrFail()));
 }

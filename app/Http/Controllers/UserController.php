@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\FeedbackStatus;
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
+use App\Models\Feedback;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -13,7 +15,8 @@ class UserController extends Controller
 {
     public function show(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('certifications.certificationLevel.facility')->findOrFail($id);
+
         $now = Carbon::now();
 
         $allStats = ControllerMonthlyStat::where('user_id', $id)->get();
@@ -61,6 +64,9 @@ class UserController extends Controller
             'biography' => 'string|nullable|max:1000',
         ], [
             'operatingInitials.max' => 'Operating initials must be 2 characters long',
+            'image.image' => 'The profile picture must be an image file.',
+            'image.mimes' => 'The profile picture must be a JPEG, PNG, GIF, or SVG file.',
+            'image.max' => 'The profile picture must be smaller than 2MB.',
         ]);
 
         if (Auth::user()->id != $id && ! Auth::user()->hasPermissionTo('manage users')) {
@@ -110,6 +116,25 @@ class UserController extends Controller
         return view('users.training-assignments', [
             'user' => $user,
             'trainingAssignments' => $trainingAssignments,
+        ]);
+    }
+
+    public function feedback(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('feedback:read')) {
+            abort(403);
+        }
+
+        $releasedFeedback = Feedback::where('controller_id', $id)
+            ->where('status', FeedbackStatus::RELEASED)
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('users.feedback', [
+            'user' => $user,
+            'releasedFeedback' => $releasedFeedback,
         ]);
     }
 
