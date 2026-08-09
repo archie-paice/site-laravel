@@ -8,7 +8,7 @@ use App\DTOs\VatusaRosterUser;
 use App\Models\Staff;
 use App\Models\User;
 use Http;
-use Illuminate\Contracts\Broadcasting\ShouldBeUnique;
+use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Log;
 class SyncRoster implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
+
+    /**
+     * The number of seconds the unique lock is held before it is considered stale.
+     *
+     * Acts as a safety net: if a worker dies mid-sync without releasing the lock,
+     * it auto-expires well before the next scheduled run (every two hours) so the
+     * sync is never permanently blocked.
+     */
+    public int $uniqueFor = 1800;
 
     /**
      * Create a new job instance.

@@ -16,7 +16,8 @@ class UserController extends Controller
 {
     public function show(int $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::with('certifications.certificationLevel.facility')->findOrFail($id);
+
         $now = Carbon::now();
 
         $allStats = ControllerMonthlyStat::where('user_id', $id)->get();
@@ -64,6 +65,9 @@ class UserController extends Controller
             'biography' => 'string|nullable|max:1000',
         ], [
             'operatingInitials.max' => 'Operating initials must be 2 characters long',
+            'image.image' => 'The profile picture must be an image file.',
+            'image.mimes' => 'The profile picture must be a JPEG, PNG, GIF, or SVG file.',
+            'image.max' => 'The profile picture must be smaller than 2MB.',
         ]);
 
         if (Auth::user()->id != $id && ! Auth::user()->hasPermissionTo('manage users')) {
