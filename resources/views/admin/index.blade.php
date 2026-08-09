@@ -16,18 +16,22 @@
                 <a class='btn btn-primary' href="{{ route('training-assignments.index') }}">Training Assignments</a>
                 <a class='btn btn-primary' href="{{ route('training-tickets.create') }}">Create Training Ticket</a>
                 <a class='btn btn-primary' href="{{ route('training-tickets.create') }}">Issue Solo Cert</a>
+                @haspermission('certifications:write')
+                    <a class='btn btn-primary' href="{{ route('certifications.index') }}">Certifications</a>
+                @endhaspermission
             </x-card-component>
         @endrole
 
-        @role('admin')
+        @haspermission('manage contributors')
         <x-card-component title="Web Quick Links">
             <a class='btn btn-primary mt-5' href="{{ route('admin.contributors.index') }}">Manage Contributors</a>
         </x-card-component>
-    @endrole
+    @endhaspermission
 
     @role('facilities')
             <x-card-component title="Facilities Quick Links">
                 <a class='btn btn-primary mt-5' href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a>
+                <a class='btn btn-primary' href="{{ route('certification-facilities.index') }}">Certification Facilities Management</a>
                 <a class='btn btn-primary' href="{{ route('admin.publications.index') }}">Document Management</a>
                 <a class='btn btn-primary' href="{{ route('certification-facilities.index') }}">Facilities Management</a>
             </x-card-component>
@@ -39,6 +43,12 @@
                 <a class='btn btn-primary' href="{{ route('admin.events.position-presets.index') }}">Position Presets</a>
             </x-card-component>
     @endrole
+
+    @haspermission('feedback:read')
+        <x-card-component title="Admin Quick Links">
+            <a class='btn btn-primary mt-5' href="{{ route('admin.feedback.index') }}">Manage Feedback</a>
+        </x-card-component>
+    @endhaspermission
 
     @haspermission('statistics:write')
         <x-card-component title="Manual Statistics Sync">
@@ -89,7 +99,5 @@
             </form>
         </x-card-component>
     @endhaspermission
-
-        
     </div>
 @endsection

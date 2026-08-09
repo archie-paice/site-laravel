@@ -35,17 +35,17 @@
                         </td>
                         <td class='border-r-1 border-base-300'>{{ $user->rating->mapToString() }}</td>
                             @foreach($certificationFacilities as $facility)
-                                <td class='text-center'>
-                                    @php
-                                        $cert = $user->certifications->where('facility_id', $facility->id)->first();
-                                    @endphp
+                                @php
+                                    $level = $user->highestCertificationLevelFor($facility->id);
+                                @endphp
 
-                                    @if($cert)
-                                        <span class='badge badge-success badge-md'>{{ $cert->level->identifier }}</span>
-                                    @else
-                                        <span class='text-gray-400'>Uncertified</span>
-                                    @endif
-                                </td>
+                                @if($level)
+                                    <td class='text-center bg-success text-success-content font-semibold'>
+                                        {{ $level->abbreviation }}
+                                    </td>
+                                @else
+                                    <td class='text-center text-gray-400'>Uncertified</td>
+                                @endif
                             @endforeach
                         </tr>
                 @endforeach

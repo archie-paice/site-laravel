@@ -67,7 +67,7 @@
         </div>
 
         <div class="footer gap-y-0 p-0">
-            @env('development')
+            @env('development', 'staging')
                 <div class="footer-center w-full p-2 bg-warning">
                     <h1>DEVELOPMENT BUILD - THE FUNCTIONS OF THIS SITE ARE NOT INDICATIVE OF THE PRODUCTION WEBSITE AND MAY BE CHANGED AT ANY TIME. SENSITIVE DATA IS ENTERED AT YOUR OWN RISK.</h1>
                     @auth
@@ -93,7 +93,6 @@
                 <h1 class="text-xl font-bold">Virtual Jacksonville ARTCC</h1>
 
                 <div class="flex gap-x-10">
-                    <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">Join vZJX</a>
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">GitHub</a>
                     <a class="link text-lg" href="https://vatusa.net" target="_blank">VATUSA</a>
                     <a class="link text-lg" href="https://vatsim.net" target="_blank">VATSIM</a>

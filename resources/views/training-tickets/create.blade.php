@@ -96,11 +96,11 @@
 
             <label for="score" class="label">Score</label>
             <div class="rating">
-                <input type="radio" name="score" value="1" class="mask mask-star" aria-label="1 star" @selected(old('score') == 1)>
-                <input type="radio" name="score" value="2" class="mask mask-star" aria-label="2 star" @selected(old('score') == 2)>
-                <input type="radio" name="score" value="3" class="mask mask-star" aria-label="3 star" @selected(old('score') == 3)>
-                <input type="radio" name="score" value="4" class="mask mask-star" aria-label="4 star" @selected(old('score') == 4)>
-                <input type="radio" name="score" value="5" class="mask mask-star" aria-label="5 star" @selected(old('score') == 5)>
+                <input type="radio" name="score" value="1" class="mask mask-star" aria-label="1 star" @checked(old('score') == 1)>
+                <input type="radio" name="score" value="2" class="mask mask-star" aria-label="2 star" @checked(old('score') == 2)>
+                <input type="radio" name="score" value="3" class="mask mask-star" aria-label="3 star" @checked(old('score') == 3)>
+                <input type="radio" name="score" value="4" class="mask mask-star" aria-label="4 star" @checked(old('score') == 4)>
+                <input type="radio" name="score" value="5" class="mask mask-star" aria-label="5 star" @checked(old('score') == 5)>
             </div>
 
             <br>
@@ -112,6 +112,26 @@
             </div>
 
             <br>
+
+            @if($certificationFacilities->isNotEmpty())
+                <label for="certification_level_id" class="label">Issue Certification (optional)</label>
+                <select name="certification_level_id" id="certification_level_id" class="select">
+                    <option value="">Do not issue a certification</option>
+                    @foreach($certificationFacilities as $facility)
+                        @if($facility->certificationLevels->isNotEmpty())
+                            <optgroup label="{{ $facility->identifier }} — {{ $facility->name }}">
+                                @foreach($facility->certificationLevels as $level)
+                                    <option value="{{ $level->id }}" @selected(old('certification_level_id') == $level->id)>
+                                        {{ $level->name }} ({{ $level->abbreviation }})
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                        @endif
+                    @endforeach
+                </select>
+
+                <br>
+            @endif
 
             <div class="flex flex-row max-w-full">
                 <input type="checkbox" class="checkbox mr-2" name="confirm" required>

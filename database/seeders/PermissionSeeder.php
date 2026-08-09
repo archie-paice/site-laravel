@@ -10,12 +10,13 @@ class PermissionSeeder extends Seeder
 {
     private array $permissions = [
         'core' => ['edit own profile'],
-        'staff' => ['view dashboard'],
-        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers', 'remove inactive controllers', 'documents:write'],
-        'events' => ['manage events', 'assign event positions', 'publish events'],
-        'facilities' => ['manage statistics prefixes', 'manage certification facilities', 'statistics:write', 'documents:write'],
-        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs', 'training-tickets:read', 'training-assignments:read', 'solo-certs:read'],
-        'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students'],
+        'rostered' => ['create atc booking'],
+        'staff' => ['view dashboard', 'feedback:read', 'feedback:write'],
+        'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers', 'remove inactive controllers', 'certifications:write', 'documents:write', 'feedback:read', 'feedback:write', 'manage contributors'],
+        'events' => ['manage events', 'assign event positions', 'publish events', 'feedback:read'],
+        'facilities' => ['manage statistics prefixes', 'certification-facilities:write', 'documents:write', 'statistics:write'],
+        'training' => ['create training tickets', 'edit training tickets', 'claim students', 'issue solo certs', 'training-tickets:read', 'training-tickets:write', 'training-assignments:read', 'solo-certs:read'],
+        'instructor' => ['revoke solo certs', 'manage training tickets', 'manage students', 'certifications:write'],
     ];
 
     /**

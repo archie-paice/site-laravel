@@ -1,8 +1,3 @@
-@php
-    $publicationCategories = \App\Models\PublicationCategory::forNavbar();
-    $mobilePublicationCategories = \App\Models\PublicationCategory::forMobileNav();
-@endphp
-
 <div class="navbar sticky top-0 bg-primary text-primary-content z-20 px-3 sm:px-5">
     {{-- Logo + Home --}}
     <div class="flex-1 min-w-0">
@@ -54,7 +49,9 @@
             </ul>
         </div>
 
-        @hasrole('staff')
+        <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
+
+        @if(auth()->user()?->hasRole('staff'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                     <span>Facility Admin</span>
@@ -63,24 +60,28 @@
                 <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-sm">
                     <li><a href="{{ route('admin.index') }}">Dashboard</a></li>
 
-                    @hasrole('training')
+                    @if(auth()->user()?->hasRole('training'))
                         <li><a href={{ route('admin.index') }}>Training Management</a></li>
-                    @endhasrole
+                    @endif
 
-                    @hasrole('facilities')
+                    @if(auth()->user()?->hasRole('facilities'))
                         <li><a href={{ route('admin.index') }}>Data Management</a></li>
-                    @endhasrole
+                    @endif
 
-                    @hasrole('events')
+                    @if(auth()->user()?->hasRole('events'))
                         <li><a href={{ route('admin.index') }}>Events Management</a></li>
-                    @endhasrole
+                    @endif
 
-                    @hasrole('admin')
+                    @if(auth()->user()?->hasRole('admin'))
                         <li><a href={{ route('admin.index') }}>Admin</a></li>
-                    @endhasrole
+                    @endif
+
+                    @if(auth()->user()?->can('feedback:read'))
+                        <li><a href="{{ route('admin.feedback.index') }}">Feedback Management</a></li>
+                    @endif
                 </ul>
             </div>
-        @endhasrole
+        @endif
 
         @if(auth()->user())
             <div class="dropdown dropdown-end">
@@ -124,22 +125,22 @@
                 <li><a href="{{ route('publications.index') }}#category-{{ $publicationCategory->id }}">{{ $publicationCategory->title }}</a></li>
             @endforeach
 
-            @hasrole('staff')
+            @if(auth()->user()?->hasRole('staff'))
                 <li class="menu-title text-xs uppercase tracking-wide pt-2">Facility Admin</li>
                 <li><a href="{{ route('admin.index') }}">Dashboard</a></li>
-                @hasrole('training')
+                @if(auth()->user()?->hasRole('training'))
                     <li><a href={{ route('admin.index') }}>Training Management</a></li>
-                @endhasrole
-                @hasrole('facilities')
+                @endif
+                @if(auth()->user()?->hasRole('facilities'))
                     <li><a href={{ route('admin.index') }}>Data Management</a></li>
-                @endhasrole
-                @hasrole('events')
+                @endif
+                @if(auth()->user()?->hasRole('events'))
                     <li><a href={{ route('admin.index') }}>Events Management</a></li>
-                @endhasrole
-                @hasrole('admin')
+                @endif
+                @if(auth()->user()?->hasRole('admin'))
                     <li><a href={{ route('admin.index') }}>Admin</a></li>
-                @endhasrole
-            @endhasrole
+                @endif
+            @endif
 
             <div class="divider my-1"></div>
 
