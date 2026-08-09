@@ -18,8 +18,12 @@ class Event extends Model
         'type',
         'featured_fields',
         'hidden',
-        'image_url',
         'presetPositions',
+        'event_image_route',
+        'positions_locked',
+        'published',
+        'archived',
+        'archived_at',
     ];
 
     protected $casts = [
@@ -28,11 +32,35 @@ class Event extends Model
         'end' => 'datetime',
         'featured_fields' => 'array',
         'hidden' => 'boolean',
+        'positions_locked' => 'boolean',
+        'published' => 'boolean',
         'presetPositions' => 'array',
+        'archived' => 'boolean',
+        'archived_at' => 'datetime',
     ];
 
     public function positionRequests()
     {
         return $this->hasMany(EventPosition::class);
+    }
+
+    public function getFormattedRangeAttribute()
+    {
+        return $this->start?->utc()->format('m/d/Y H:i:s').'z - '.$this->end?->utc()->format('m/d/Y H:i:s').'z';
+    }
+
+    public function getFormattedTimeAttribute()
+    {
+        return $this->start?->utc()->format('H:i:s').'z - '.$this->end?->utc()->format('H:i:s').'z';
+
+    }
+
+    /**
+     * True only in the 24 hours before an event starts — deliberately not true
+     * once the event is already underway.
+     */
+    public function isStartingSoon(): bool
+    {
+        return $this->start !== null && $this->start->between(now(), now()->addHours(24));
     }
 }
