@@ -1,7 +1,7 @@
 @extends('layouts.event-manage')
 
 @section('event-content')
-    <div class="flex gap-6 w-full">
+    <div class="flex flex-col lg:flex-row gap-6 w-full">
         <div class="flex flex-col gap-10 flex-1 min-w-0 max-w-2xl">
             <div class="card bg-base-100 border border-base-300 w-full">
                 <div class="card-body">
@@ -101,7 +101,7 @@
             </p>
         </div>
 
-        <div class="w-1/3 flex flex-col justify-start items-center gap-6">
+        <div class="w-full lg:w-1/3 flex flex-col justify-start items-center gap-6">
             <div class="card card-dash bg-base-100 w-full max-w-xl shadow-sm overflow-hidden">
                 @if ($event->event_image_route)
                     <figure>
