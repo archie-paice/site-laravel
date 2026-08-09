@@ -11,7 +11,7 @@
 
     {{-- Desktop nav (hidden on mobile) --}}
     <ul class='hidden md:flex menu menu-horizontal items-center gap-x-5 justify-center'>
-        @hasrole('training')
+        @if(auth()->user()?->hasRole('training'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
                     <span>Training Admin</span>
@@ -128,46 +128,46 @@
                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
                     class="absolute inset-0 overflow-y-auto flex flex-col">
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
-                        @hasrole('training')
+                        @if(auth()->user()?->hasRole('training'))
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'training-admin'">
                                     Training Admin
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </button>
                             </li>
-                        @endhasrole
+                        @endif
 
-                        @hasrole('facilities')
+                        @if(auth()->user()?->hasRole('facilities'))
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'data-admin'">
                                     Data Admin
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </button>
                             </li>
-                        @endhasrole
+                        @endif
 
-                        @hasrole('events')
+                        @if(auth()->user()?->hasRole('events'))
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'events-admin'">
                                     Events Admin
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </button>
                             </li>
-                        @endhasrole
+                        @endif
 
-                        @hasrole('admin')
+                        @if(auth()->user()?->hasRole('admin'))
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'facility-admin'">
                                     Facility Admin
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </button>
                             </li>
-                        @endhasrole
+                        @endif
                     </ul>
                 </div>
 
                 {{-- Training Admin sub-screen --}}
-                @hasrole('training')
+                @if(auth()->user()?->hasRole('training'))
                     <div x-show="screen === 'training-admin'"
                         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
@@ -179,15 +179,15 @@
                             <li><a href={{ route('training-tickets.index') }} class="rounded-none px-3 py-3.5 text-lg">Training Tickets</a></li>
                             <li><a href={{ route('training-assignments.index') }} class="rounded-none px-3 py-3.5 text-lg">Training Assignments</a></li>
                             <li><a href={{ route('solo-certs.index') }} class="rounded-none px-3 py-3.5 text-lg">Solo Certs</a></li>
-                            @haspermission('certifications:write')
+                            @if(auth()->user()?->can('certifications:write'))
                                 <li><a href={{ route('certifications.index') }} class="rounded-none px-3 py-3.5 text-lg">Certifications</a></li>
-                            @endhaspermission
+                            @endif
                         </ul>
                     </div>
-                @endhasrole
+                @endif
 
                 {{-- Data Admin sub-screen --}}
-                @hasrole('facilities')
+                @if(auth()->user()?->hasRole('facilities'))
                     <div x-show="screen === 'data-admin'"
                         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
@@ -196,19 +196,19 @@
                             <span class="text-xl font-bold text-info">Data Admin</span>
                         </div>
                         <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
-                            @haspermission('manage statistics prefixes')
+                            @if(auth()->user()?->can('manage statistics prefixes'))
                                 <li><a href="{{ route('statistics-prefixes.index') }}" class="rounded-none px-3 py-3.5 text-lg">Statistics Prefixes</a></li>
-                            @endhaspermission
-                            @haspermission('certification-facilities:write')
+                            @endif
+                            @if(auth()->user()?->can('certification-facilities:write'))
                                 <li><a href={{ route('certification-facilities.index') }} class="rounded-none px-3 py-3.5 text-lg">Certification Facilities</a></li>
-                            @endhaspermission
+                            @endif
                             <li><a href="{{ route('admin.publications.index') }}" class="rounded-none px-3 py-3.5 text-lg">Document Management</a></li>
                         </ul>
                     </div>
-                @endhasrole
+                @endif
 
                 {{-- Events Admin sub-screen --}}
-                @hasrole('events')
+                @if(auth()->user()?->hasRole('events'))
                     <div x-show="screen === 'events-admin'"
                         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
@@ -223,10 +223,10 @@
                             <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Staffing Requests</a></li>
                         </ul>
                     </div>
-                @endhasrole
+                @endif
 
                 {{-- Facility Admin sub-screen --}}
-                @hasrole('admin')
+                @if(auth()->user()?->hasRole('admin'))
                     <div x-show="screen === 'facility-admin'"
                         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
@@ -247,7 +247,7 @@
                             <li><a href={{ route('logs.index') }} class="rounded-none px-3 py-3.5 text-lg">Audit Log</a></li>
                         </ul>
                     </div>
-                @endhasrole
+                @endif
             </div>
         </div>
         </div>

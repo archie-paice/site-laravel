@@ -191,14 +191,14 @@
 
                         <li><a href="{{ route('feedback.index') }}" class="rounded-none px-3 py-3.5 text-lg">Feedback</a></li>
 
-                        @hasrole('staff')
+                        @if(auth()->user()?->hasRole('staff'))
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'facility-admin'">
                                     Facility Admin
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                                 </button>
                             </li>
-                        @endhasrole
+                        @endif
 
                         <div class="divider w-full my-1 mx-0"></div>
 
@@ -258,7 +258,7 @@
                 </div>
 
                 {{-- Facility Admin sub-screen --}}
-                @hasrole('staff')
+                @if(auth()->user()?->hasRole('staff'))
                     <div x-show="screen === 'facility-admin'"
                         x-transition:enter="transition ease-out duration-200" x-transition:enter-start="translate-x-full" x-transition:enter-end="translate-x-0"
                         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
@@ -268,24 +268,24 @@
                         </div>
                         <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
                             <li><a href="{{ route('admin.index') }}" class="rounded-none px-3 py-3.5 text-lg">Dashboard</a></li>
-                            @hasrole('training')
+                            @if(auth()->user()?->hasRole('training'))
                                 <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Training Management</a></li>
-                            @endhasrole
-                            @hasrole('facilities')
+                            @endif
+                            @if(auth()->user()?->hasRole('facilities'))
                                 <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Data Management</a></li>
-                            @endhasrole
-                            @hasrole('events')
+                            @endif
+                            @if(auth()->user()?->hasRole('events'))
                                 <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Events Management</a></li>
-                            @endhasrole
-                            @hasrole('admin')
+                            @endif
+                            @if(auth()->user()?->hasRole('admin'))
                                 <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Admin</a></li>
-                            @endhasrole
-                            @haspermission('feedback:read')
+                            @endif
+                            @if(auth()->user()?->can('feedback:read'))
                                 <li><a href="{{ route('admin.feedback.index') }}" class="rounded-none px-3 py-3.5 text-lg">Feedback Management</a></li>
-                            @endhaspermission
+                            @endif
                         </ul>
                     </div>
-                @endhasrole
+                @endif
             </div>
         </div>
         </div>
