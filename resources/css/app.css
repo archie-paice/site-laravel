@@ -146,10 +146,28 @@
     background-color: var(--color-base-100);
 }
 
-/* Plain text-primary (links/headings on a base-100 surface) is unreadable in dark mode
-   now that primary matches light mode's darker blue; render it as regular light text
-   instead. Elements pairing primary as a background (bg-primary + text-primary-content)
-   are unaffected. */
-[data-theme="dark"] .text-primary {
+/* Quill's snow theme hardcodes dark ink for its toolbar icons (#444), borders, and
+   placeholder text, so the B/I/U/strike controls vanish against the dark theme's
+   surfaces. Recolor them to follow base-content. Hover/active keep Quill's own blue
+   so the toggled state stays distinguishable from the default. */
+[data-theme="dark"] .ql-snow .ql-stroke {
+    stroke: var(--color-base-content);
+}
+
+[data-theme="dark"] .ql-snow .ql-fill,
+[data-theme="dark"] .ql-snow .ql-stroke.ql-fill {
+    fill: var(--color-base-content);
+}
+
+[data-theme="dark"] .ql-snow .ql-picker {
     color: var(--color-base-content);
+}
+
+[data-theme="dark"] .ql-toolbar.ql-snow,
+[data-theme="dark"] .ql-container.ql-snow {
+    border-color: var(--color-base-300);
+}
+
+[data-theme="dark"] .ql-editor.ql-blank::before {
+    color: color-mix(in oklch, var(--color-base-content) 60%, transparent);
 }

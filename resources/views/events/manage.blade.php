@@ -13,7 +13,7 @@
                 <div class="divide-y divide-base-300">
 
                     <div class="py-3">
-                        <h3 class="font-bold text-primary">
+                        <h3 class="font-bold text-base-content">
                             Registered Controllers
                         </h3>
                         <p class="text-4xl">
@@ -23,7 +23,7 @@
 
 
                     <div class="py-3">
-                        <h3 class="font-bold text-primary">
+                        <h3 class="font-bold text-base-content">
                             Most Requested Position
                         </h3>
                         <p class="text-4xl">
@@ -32,7 +32,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-primary">Visible</h3>
+                        <h3 class="font-bold text-base-content">Visible</h3>
                         <form method="POST" action="{{ route('admin.event.visibility', $event) }}">
                             @csrf
                             @method('PATCH')
@@ -51,7 +51,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-primary">
+                        <h3 class="font-bold text-base-content">
                             Positions Locked
                         </h3>
                         <form method="POST" action="{{ route('admin.event.positions-locked', $event) }}">
@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-primary">
+                        <h3 class="font-bold text-base-content">
                             Archived
                         </h3>
                         <form method="POST" action="{{ route('admin.event.archived', $event) }}">

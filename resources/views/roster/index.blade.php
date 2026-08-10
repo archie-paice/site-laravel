@@ -45,7 +45,7 @@
                                         {{ $level->abbreviation }}
                                     </td>
                                 @else
-                                    <td class='text-center text-gray-400'>Uncertified</td>
+                                    <td class='text-center text-base-content/60'>Uncertified</td>
                                 @endif
                             @endforeach
                         </tr>

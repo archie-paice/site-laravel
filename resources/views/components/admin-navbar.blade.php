@@ -256,6 +256,7 @@
                                     @endif
                                 </a>
                             </li>
+                            <li><a href={{ route('admin.news.index') }} class="rounded-none px-3 py-3.5 text-lg">News Management</a></li>
                             <li><a href={{ route('logs.index') }} class="rounded-none px-3 py-3.5 text-lg">Audit Log</a></li>
                         </ul>
                     </div>

@@ -136,7 +136,7 @@
                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
                     class="absolute inset-0 overflow-y-auto flex flex-col">
                     <div class="px-3 pt-4 pb-2 shrink-0">
-                        <span class="text-xl font-bold text-primary">Main Menu</span>
+                        <span class="text-xl font-bold text-base-content">Main Menu</span>
                     </div>
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
                         <li><a href="{{ route('home') }}" class="rounded-none px-3 py-3.5 text-lg">Home</a></li>
@@ -187,7 +187,7 @@
                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
                     class="absolute inset-0 overflow-y-auto flex flex-col">
                     <div class="px-3 pt-4 pb-2 shrink-0">
-                        <span class="text-xl font-bold text-primary">Events</span>
+                        <span class="text-xl font-bold text-base-content">Events</span>
                     </div>
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
                         <li><a href="{{ route('events.index') }}" class="rounded-none px-3 py-3.5 text-lg">Upcoming Events</a></li>
@@ -200,7 +200,7 @@
                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
                     class="absolute inset-0 overflow-y-auto flex flex-col">
                     <div class="px-3 pt-4 pb-2 shrink-0">
-                        <span class="text-xl font-bold text-primary">Controllers</span>
+                        <span class="text-xl font-bold text-base-content">Controllers</span>
                     </div>
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
                         <li><a href="{{ route('visit.index') }}" class="rounded-none px-3 py-3.5 text-lg">Visit vZJX</a></li>
@@ -216,7 +216,7 @@
                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="translate-x-full"
                     class="absolute inset-0 overflow-y-auto flex flex-col">
                     <div class="px-3 pt-4 pb-2 shrink-0">
-                        <span class="text-xl font-bold text-primary">Publications</span>
+                        <span class="text-xl font-bold text-base-content">Publications</span>
                     </div>
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
                         <li><a href="{{ route('publications.index') }}" class="rounded-none px-3 py-3.5 text-lg">All Documents</a></li>
