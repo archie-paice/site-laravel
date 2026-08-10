@@ -196,8 +196,8 @@
                         <p class="text-xs text-base-content/70 mt-2">
                             Formatting shortcuts work as you type (e.g. <code>**bold**</code>, <code>- list item</code>), or use the toolbar.
                         </p>
-                        @error('answer') <span class="text-error text-xs">{{ $message }}</span> @enderror
                     </div>
+                    @error('answer') <span class="text-error text-xs">{{ $message }}</span> @enderror
                 </div>
 
                 <div class="flex justify-end gap-2 border-t border-base-300 px-5 py-3">
