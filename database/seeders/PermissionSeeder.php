@@ -11,7 +11,7 @@ class PermissionSeeder extends Seeder
     private array $permissions = [
         'core' => ['edit own profile'],
         'rostered' => ['create atc booking'],
-        'staff' => ['view dashboard', 'feedback:read', 'feedback:write'],
+        'staff' => ['view dashboard', 'manage faqs', 'feedback:read', 'feedback:write'],
         'admin' => ['manage users', 'assign roles', 'manage roles', 'view audit logs', 'manage visiting controllers', 'manage loas', 'certifications:write', 'documents:write', 'feedback:read', 'feedback:write', 'manage contributors'],
         'events' => ['manage events', 'assign event positions', 'publish events', 'feedback:read'],
         'facilities' => ['manage statistics prefixes', 'certification-facilities:write', 'documents:write', 'statistics:write'],

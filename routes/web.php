@@ -13,6 +13,7 @@ use App\Http\Controllers\Events\EventController;
 use App\Http\Controllers\Events\EventFieldController;
 use App\Http\Controllers\Events\EventManagementController;
 use App\Http\Controllers\Events\EventPositionPresetController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoaController;
@@ -109,6 +110,9 @@ Route::prefix('loa')->middleware('auth')->name('loa.')->group(function () {
     Route::delete('{loa}', [LoaController::class, 'destroy'])->name('destroy');
 });
 
+// FAQ (public)
+Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
+
 // Feedback
 Route::get('/feedback', [FeedbackController::class, 'index'])->middleware('auth')->name('feedback.index');
 Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('auth')->name('feedback.store');
@@ -169,6 +173,11 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     // User Management
     Route::get('users', [UserManagementController::class, 'index'])
         ->name('manage-users.index');
+
+    // FAQ Management (all ARTCC staff)
+    Route::middleware('permission:manage faqs')->group(function () {
+        Route::get('faqs', [FaqController::class, 'manage'])->name('admin.faqs.index');
+    });
 
     // Feedback
     Route::middleware('permission:feedback:read')->group(function () {
