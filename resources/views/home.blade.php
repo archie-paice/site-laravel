@@ -87,6 +87,14 @@
                             </a>
                         </h3>
                     </div>
+
+                    <div class="py-3">
+                        <h3 class="font-bold text-primary">
+                            <a href="{{ route('faq.index') }}">
+                                <i class="fa-regular fa-circle-question"></i> FAQ &amp; Useful Controller Information
+                            </a>
+                        </h3>
+                    </div>
                 </div>
             </div>
 
