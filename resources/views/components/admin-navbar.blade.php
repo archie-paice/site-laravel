@@ -11,6 +11,14 @@
 
     {{-- Desktop nav (hidden on mobile) --}}
     <ul class='hidden md:flex menu menu-horizontal items-center gap-x-5 justify-center'>
+        @if(auth()->user()?->can('manage faqs'))
+            <div class="">
+                <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
+                    <a href="{{ route('admin.faqs.index') }}">FAQs</a>
+                </div>
+            </div>
+        @endif
+
         @if(auth()->user()?->hasRole('training'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
@@ -128,6 +136,10 @@
                     x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
                     class="absolute inset-0 overflow-y-auto flex flex-col">
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
+                        @if(auth()->user()?->can('manage faqs'))
+                            <li><a href="{{ route('admin.faqs.index') }}" class="rounded-none px-3 py-3.5 text-lg">FAQs</a></li>
+                        @endif
+
                         @if(auth()->user()?->hasRole('training'))
                             <li>
                                 <button type="button" class="w-full rounded-none px-3 py-3.5 flex items-center gap-2 text-lg" @click="screen = 'training-admin'">

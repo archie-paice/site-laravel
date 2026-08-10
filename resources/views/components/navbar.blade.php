@@ -50,6 +50,7 @@
         </div>
 
         <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
+        <a href="{{ route('faq.index') }}" role="button" class="m-1">FAQ &amp; Help</a>
 
         @if(auth()->user()?->hasRole('staff'))
             <a href="{{ route('admin.index') }}" class="m-1 font-medium">Facility Admin</a>
@@ -162,6 +163,7 @@
                         </li>
 
                         <li><a href="{{ route('feedback.index') }}" class="rounded-none px-3 py-3.5 text-lg">Feedback</a></li>
+                        <li><a href="{{ route('faq.index') }}" class="rounded-none px-3 py-3.5 text-lg">FAQ &amp; Help</a></li>
 
                         @if(auth()->user()?->hasRole('staff'))
                             <li><a href="{{ route('admin.index') }}" class="rounded-none px-3 py-3.5 text-lg">Facility Admin</a></li>
