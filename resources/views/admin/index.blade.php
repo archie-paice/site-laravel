@@ -7,23 +7,6 @@
                 <h2 class='text-2xl'><strong>Home:</strong> {{ $homeControllers }}</h2>
                 <h2 class='text-2xl'><strong>Visiting:</strong> {{ $visitingControllers }}</h2>
                 <h2 class='text-2xl'><strong>Total:</strong> {{ $homeControllers + $visitingControllers }}</h2>
-
-                <h2 class='text-2xl mt-3'>
-                    <strong>ATM:</strong>
-                    @if($atm)
-                        <a href="{{ route('users.show', ['user' => $atm->user->id]) }}" class="link">{{ $atm->user->first_name.' '.$atm->user->last_name }}</a>
-                    @else
-                        Vacant
-                    @endif
-                </h2>
-                <h2 class='text-2xl'>
-                    <strong>DATM:</strong>
-                    @if($datm)
-                        <a href="{{ route('users.show', ['user' => $datm->user->id]) }}" class="link">{{ $datm->user->first_name.' '.$datm->user->last_name }}</a>
-                    @else
-                        Vacant
-                    @endif
-                </h2>
             </div>
         </x-card-component>
 
