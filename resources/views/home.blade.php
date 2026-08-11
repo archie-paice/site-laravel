@@ -55,7 +55,7 @@
 
                 <div class="divide-y divide-base-300">
                     <div class="py-3">
-                        <h3 class="font-bold text-base-content">
+                        <h3 class="font-bold text-primary dark:text-base-content">
                             <a href="https://discord.gg/bHDwSQn9fh">
                                 <i class="fa-brands fa-discord"></i> Join Our Discord
                             </a>
@@ -63,7 +63,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-base-content">
+                        <h3 class="font-bold text-primary dark:text-base-content">
                             <a href="{{ route('events.index') }}">
                                 <i class="fa-regular fa-calendar"></i> View Events
                             </a>
@@ -71,7 +71,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-base-content">
+                        <h3 class="font-bold text-primary dark:text-base-content">
                             <a href="{{ route('roster.index') }}">
                                 <i class="fa-solid fa-users"></i> Controller Roster
                             </a>
@@ -79,7 +79,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-base-content">
+                        <h3 class="font-bold text-primary dark:text-base-content">
                             <a href="{{ route('publications.index') }}">
                                 <i class="fa-regular fa-file-lines"></i> Publications &amp; Downloads
                             </a>
@@ -87,7 +87,7 @@
                     </div>
 
                     <div class="py-3">
-                        <h3 class="font-bold text-base-content">
+                        <h3 class="font-bold text-primary dark:text-base-content">
                             <a href="{{ route('faq.index') }}">
                                 <i class="fa-regular fa-circle-question"></i> FAQ &amp; Useful Controller Information
                             </a>

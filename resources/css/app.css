@@ -3,6 +3,17 @@
 
 [x-cloak] { display: none !important; }
 
+/* Point Tailwind's dark: variant at the theme actually in use. data-theme is only
+   present once someone picks a theme, so the media query covers the untouched
+   default the way daisyUI's own prefersdark does. */
+@custom-variant dark {
+    &:where([data-theme="dark"], [data-theme="dark"] *) { @slot; }
+
+    @media (prefers-color-scheme: dark) {
+        :where(html:not([data-theme="light"])) & { @slot; }
+    }
+}
+
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 
