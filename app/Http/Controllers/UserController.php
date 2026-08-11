@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\FeedbackStatus;
+use App\Enums\LoaStatus;
 use App\Models\ControllerMonthlyStat;
 use App\Models\ControllerSession;
 use App\Models\Feedback;
@@ -64,6 +65,9 @@ class UserController extends Controller
             'biography' => 'string|nullable|max:1000',
         ], [
             'operatingInitials.max' => 'Operating initials must be 2 characters long',
+            'image.image' => 'The profile picture must be an image file.',
+            'image.mimes' => 'The profile picture must be a JPEG, PNG, GIF, or SVG file.',
+            'image.max' => 'The profile picture must be smaller than 2MB.',
         ]);
 
         if (Auth::user()->id != $id && ! Auth::user()->hasPermissionTo('manage users')) {
@@ -152,6 +156,43 @@ class UserController extends Controller
         return view('users.training-tickets', [
             'user' => $user,
             'trainingTickets' => $trainingTickets,
+        ]);
+    }
+
+    public function loa(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (Auth::user()->id != $user->id) {
+            return response('Unauthorized', 403);
+        }
+
+        $activeLoa = $user->loas()->where('status', '!=', LoaStatus::INACTIVE)->first();
+        $loaHistory = $user->loas()->where('status', LoaStatus::INACTIVE)->paginate(25, ['*'], 'loaPage');
+
+        return view('users.loa', [
+            'user' => $user,
+            'activeLoa' => $activeLoa,
+            'loaHistory' => $loaHistory,
+        ]);
+    }
+
+    public function registeredEvents(int $id)
+    {
+        $user = User::findOrFail($id);
+
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('assign event positions')) {
+            abort(403);
+        }
+
+        $registeredEvents = $user->events()
+            ->withPivot('requested_position', 'start', 'end', 'position_status', 'assigned_position', 'assigned_start', 'assigned_end')
+            ->paginate(25, ['*'], 'eventsPage');
+
+        return view('users.registered-events', [
+            'user' => $user,
+            'userId' => $user->id,
+            'registeredEvents' => $registeredEvents,
         ]);
     }
 

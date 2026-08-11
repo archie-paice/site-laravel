@@ -1,5 +1,7 @@
 <?php
 
+use App\Jobs\ArchiveEvents;
+use App\Jobs\ExpireLoas;
 use App\Jobs\SyncRoster;
 use App\Jobs\SyncStatsimSessions;
 use App\Jobs\UpdateOnlineControllers;
@@ -15,6 +17,10 @@ Artisan::command('inspire', function () {
 Schedule::job(new SyncRoster)->everyTwoHours();
 
 Schedule::job(new UpdateOnlineControllers)->everyMinute();
+
+Schedule::job(new ExpireLoas)->daily();
+
+Schedule::job(new ArchiveEvents)->everyFiveMinutes();
 
 Schedule::call(function () {
     $now = Carbon::now();

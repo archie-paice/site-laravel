@@ -62,6 +62,11 @@ COPY --from=build /var/www/html /var/www/html
 
 WORKDIR /var/www/html
 
+# Without this the repo's php.ini is just a file in the app directory and PHP's
+# 2M upload_max_filesize default applies, which rejects event banners before
+# Laravel's validator ever sees them.
+COPY ./php.ini "$PHP_INI_DIR/conf.d/zzz-app.ini"
+
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
