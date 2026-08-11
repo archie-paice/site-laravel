@@ -17,6 +17,7 @@ RUN apk add --no-cache \
     libpq-dev \
     nodejs \
     npm \
+    git \
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip pdo pdo_pgsql \
     && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
