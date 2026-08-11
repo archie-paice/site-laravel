@@ -42,7 +42,8 @@ The production image is defined in `Dockerfile`. It is a two-stage build on top 
 ### Stage 2 — production
 
 - Starts fresh from `php:8.4-fpm-alpine` and installs only the runtime bits it needs
-  (`libpq-dev`, `pdo`, `pdo_pgsql`). Node and the build toolchain are left behind.
+  (`libpq-dev`, `pdo`, `pdo_pgsql`, and the `redis` extension via PECL). Node and the
+  build toolchain (and the temporary PECL build deps) are left behind.
 - Copies the fully built `/var/www/html` (vendor + compiled assets) from the build
   stage.
 - Copies `entrypoint.sh` in and marks it executable.
@@ -128,25 +129,34 @@ fast, dependency-free test config: `APP_ENV=testing`, `DB_CONNECTION=sqlite`,
   the workflow reports style violations but does not push fixes back. Run
   `vendor/bin/pint` locally before pushing.
 
-### `build-and-push-staging.yml` and `build-and-push-production.yml` — build & deploy
+### `deploy.yml` — test once, build once, staging gates production
 
-Both workflows build the image from `./Dockerfile`, push it to GHCR
-(`ghcr.io/<repository>`) tagged `latest` and an `IMAGE_TAG`, then SSH into the deploy
-host (`appleboy/ssh-action`) and, from the environment's `infrastructure/<env>`
-directory, write an `.env` from the `ENV_FILE` secret and run
-`docker compose pull && docker compose up -d`.
+Triggers on `push` to `main` (plus manual `workflow_dispatch`). One workflow, five
+sequential jobs (`needs:` chained, so a failure anywhere stops the pipeline):
 
-- **Staging:** `deploy` uses the `staging` environment and deploys under
-  `infrastructure/staging`.
-- **Production:** `deploy` uses the `production` environment and deploys under
-  `infrastructure/production`.
+1. **`test`** — calls `ci.yml` as a reusable workflow (build/lint/test).
+2. **`build-staging`** — builds the image from `./Dockerfile` once, and pushes it to
+   GHCR (`ghcr.io/<repository>`) under three tags: `latest`, the `staging` environment's
+   `IMAGE_TAG`, and an immutable `sha-<commit sha>` tag that pins this exact build for
+   the rest of the pipeline. Uses the `staging` environment.
+3. **`deploy-staging`** — SSHes into the deploy host (`appleboy/ssh-action`), writes
+   `infrastructure/staging/.env` from the `staging` environment's `ENV_FILE` secret, and
+   runs `docker compose pull && docker compose up -d`.
+4. **`promote-production`** — does **not** rebuild. It runs
+   `docker buildx imagetools create` to point the `production` environment's `IMAGE_TAG`
+   (and `latest`) at the same `sha-<commit sha>` digest that was just deployed to
+   staging — so production always ships the literal artifact staging validated, not a
+   fresh build that could differ (base image updates, resolver drift, etc.). Uses the
+   `production` environment.
+5. **`deploy-production`** — same deploy pattern under `infrastructure/production`, using
+   the `production` environment.
 
-> **IMPORTANT — both deploy on push to `main`.** Both the staging and the production
-> workflows trigger on `push` to the `main` branch (plus manual `workflow_dispatch`).
-> There is **no separate release gate for production**: merging to `main` deploys to
-> staging *and* production in the same event. The only difference between them is the
-> GitHub Environment used (which is where any required-reviewer / protection rules and
-> per-environment secrets would apply) and the target directory on the host.
+Because `promote-production` and `deploy-production` both declare `environment:
+production`, and that environment has a required-reviewers protection rule configured
+in GitHub, the pipeline pauses after staging is live and waits for a manual approval
+before it will promote or deploy to production. **A push to `main` no longer deploys to
+production automatically** — it always goes through staging first and needs a human to
+approve the production stage.
 
 ---
 
