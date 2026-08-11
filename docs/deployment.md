@@ -131,7 +131,7 @@ fast, dependency-free test config: `APP_ENV=testing`, `DB_CONNECTION=sqlite`,
 
 ### `deploy.yml` — test once, build once, staging gates production
 
-Triggers on `push` to `main` (plus manual `workflow_dispatch`). One workflow, five
+Triggers on `push` to `main` (plus manual `workflow_dispatch`). One workflow, four
 sequential jobs (`needs:` chained, so a failure anywhere stops the pipeline):
 
 1. **`test`** — calls `ci.yml` as a reusable workflow (build/lint/test).
@@ -142,21 +142,24 @@ sequential jobs (`needs:` chained, so a failure anywhere stops the pipeline):
 3. **`deploy-staging`** — SSHes into the deploy host (`appleboy/ssh-action`), writes
    `infrastructure/staging/.env` from the `staging` environment's `ENV_FILE` secret, and
    runs `docker compose pull && docker compose up -d`.
-4. **`promote-production`** — does **not** rebuild. It runs
+4. **`promote-and-deploy-production`** — a single job that first runs
    `docker buildx imagetools create` to point the `production` environment's `IMAGE_TAG`
    (and `latest`) at the same `sha-<commit sha>` digest that was just deployed to
-   staging — so production always ships the literal artifact staging validated, not a
-   fresh build that could differ (base image updates, resolver drift, etc.). Uses the
-   `production` environment.
-5. **`deploy-production`** — same deploy pattern under `infrastructure/production`, using
+   staging (no rebuild — production always ships the literal artifact staging
+   validated), then immediately SSHes in and deploys it the same way staging did. Uses
    the `production` environment.
 
-Because `promote-production` and `deploy-production` both declare `environment:
-production`, and that environment has a required-reviewers protection rule configured
-in GitHub, the pipeline pauses after staging is live and waits for a manual approval
-before it will promote or deploy to production. **A push to `main` no longer deploys to
-production automatically** — it always goes through staging first and needs a human to
-approve the production stage.
+`promote-and-deploy-production` declares `environment: production`, and that environment
+has a required-reviewers protection rule configured in GitHub, so the pipeline pauses
+after staging is live and waits for a single manual approval before it will touch
+production at all. **A push to `main` no longer deploys to production automatically** —
+it always goes through staging first and needs a human to approve the production stage.
+
+Promote and deploy used to be two separate jobs, each with its own `environment:
+production` — but GitHub requests a fresh approval per *pending deployment*, and since
+the jobs ran sequentially (never pending at the same time), that meant two separate
+approval prompts for what is really one decision. They're merged into one job so there's
+exactly one approval for the whole production stage.
 
 ---
 

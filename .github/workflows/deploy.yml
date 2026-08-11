@@ -75,10 +75,10 @@ jobs:
               docker compose pull
               docker compose up -d
 
-  promote-production:
+  promote-and-deploy-production:
     needs: deploy-staging
     environment: production
-    runs-on: ubuntu-latest
+    runs-on: primary-server
     permissions:
       contents: read
       packages: write
@@ -102,13 +102,6 @@ jobs:
             --tag ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:sha-${{ github.sha }}
 
-  deploy-production:
-    runs-on: primary-server
-    needs: promote-production
-    environment: production
-    permissions: {}
-
-    steps:
       - name: Deploy to production host
         uses: appleboy/ssh-action@v1.2.0
         with:
