@@ -1,6 +1,8 @@
 @php
     use \App\Models\VisitorRequest;
     use \App\Enums\VisitRequestStatus;
+    use \App\Models\Loa;
+    use \App\Enums\LoaStatus;
 @endphp
 
 <div class="navbar bg-info text-primary-content z-10">
@@ -80,6 +82,13 @@
                         <a href={{ route('visit.manage') }}>Visitor Requests
                             @if(VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() > 0)
                                 <span class='badge badge-primary'>{{ VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li>
+                        <a href={{ route('loa.manage') }}>LOA Requests
+                            @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
+                                <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
                             @endif
                         </a>
                     </li>

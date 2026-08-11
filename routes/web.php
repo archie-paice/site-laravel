@@ -16,6 +16,7 @@ use App\Http\Controllers\Events\EventPositionPresetController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoaController;
 use App\Http\Controllers\News\NewsController;
 use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\RosterController;
@@ -94,12 +95,20 @@ Route::prefix('users/{user}')->group(function () {
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
+    Route::get('loa', [UserController::class, 'loa'])->middleware('auth')->name('users.show.loa');
     Route::get('registered-events', [UserController::class, 'registeredEvents'])->middleware('auth')->name('users.show.registered-events');
 });
 
 // Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])
     ->name('staff.index');
+
+// LOA
+Route::prefix('loa')->middleware('auth')->name('loa.')->group(function () {
+    Route::post('/', [LoaController::class, 'store'])->name('store');
+    Route::put('{loa}', [LoaController::class, 'update'])->name('update');
+    Route::delete('{loa}', [LoaController::class, 'destroy'])->name('destroy');
+});
 
 // FAQ (public)
 Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
@@ -198,6 +207,14 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
 
         Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])
             ->name('visit.deny');
+    });
+
+    Route::middleware('permission:manage loas')->group(function () {
+        Route::get('loas', [LoaController::class, 'manage'])->name('loa.manage');
+        Route::get('loas/{loa}', [LoaController::class, 'show'])->name('loa.show');
+        Route::put('loas/{loa}/approve', [LoaController::class, 'approve'])->name('loa.approve');
+        Route::put('loas/{loa}/deny', [LoaController::class, 'deny'])->name('loa.deny');
+        Route::put('loas/{loa}/revoke', [LoaController::class, 'revoke'])->name('loa.revoke');
     });
 
     // Contributors
