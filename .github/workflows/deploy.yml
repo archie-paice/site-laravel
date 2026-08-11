@@ -20,6 +20,8 @@ concurrency:
 
 jobs:
   test:
+    permissions:
+      contents: read
     uses: ./.github/workflows/ci.yml
 
   build-staging:
@@ -56,6 +58,7 @@ jobs:
       runs-on: primary-server
       needs: build-staging
       environment: staging
+      permissions: {}
 
       steps:
         - name: Deploy to staging host
@@ -103,6 +106,7 @@ jobs:
     runs-on: primary-server
     needs: promote-production
     environment: production
+    permissions: {}
 
     steps:
       - name: Deploy to production host
