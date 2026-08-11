@@ -51,7 +51,11 @@ RUN chown -R www-data:www-data /var/www/html/ \
 FROM php:8.4-fpm-alpine
 
 RUN apk add --no-cache ca-certificates curl libcurl libpq-dev \
-    && docker-php-ext-install pdo pdo_pgsql
+    && docker-php-ext-install pdo pdo_pgsql \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apk del .build-deps
 
 # copy files from the build stage
 COPY --from=build /var/www/html /var/www/html
