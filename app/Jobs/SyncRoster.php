@@ -35,7 +35,7 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
     {
         $ROSTER_API_ENDPOINT = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility').'/roster/both';
 
-        $rosterData = Http::retry(2, 500)->timeout(20)->get($ROSTER_API_ENDPOINT, [
+        $rosterData = Http::retry(4, fn ($attempt) => $attempt * 1000)->timeout(20)->get($ROSTER_API_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key'),
         ]);
 
@@ -120,7 +120,7 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
     private function updateStaffMembers()
     {
         $FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility');
-        $facilityInfo = Http::retry(2, 500)->timeout(20)->get($FACILITY_INFO_ENDPOINT, [
+        $facilityInfo = Http::retry(4, fn ($attempt) => $attempt * 1000)->timeout(20)->get($FACILITY_INFO_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key'),
         ]);
 

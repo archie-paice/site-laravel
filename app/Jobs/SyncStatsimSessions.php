@@ -19,6 +19,10 @@ class SyncStatsimSessions implements ShouldQueue
 
     public int $timeout = 300;
 
+    public int $tries = 3;
+
+    public array $backoff = [60, 300];
+
     public function __construct(public int $year, public int $month) {}
 
     public function handle(): void
@@ -27,6 +31,7 @@ class SyncStatsimSessions implements ShouldQueue
         $to = $from->copy()->endOfMonth();
 
         $response = Http::timeout(60)
+            ->retry(3, fn ($attempt) => $attempt * 1000)
             ->withHeaders(['X-Api-Key' => config('app.statsim_api_key') ?? ''])
             ->get('https://api.statsim.net/api/atcsessions/dates', [
                 'from' => $from->format('n/j/Y'),
