@@ -247,7 +247,7 @@ class User extends Authenticatable
 
     public static function createFromVatusa(int $id)
     {
-        $userData = Http::get(config('app.vatusa_api_url').'/v2/user/'.$id, [
+        $userData = Http::retry(2, 500)->timeout(20)->get(config('app.vatusa_api_url').'/v2/user/'.$id, [
             'apikey' => config('app.vatusa_api_key'),
         ])->throw()->json()['data'] ?? throw new \Exception('Failed to fetch user data for CID '.$id);
 
