@@ -1,5 +1,9 @@
 @extends('layouts.main')
 
+@php
+    use Stevebauman\Purify\Facades\Purify;
+@endphp
+
 @section('title', 'Home')
 @section('hide-heading')@endsection
 
@@ -163,9 +167,9 @@
                                     {{ $n->published_at }}
                                 </p>
 
-                                <p class="py-4">
-                                    {{ $n->content }}
-                                </p>
+                                <div class="py-4">
+                                    {!! Purify::clean($n->content) !!}
+                                </div>
 
                                 <div class="modal-action">
                                     <form method="dialog">
