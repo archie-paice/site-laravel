@@ -168,6 +168,12 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
 
         Route::post('/', [NewsController::class, 'store'])
             ->name('admin.news.store');
+
+        Route::get('{news}/edit', [NewsController::class, 'edit'])
+            ->name('admin.news.edit');
+
+        Route::put('{news}', [NewsController::class, 'update'])
+            ->name('admin.news.update');
     });
 
     // User Management

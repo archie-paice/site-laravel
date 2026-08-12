@@ -1,5 +1,12 @@
 @extends('layouts.admin')
 
+@php
+    use \App\Models\VisitorRequest;
+    use \App\Enums\VisitRequestStatus;
+    use \App\Models\Loa;
+    use \App\Enums\LoaStatus;
+@endphp
+
 @section('body')
     <div class='flex flex-wrap gap-10'>
         <x-card-component title="ARTCC Membership Overview">
@@ -12,36 +19,76 @@
 
         @role('training')
             <x-card-component title="Training Quick Links">
-                <a class='btn btn-primary mt-5' href="{{ route('training-assignments.index') }}">My Students (TODO)</a>
+                <a class='btn btn-primary mt-5' href="{{ route('admin.training.index') }}">Training Dashboard</a>
+                <a class='btn btn-primary' href="{{ route('training-assignments.index') }}">My Students (TODO)</a>
                 <a class='btn btn-primary' href="{{ route('training-assignments.index') }}">Training Assignments</a>
+                <a class='btn btn-primary' href="{{ route('training-tickets.index') }}">Training Tickets</a>
                 <a class='btn btn-primary' href="{{ route('training-tickets.create') }}">Create Training Ticket</a>
-                <a class='btn btn-primary' href="{{ route('training-tickets.create') }}">Issue Solo Cert</a>
+                <a class='btn btn-primary' href="{{ route('solo-certs.index') }}">Solo Certs</a>
+                <a class='btn btn-primary' href="{{ route('solo-certs.create') }}">Issue Solo Cert</a>
                 @haspermission('certifications:write')
                     <a class='btn btn-primary' href="{{ route('certifications.index') }}">Certifications</a>
                 @endhaspermission
             </x-card-component>
         @endrole
 
-        @haspermission('manage contributors')
+        @if(auth()->user()?->can('manage contributors') || auth()->user()?->can('manage faqs'))
         <x-card-component title="Web Quick Links">
-            <a class='btn btn-primary mt-5' href="{{ route('admin.contributors.index') }}">Manage Contributors</a>
+            @haspermission('manage contributors')
+                <a class='btn btn-primary mt-5' href="{{ route('admin.contributors.index') }}">Manage Contributors</a>
+            @endhaspermission
+            @haspermission('manage faqs')
+                <a class='btn btn-primary mt-5' href="{{ route('admin.faqs.index') }}">FAQ Management</a>
+            @endhaspermission
         </x-card-component>
-    @endhaspermission
+    @endif
 
     @role('facilities')
             <x-card-component title="Facilities Quick Links">
-                <a class='btn btn-primary mt-5' href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a>
-                <a class='btn btn-primary' href="{{ route('certification-facilities.index') }}">Certification Facilities Management</a>
-                <a class='btn btn-primary' href="{{ route('admin.publications.index') }}">Document Management</a>
-                <a class='btn btn-primary' href="{{ route('certification-facilities.index') }}">Facilities Management</a>
+                @haspermission('manage statistics prefixes')
+                    <a class='btn btn-primary mt-5' href="{{ route('statistics-prefixes.index') }}">Statistics Prefixes</a>
+                @endhaspermission
+                @haspermission('certification-facilities:write')
+                    <a class='btn btn-primary mt-5' href="{{ route('certification-facilities.index') }}">Certification Facilities Management</a>
+                @endhaspermission
+                @haspermission('documents:write')
+                    <a class='btn btn-primary mt-5' href="{{ route('admin.publications.index') }}">Document Management</a>
+                @endhaspermission
             </x-card-component>
     @endrole
 
     @role('events')
+        @haspermission('manage events')
             <x-card-component title="Events Quick Links">
                 <a class='btn btn-primary mt-5' href="{{ route('admin.events.index') }}">Manage Events</a>
                 <a class='btn btn-primary' href="{{ route('admin.events.position-presets.index') }}">Position Presets</a>
+                <a class='btn btn-primary' href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a>
             </x-card-component>
+        @endhaspermission
+    @endrole
+
+    @role('admin')
+        <x-card-component title="Facility Admin Quick Links">
+            <a class='btn btn-primary mt-5' href="{{ route('manage-users.index') }}">User Management</a>
+            <a class='btn btn-primary' href="{{ route('admin.news.index') }}">News Management</a>
+            @haspermission('manage visiting controllers')
+                <a class='btn btn-primary' href="{{ route('visit.manage') }}">Visitor Requests
+                    @if(VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() > 0)
+                        <span class='badge badge-primary'>{{ VisitorRequest::where('status', VisitRequestStatus::PENDING)->count() }}</span>
+                    @endif
+                </a>
+            @endhaspermission
+            @haspermission('manage loas')
+                <a class='btn btn-primary' href="{{ route('loa.manage') }}">LOA Requests
+                    @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
+                        <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
+                    @endif
+                </a>
+            @endhaspermission
+            @haspermission('view audit logs')
+                <a class='btn btn-primary' href="{{ route('logs.index') }}">Audit Log</a>
+            @endhaspermission
+        </x-card-component>
     @endrole
 
     @haspermission('feedback:read')
