@@ -34,23 +34,21 @@
 @endsection
 
 @section('body')
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 pt-5">
-        @if(count($soloCerts) > 0)
-            <x-card-component title="Solo Certs">
-                <ul>
-                    @foreach ($soloCerts as $soloCert)
-                        <x-solo-cert-card :soloCert="$soloCert"/>
-                    @endforeach
-                </ul>
-            </x-card-component>
-        @endif
-    </div>
-
     <div
-        class="mt-6 lg:mt-8 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)_minmax(0,24rem)] xl:grid-cols-[24rem_minmax(0,1fr)_24rem] lg:gap-4 items-start"
+        class="pt-5 grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)_minmax(0,24rem)] xl:grid-cols-[24rem_minmax(0,1fr)_24rem] lg:gap-4 items-start"
     >
 
         <aside class="order-2 lg:order-1 flex flex-col gap-4 w-full min-w-0">
+
+            @if(count($soloCerts) > 0)
+                <x-card-component title="Solo Certs">
+                    <ul>
+                        @foreach ($soloCerts as $soloCert)
+                            <x-solo-cert-card :soloCert="$soloCert"/>
+                        @endforeach
+                    </ul>
+                </x-card-component>
+            @endif
 
             <div
                 class="bg-base-100 rounded-md p-4 sm:p-6 w-full border-2 border-base-300 hover:shadow-2xl transition-all duration-300"
