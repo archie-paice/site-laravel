@@ -170,6 +170,43 @@ test('given an events staff member, when visiting the management page, then the 
     $response->assertSee('name="_method" value="DELETE"', false);
 });
 
+// Creating an event from a staffing request
+
+test('given an events staff member, when creating an event from a staffing request, then the name and description are prefilled', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole(['staff', 'events']);
+
+    $staffingRequest = StaffingRequest::factory()->create([
+        'name' => 'Coastal Cruise',
+        'description' => 'Please staff JAX_GND and JAX_TWR.',
+    ]);
+
+    $response = $this->actingAs($staff)->get(route('admin.events.create', ['staffing_request' => $staffingRequest->id]));
+
+    $response->assertOk();
+    $response->assertSee('value="Coastal Cruise"', false);
+    $response->assertSee('Please staff JAX_GND and JAX_TWR.');
+});
+
+test('given an events staff member, when opening the event form without a staffing request, then the fields are empty', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole(['staff', 'events']);
+
+    $response = $this->actingAs($staff)->get(route('admin.events.create'));
+
+    $response->assertOk();
+    $response->assertSee('value=""', false);
+});
+
+test('given a stale staffing request id, when opening the event form, then it still loads with empty fields', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole(['staff', 'events']);
+
+    $response = $this->actingAs($staff)->get(route('admin.events.create', ['staffing_request' => 999999]));
+
+    $response->assertOk();
+});
+
 test('given an events staff member, when searching staffing requests, then only matching entries are shown', function () {
     $staff = User::factory()->create();
     $staff->assignRole(['staff', 'events']);

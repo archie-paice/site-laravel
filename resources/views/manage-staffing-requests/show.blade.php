@@ -54,7 +54,8 @@
                             <button type="submit" class="btn btn-error">Close Request</button>
                         </form>
                         <p class="text-sm opacity-70">This will delete the staffing request permanently. Create a new
-                            event <a href="{{ route('admin.events.create') }}" target="_blank" class="link">here</a>.</p>
+                            event <a href="{{ route('admin.events.create', ['staffing_request' => $staffingRequest->id]) }}" target="_blank" class="link">here</a>,
+                            prefilled with the details above.</p>
                     </div>
                 @endhaspermission
             </div>
