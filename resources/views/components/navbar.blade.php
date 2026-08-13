@@ -50,6 +50,7 @@
         </div>
 
         <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
+        <a href="{{ route('staffing-requests.index') }}" role="button" class="m-1">Staffing Request</a>
         <a href="{{ route('faq.index') }}" role="button" class="m-1">FAQ &amp; Help</a>
 
         @if(auth()->user()?->hasRole('staff'))
@@ -99,6 +100,7 @@
             @endforeach
 
             <li><a href="{{ route('feedback.index') }}">Feedback</a></li>
+            <li><a href="{{ route('staffing-requests.index') }}">Staffing Request</a></li>
             <li><a href="{{ route('faq.index') }}">FAQ &amp; Help</a></li>
 
             @if(auth()->user()?->hasRole('staff'))

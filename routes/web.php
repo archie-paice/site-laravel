@@ -21,6 +21,7 @@ use App\Http\Controllers\News\NewsController;
 use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffingRequestController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
@@ -117,6 +118,10 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
 Route::get('/feedback', [FeedbackController::class, 'index'])->middleware('auth')->name('feedback.index');
 Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('auth')->name('feedback.store');
 
+// Staffing Requests
+Route::get('/staffing-requests', [StaffingRequestController::class, 'index'])->middleware('auth')->name('staffing-requests.index');
+Route::post('/staffing-requests', [StaffingRequestController::class, 'store'])->middleware('auth')->name('staffing-requests.store');
+
 // Controller Statistics
 Route::get('controllers/statistics', [StatisticsController::class, 'index'])
     ->name('statistics.index');
@@ -196,6 +201,16 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::put('feedback/{feedback}/unstash', [FeedbackController::class, 'unstash'])->name('admin.feedback.unstash');
         Route::put('feedback/{feedback}/release', [FeedbackController::class, 'release'])->name('admin.feedback.release');
         Route::post('feedback/{feedback}/comments', [FeedbackController::class, 'storeComment'])->name('admin.feedback.comments.store');
+    });
+
+    // Staffing Requests
+    Route::middleware('permission:staffing-requests:read')->group(function () {
+        Route::get('staffing-requests', [StaffingRequestController::class, 'manage'])->name('admin.staffing-requests.index');
+        Route::get('staffing-requests/{staffingRequest}', [StaffingRequestController::class, 'show'])->name('admin.staffing-requests.show');
+    });
+
+    Route::middleware('permission:staffing-requests:write')->group(function () {
+        Route::delete('staffing-requests/{staffingRequest}', [StaffingRequestController::class, 'destroy'])->name('admin.staffing-requests.destroy');
     });
 
     Route::middleware('permission:manage visiting controllers')->group(function () {

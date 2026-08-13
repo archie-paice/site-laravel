@@ -5,6 +5,7 @@
     use \App\Enums\VisitRequestStatus;
     use \App\Models\Loa;
     use \App\Enums\LoaStatus;
+    use \App\Models\StaffingRequest;
 @endphp
 
 @section('body')
@@ -63,6 +64,13 @@
                 <a class='btn btn-primary mt-5' href="{{ route('admin.events.index') }}">Manage Events</a>
                 <a class='btn btn-primary' href="{{ route('admin.events.position-presets.index') }}">Position Presets</a>
                 <a class='btn btn-primary' href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a>
+                @haspermission('staffing-requests:read')
+                    <a class='btn btn-primary' href="{{ route('admin.staffing-requests.index') }}">Staffing Requests
+                        @if(StaffingRequest::count() > 0)
+                            <span class='badge badge-primary'>{{ StaffingRequest::count() }}</span>
+                        @endif
+                    </a>
+                @endhaspermission
             </x-card-component>
         @endhaspermission
     @endrole
