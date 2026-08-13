@@ -19,13 +19,13 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  ci:
     permissions:
       contents: read
     uses: ./.github/workflows/ci.yml
 
   build-staging:
-    needs: test
+    needs: ci
     environment: staging
     runs-on: ubuntu-latest
     permissions:
