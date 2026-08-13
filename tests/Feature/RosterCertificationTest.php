@@ -22,7 +22,15 @@ test('the roster shows the highest held abbreviation and uncertified otherwise',
     $response = $this->get(route('roster.index'));
 
     $response->assertStatus(200);
-    $response->assertSee('TWR');        // highest level shown for the certified user
-    $response->assertDontSee('GND');    // the lower level is not surfaced
-    $response->assertSee('Uncertified');
+
+    // Scope assertions to the roster table itself, not the full page: the
+    // page head contains random tokens (CSRF, Livewire IDs, asset hashes)
+    // that can coincidentally contain "GND" and make a page-wide
+    // assertDontSee flaky.
+    preg_match('/<table.*<\/table>/s', $response->getContent(), $matches);
+    $table = $matches[0] ?? '';
+
+    expect($table)->toContain('TWR');        // highest level shown for the certified user
+    expect($table)->not->toContain('GND');   // the lower level is not surfaced
+    expect($table)->toContain('Uncertified');
 });
