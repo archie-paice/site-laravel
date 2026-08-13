@@ -66,8 +66,8 @@
                 <a class='btn btn-primary' href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a>
                 @haspermission('staffing-requests:read')
                     <a class='btn btn-primary' href="{{ route('admin.staffing-requests.index') }}">Staffing Requests
-                        @if(StaffingRequest::count() > 0)
-                            <span class='badge badge-primary'>{{ StaffingRequest::count() }}</span>
+                        @if(StaffingRequest::where('closed', false)->count() > 0)
+                            <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
                         @endif
                     </a>
                 @endhaspermission

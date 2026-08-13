@@ -39,9 +39,20 @@
                 </label>
 
                 <label class="form-control flex flex-col">
+                    <span class="label-text font-semibold mb-1">Date/Time Needed (Zulu)</span>
+                    <input type="datetime-local" name="requested_at" class="input input-bordered w-full"
+                           value="{{ old('requested_at') }}" required>
+                    @error('requested_at')
+                        <span class="text-error text-sm mt-1">{{ $message }}</span>
+                    @enderror
+                </label>
+
+                <label class="form-control flex flex-col">
                     <span class="label-text font-semibold mb-1">Description</span>
+                    <span class="text-sm opacity-70 mb-1">Tell us about your planned route, how many pilots are
+                        flying, what kind of event it is, and any specific positions you'll need staffed.</span>
                     <textarea name="description" rows="6" class="textarea textarea-bordered w-full resize-none"
-                              placeholder="Include airports, times, routes, and any other staffing requirements needed."
+                              placeholder="Include airports, routes, pilot count, and any other staffing requirements needed."
                               required>{{ old('description') }}</textarea>
                     @error('description')
                         <span class="text-error text-sm mt-1">{{ $message }}</span>

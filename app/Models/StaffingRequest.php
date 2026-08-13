@@ -14,7 +14,17 @@ class StaffingRequest extends Model
         'user_id',
         'name',
         'description',
+        'requested_at',
+        'closed',
     ];
+
+    public function casts(): array
+    {
+        return [
+            'requested_at' => 'datetime',
+            'closed' => 'boolean',
+        ];
+    }
 
     public function user()
     {

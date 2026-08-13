@@ -210,7 +210,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
     });
 
     Route::middleware('permission:staffing-requests:write')->group(function () {
-        Route::delete('staffing-requests/{staffingRequest}', [StaffingRequestController::class, 'destroy'])->name('admin.staffing-requests.destroy');
+        Route::patch('staffing-requests/{staffingRequest}/close', [StaffingRequestController::class, 'close'])->name('admin.staffing-requests.close');
+        Route::patch('staffing-requests/{staffingRequest}/reopen', [StaffingRequestController::class, 'reopen'])->name('admin.staffing-requests.reopen');
     });
 
     Route::middleware('permission:manage visiting controllers')->group(function () {

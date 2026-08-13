@@ -17,6 +17,7 @@
             </div>
             <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-sm">
                 <li><a href="{{ route('events.index') }}">Upcoming Events</a></li>
+                <li><a href="{{ route('staffing-requests.index') }}">Request Staffing</a></li>
             </ul>
         </div>
 
@@ -50,7 +51,6 @@
         </div>
 
         <a href="{{ route('feedback.index') }}" role="button" class="m-1">Feedback</a>
-        <a href="{{ route('staffing-requests.index') }}" role="button" class="m-1">Staffing Request</a>
         <a href="{{ route('faq.index') }}" role="button" class="m-1">FAQ &amp; Help</a>
 
         @if(auth()->user()?->hasRole('staff'))
@@ -86,6 +86,7 @@
 
             <li class="menu-title text-xs uppercase tracking-wide pt-2">Events</li>
             <li><a href="{{ route('events.index') }}">Upcoming Events</a></li>
+            <li><a href="{{ route('staffing-requests.index') }}">Request Staffing</a></li>
 
             <li class="menu-title text-xs uppercase tracking-wide pt-2">Controllers</li>
             <li><a href="{{ route('visit.index') }}">Visit vZJX</a></li>
@@ -100,7 +101,6 @@
             @endforeach
 
             <li><a href="{{ route('feedback.index') }}">Feedback</a></li>
-            <li><a href="{{ route('staffing-requests.index') }}">Staffing Request</a></li>
             <li><a href="{{ route('faq.index') }}">FAQ &amp; Help</a></li>
 
             @if(auth()->user()?->hasRole('staff'))

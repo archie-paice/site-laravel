@@ -9,11 +9,23 @@
         </div>
 
         <x-card-component title="Staffing Request - {{ $staffingRequest->name }}">
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+                @if ($staffingRequest->closed)
+                    <span class="badge badge-ghost">Closed</span>
+                @else
+                    <span class="badge badge-success">Open</span>
+                @endif
+                <span class="text-sm opacity-70">#{{ $staffingRequest->id }}</span>
+            </div>
+
+            <p class="text-sm opacity-70 mb-1">
+                Submitted {{ $staffingRequest->created_at->utc()->format('Y-m-d H:i') }}Z
+            </p>
+            <p class="text-sm opacity-70 mb-1">
+                Requested For {{ $staffingRequest->requested_at->utc()->format('Y-m-d H:i') }}Z
+            </p>
             <p class="text-sm opacity-70 mb-4">
-                Submitted
-                <time data-local datetime="{{ $staffingRequest->created_at->toIso8601String() }}">
-                    {{ $staffingRequest->created_at->timezone('America/New_York')->format('m-d-Y g:i A') }} ET
-                </time>
+                Last Updated {{ $staffingRequest->updated_at->utc()->format('Y-m-d H:i') }}Z
             </p>
 
             <div class="flex flex-col gap-y-4">
@@ -48,14 +60,23 @@
 
                 @haspermission('staffing-requests:write')
                     <div class="flex flex-col items-end gap-2">
-                        <form action="{{ route('admin.staffing-requests.destroy', [$staffingRequest]) }}" method="POST">
-                            @method('DELETE')
-                            @csrf
-                            <button type="submit" class="btn btn-error">Close Request</button>
-                        </form>
-                        <p class="text-sm opacity-70">This will delete the staffing request permanently. Create a new
-                            event <a href="{{ route('admin.events.create', ['staffing_request' => $staffingRequest->id]) }}" target="_blank" class="link">here</a>,
-                            prefilled with the details above.</p>
+                        @if ($staffingRequest->closed)
+                            <form action="{{ route('admin.staffing-requests.reopen', [$staffingRequest]) }}" method="POST">
+                                @method('PATCH')
+                                @csrf
+                                <button type="submit" class="btn btn-outline">Reopen Request</button>
+                            </form>
+                        @else
+                            <form action="{{ route('admin.staffing-requests.close', [$staffingRequest]) }}" method="POST">
+                                @method('PATCH')
+                                @csrf
+                                <button type="submit" class="btn btn-error">Close Request</button>
+                            </form>
+                            <p class="text-sm opacity-70">Closing will email the submitter and mark this request as
+                                closed. It can be reopened later if needed. Create a new event
+                                <a href="{{ route('admin.events.create', ['staffing_request' => $staffingRequest->id]) }}" target="_blank" class="link">here</a>,
+                                prefilled with the details above.</p>
+                        @endif
                     </div>
                 @endhaspermission
             </div>

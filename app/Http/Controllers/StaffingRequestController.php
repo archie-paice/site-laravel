@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\StaffingRequestClosed;
+use App\Mail\StaffingRequestSubmitted;
 use App\Models\StaffingRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class StaffingRequestController extends Controller
 {
@@ -18,14 +22,17 @@ class StaffingRequestController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string|max:2000',
+            'requested_at' => 'required|date',
         ]);
 
         $staffingRequest = StaffingRequest::create([
             'user_id' => $request->user()->id,
             'name' => $validated['name'],
             'description' => $validated['description'],
+            'requested_at' => $validated['requested_at'],
         ]);
 
+        Mail::to($staffingRequest->user)->queue(new StaffingRequestSubmitted($staffingRequest));
         Log::info('New staffing request submitted by '.$request->user()->id.': '.$staffingRequest->name);
 
         return redirect()->route('staffing-requests.index')->with('success', 'Thank you! Your staffing request has been submitted. Our events team will follow up by email.');
@@ -37,7 +44,10 @@ class StaffingRequestController extends Controller
             'search' => 'nullable|string|max:255',
         ]);
 
-        $staffingRequests = StaffingRequest::search($request->input('search'))->orderBy('created_at', 'desc')->paginate(25);
+        $staffingRequests = StaffingRequest::search($request->input('search'))
+            ->orderBy('closed')
+            ->orderBy('created_at', 'desc')
+            ->paginate(25);
 
         return view('manage-staffing-requests.index', ['staffingRequests' => $staffingRequests]);
     }
@@ -49,13 +59,22 @@ class StaffingRequestController extends Controller
         return view('manage-staffing-requests.show', ['staffingRequest' => $staffingRequest]);
     }
 
-    public function destroy(StaffingRequest $staffingRequest)
+    public function close(StaffingRequest $staffingRequest)
     {
-        $name = $staffingRequest->name;
-        $staffingRequest->delete();
+        $staffingRequest->update(['closed' => true]);
 
-        Log::info('Staffing request "'.$name.'" closed.');
+        Mail::to($staffingRequest->user)->queue(new StaffingRequestClosed($staffingRequest));
+        Log::info('Staffing request "'.$staffingRequest->name.'" closed by '.Auth::user()->id);
 
         return redirect()->route('admin.staffing-requests.index')->with('success', 'Staffing request closed.');
+    }
+
+    public function reopen(StaffingRequest $staffingRequest)
+    {
+        $staffingRequest->update(['closed' => false]);
+
+        Log::info('Staffing request "'.$staffingRequest->name.'" reopened by '.Auth::user()->id);
+
+        return redirect()->route('admin.staffing-requests.index')->with('success', 'Staffing request reopened.');
     }
 }

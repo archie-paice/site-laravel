@@ -1,8 +1,11 @@
 <?php
 
+use App\Mail\StaffingRequestClosed;
+use App\Mail\StaffingRequestSubmitted;
 use App\Models\StaffingRequest;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Support\Facades\Mail;
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
@@ -26,12 +29,15 @@ test('given an authenticated user, when visiting the staffing request form, then
     $response->assertSee($user->email);
 });
 
-test('given an authenticated user, when submitting a valid staffing request, then it is stored against them', function () {
+test('given an authenticated user, when submitting a valid staffing request, then it is stored against them and a confirmation email is sent', function () {
+    Mail::fake();
+
     $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post(route('staffing-requests.store'), [
         'name' => 'Jacksonville Fly-In',
         'description' => 'Looking for JAX_TWR and JAX_APP staffed from 2300z-0200z.',
+        'requested_at' => '2026-09-01T23:00',
     ]);
 
     $response->assertRedirect(route('staffing-requests.index'));
@@ -40,13 +46,18 @@ test('given an authenticated user, when submitting a valid staffing request, the
     $staffingRequest = StaffingRequest::sole();
     expect($staffingRequest->user_id)->toBe($user->id)
         ->and($staffingRequest->name)->toBe('Jacksonville Fly-In')
-        ->and($staffingRequest->description)->toBe('Looking for JAX_TWR and JAX_APP staffed from 2300z-0200z.');
+        ->and($staffingRequest->description)->toBe('Looking for JAX_TWR and JAX_APP staffed from 2300z-0200z.')
+        ->and($staffingRequest->requested_at->format('Y-m-d H:i'))->toBe('2026-09-01 23:00')
+        ->and($staffingRequest->closed)->toBeFalse();
+
+    Mail::assertQueued(StaffingRequestSubmitted::class, fn ($mail) => $mail->hasTo($user->email));
 });
 
 test('given a guest, when submitting a staffing request, then they are redirected to login and nothing is stored', function () {
     $response = $this->post(route('staffing-requests.store'), [
         'name' => 'Jacksonville Fly-In',
         'description' => 'Should not be stored.',
+        'requested_at' => '2026-09-01T23:00',
     ]);
 
     $response->assertRedirect(route('login'));
@@ -59,6 +70,7 @@ test('given an authenticated user, when submitting without an event name, then a
     $response = $this->actingAs($user)->post(route('staffing-requests.store'), [
         'name' => '',
         'description' => 'Some description.',
+        'requested_at' => '2026-09-01T23:00',
     ]);
 
     $response->assertSessionHasErrors('name');
@@ -71,9 +83,23 @@ test('given an authenticated user, when submitting without a description, then a
     $response = $this->actingAs($user)->post(route('staffing-requests.store'), [
         'name' => 'Jacksonville Fly-In',
         'description' => '',
+        'requested_at' => '2026-09-01T23:00',
     ]);
 
     $response->assertSessionHasErrors('description');
+    expect(StaffingRequest::count())->toBe(0);
+});
+
+test('given an authenticated user, when submitting without a requested date/time, then a requested_at error is returned and nothing is stored', function () {
+    $user = User::factory()->create();
+
+    $response = $this->actingAs($user)->post(route('staffing-requests.store'), [
+        'name' => 'Jacksonville Fly-In',
+        'description' => 'Some description.',
+        'requested_at' => '',
+    ]);
+
+    $response->assertSessionHasErrors('requested_at');
     expect(StaffingRequest::count())->toBe(0);
 });
 
@@ -90,6 +116,7 @@ test('given an events staff member, when visiting the management page, then subm
     $response->assertOk();
     $response->assertSee('Coastal Cruise');
     $response->assertSee($staffingRequest->user->name);
+    $response->assertSee((string) $staffingRequest->id);
 });
 
 test('given a user without the staffing-requests:read permission, when visiting the management page, then the request is forbidden', function () {
@@ -119,29 +146,48 @@ test('given an events staff member, when viewing a staffing request, then the su
     $response->assertSee($staffingRequest->user->email);
 });
 
-test('given an events staff member, when closing a staffing request, then it is deleted', function () {
+test('given an events staff member, when closing a staffing request, then it is kept and marked closed, and the submitter is emailed', function () {
+    Mail::fake();
+
     $staff = User::factory()->create();
     $staff->assignRole(['staff', 'events']);
 
     $staffingRequest = StaffingRequest::factory()->create();
 
-    $response = $this->actingAs($staff)->delete(route('admin.staffing-requests.destroy', $staffingRequest));
+    $response = $this->actingAs($staff)->patch(route('admin.staffing-requests.close', $staffingRequest));
 
     $response->assertRedirect(route('admin.staffing-requests.index'));
     $response->assertSessionHas('success');
-    expect(StaffingRequest::count())->toBe(0);
+
+    expect(StaffingRequest::count())->toBe(1)
+        ->and($staffingRequest->fresh()->closed)->toBeTrue();
+
+    Mail::assertQueued(StaffingRequestClosed::class, fn ($mail) => $mail->hasTo($staffingRequest->user->email));
 });
 
-test('given a user with only the staffing-requests:read permission, when closing a staffing request, then the request is forbidden and it is kept', function () {
+test('given an events staff member, when reopening a closed staffing request, then it is marked open again', function () {
+    $staff = User::factory()->create();
+    $staff->assignRole(['staff', 'events']);
+
+    $staffingRequest = StaffingRequest::factory()->create(['closed' => true]);
+
+    $response = $this->actingAs($staff)->patch(route('admin.staffing-requests.reopen', $staffingRequest));
+
+    $response->assertRedirect(route('admin.staffing-requests.index'));
+    $response->assertSessionHas('success');
+    expect($staffingRequest->fresh()->closed)->toBeFalse();
+});
+
+test('given a user with only the staffing-requests:read permission, when closing a staffing request, then the request is forbidden and it stays open', function () {
     $user = User::factory()->create();
     $user->givePermissionTo(['view dashboard', 'staffing-requests:read']);
 
     $staffingRequest = StaffingRequest::factory()->create();
 
-    $response = $this->actingAs($user)->delete(route('admin.staffing-requests.destroy', $staffingRequest));
+    $response = $this->actingAs($user)->patch(route('admin.staffing-requests.close', $staffingRequest));
 
     $response->assertForbidden();
-    expect(StaffingRequest::count())->toBe(1);
+    expect($staffingRequest->fresh()->closed)->toBeFalse();
 });
 
 test('given a user with only the staffing-requests:read permission, when visiting the management page, then requests are shown without the close action', function () {
@@ -154,8 +200,7 @@ test('given a user with only the staffing-requests:read permission, when visitin
 
     $response->assertOk();
     $response->assertSee('Coastal Cruise');
-    // The close form is the only DELETE form on this page.
-    $response->assertDontSee('name="_method" value="DELETE"', false);
+    $response->assertDontSee('name="_method" value="PATCH"', false);
 });
 
 test('given an events staff member, when visiting the management page, then the close action is available', function () {
@@ -167,7 +212,7 @@ test('given an events staff member, when visiting the management page, then the 
     $response = $this->actingAs($staff)->get(route('admin.staffing-requests.index'));
 
     $response->assertOk();
-    $response->assertSee('name="_method" value="DELETE"', false);
+    $response->assertSee('name="_method" value="PATCH"', false);
 });
 
 // Creating an event from a staffing request

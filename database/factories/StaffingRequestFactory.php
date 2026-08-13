@@ -22,6 +22,8 @@ class StaffingRequestFactory extends Factory
             'user_id' => User::factory(),
             'name' => fake()->words(3, true).' Fly-In',
             'description' => fake()->paragraph(),
+            'requested_at' => fake()->dateTimeBetween('now', '+2 months'),
+            'closed' => false,
         ];
     }
 }
