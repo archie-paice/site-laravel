@@ -11,6 +11,8 @@
 
                 <h2 class='text-lg'>Expires on {{ $soloCert->expires->format('Y-m-d') }}</h2>
             </div>
+
+            <h2 class='text-lg'>Expires on {{ $soloCert->expires->format('Y-m-d') }}</h2>
         </div>
     </div>
 </li>
