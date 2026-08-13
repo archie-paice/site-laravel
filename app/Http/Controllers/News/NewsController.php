@@ -5,6 +5,7 @@ namespace App\Http\Controllers\News;
 use App\Http\Controllers\Controller;
 use App\Models\News;
 use Illuminate\Http\Request;
+use Stevebauman\Purify\Facades\Purify;
 
 class NewsController extends Controller
 {
@@ -26,12 +27,12 @@ class NewsController extends Controller
     {
         $validated = $request->validate([
             'title' => 'required|string|max:100',
-            'content' => 'required|string|max:250',
+            'content' => 'required|string',
         ]);
 
         $news = new News([
             'title' => $validated['title'],
-            'content' => $validated['content'],
+            'content' => Purify::clean($validated['content']),
             'published_at' => now(),
         ]);
 
@@ -39,5 +40,24 @@ class NewsController extends Controller
 
         return redirect()->route('home');
 
+    }
+
+    public function edit(News $news)
+    {
+        return view('news.admin.edit', ['news' => $news]);
+    }
+
+    public function update(Request $request, News $news)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:100',
+            'content' => 'required|string',
+        ]);
+
+        $news->title = $validated['title'];
+        $news->content = Purify::clean($validated['content']);
+        $news->save();
+
+        return redirect()->route('admin.news.index');
     }
 }
