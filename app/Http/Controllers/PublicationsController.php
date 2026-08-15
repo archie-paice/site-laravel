@@ -27,6 +27,12 @@ class PublicationsController extends Controller
             404
         );
 
-        return Storage::disk('public')->response($publication->file_path, $publication->original_filename);
+        // Anything a browser cannot render (vATIS profile JSON, legacy uploads) is
+        // saved to disk rather than dumped on screen as raw text.
+        if ($publication->opensInBrowser()) {
+            return Storage::disk('public')->response($publication->file_path, $publication->original_filename);
+        }
+
+        return Storage::disk('public')->download($publication->file_path, $publication->original_filename);
     }
 }
