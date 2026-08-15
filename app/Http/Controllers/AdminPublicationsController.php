@@ -14,7 +14,7 @@ class AdminPublicationsController extends Controller
 
     private const DIRECTORY = 'documents';
 
-    private const ALLOWED_MIMES = 'pdf,docx,png,jpg,jpeg';
+    private const ALLOWED_MIMES = 'pdf,png,jpg,jpeg,json';
 
     private const MAX_KB = 10240;
 
@@ -47,8 +47,7 @@ class AdminPublicationsController extends Controller
         Publication::create([
             'publication_category_id' => $validated['publication_category_id'],
             'name' => $validated['name'],
-            'description' => $validated['description'],
-            'version' => $validated['version'],
+            'description' => $validated['description'] ?? null,
             'file_path' => $storedPath,
             'original_filename' => $file->getClientOriginalName(),
             'file_size' => $file->getSize(),
@@ -75,8 +74,7 @@ class AdminPublicationsController extends Controller
         $document->fill([
             'publication_category_id' => $validated['publication_category_id'],
             'name' => $validated['name'],
-            'description' => $validated['description'],
-            'version' => $validated['version'],
+            'description' => $validated['description'] ?? null,
         ]);
 
         if ($request->hasFile('file')) {
@@ -118,8 +116,7 @@ class AdminPublicationsController extends Controller
         return $request->validate([
             'publication_category_id' => ['required', Rule::exists('publication_categories', 'id')],
             'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'version' => ['required', 'string', 'max:50'],
+            'description' => ['nullable', 'string'],
             'file' => [
                 $fileRequired ? 'required' : 'nullable',
                 'file',

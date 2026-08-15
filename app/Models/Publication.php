@@ -15,7 +15,7 @@ class Publication extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'description', 'version', 'publication_category_id', 'original_filename'])
+            ->logOnly(['name', 'description', 'publication_category_id', 'original_filename'])
             ->logOnlyDirty();
     }
 
@@ -23,7 +23,6 @@ class Publication extends Model
         'publication_category_id',
         'name',
         'description',
-        'version',
         'file_path',
         'original_filename',
         'file_size',
@@ -43,10 +42,20 @@ class Publication extends Model
             : null);
     }
 
-    public function isViewableInBrowser(): bool
+    /**
+     * Whether a browser renders this file in a tab rather than saving it.
+     *
+     * This drives both the Content-Disposition the file route sends and the
+     * action label shown in the listing, so the two can never disagree about
+     * what clicking a document will do.
+     */
+    public function opensInBrowser(): bool
     {
-        $ext = strtolower(pathinfo($this->original_filename ?? $this->file_path, PATHINFO_EXTENSION));
+        $extension = strtolower(pathinfo(
+            $this->original_filename ?? $this->file_path,
+            PATHINFO_EXTENSION
+        ));
 
-        return in_array($ext, ['pdf', 'png', 'jpg', 'jpeg', 'txt']);
+        return in_array($extension, ['pdf', 'png', 'jpg', 'jpeg']);
     }
 }
