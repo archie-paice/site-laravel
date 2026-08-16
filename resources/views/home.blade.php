@@ -10,7 +10,7 @@
 @section('body-nopad')
     <div
         class="hero min-h-[260px] h-[42vh] sm:h-[36vh] lg:h-[30vh] w-full bg-cover bg-center"
-        style="background-image: url('{{ asset('images/fake_background.png') }}')"
+        style="background-image: url('{{ asset('images/hero_banner.jpg') }}')"
     >
         <div class="hero-overlay bg-black/50"></div>
 
