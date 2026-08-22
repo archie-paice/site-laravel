@@ -10,6 +10,12 @@ use Illuminate\Support\Facades\Auth;
 
 beforeEach(fn () => $this->seed(PermissionSeeder::class));
 
+test('guests are redirected to login', function () {
+    $user = User::factory()->create();
+
+    $this->get(route('users.show', ['user' => $user->id]))->assertRedirect(route('login'));
+});
+
 test('a user profile publicly displays their certifications', function () {
     $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX', 'name' => 'Jacksonville']);
     $level = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'name' => 'Ground', 'abbreviation' => 'GND']);
@@ -17,7 +23,7 @@ test('a user profile publicly displays their certifications', function () {
     $user = User::factory()->create();
     UserCertification::create(['user_id' => $user->id, 'certification_level_id' => $level->id]);
 
-    $response = $this->get(route('users.show', ['user' => $user->id]));
+    $response = $this->actingAs(User::factory()->create())->get(route('users.show', ['user' => $user->id]));
 
     $response->assertStatus(200);
     $response->assertSee('Certifications');
