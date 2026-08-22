@@ -32,18 +32,29 @@ class VatsimOauthController extends Controller
     {
         $user = Socialite::driver('vatsim')->user();
 
+        $existing = User::find($user->cid);
+
         // NOTE: `facility` (the ARTCC) is intentionally NOT written here. It is owned
         // by the VATUSA roster sync (SyncRoster / User::updateFromVatusa), which is the
         // authoritative source. VATSIM's subdivision is frequently null for VATUSA
         // controllers, so updating facility at login previously blanked/clobbered it and
         // made rostered users render as visitors (issue #59).
+        //
+        // VATSIM Connect has no concept of VATUSA's name-privacy flag, so it always
+        // reports the real last name. Only the roster sync knows about that flag, so
+        // keep a last name it has already redacted to the CID rather than overwriting
+        // it here — otherwise every login would undo the redaction until the next sync
+        // fixes it back. `last_name` must still be present in every upsert call because
+        // it is a NOT NULL column with no default.
+        $isRedacted = $existing && $existing->last_name === (string) $existing->id;
+
         User::upsert([
             'id' => $user->cid,
             'first_name' => $user->first_name,
-            'last_name' => $user->last_name,
+            'last_name' => $isRedacted ? $existing->last_name : $user->last_name,
             'email' => $user->email,
             'division' => $user->division,
-            'facility' => $user->facility ?? User::find($user->cid)?->facility,
+            'facility' => $user->facility ?? $existing?->facility,
             'rating' => $user->rating,
         ], 'id');
 
