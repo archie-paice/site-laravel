@@ -8,7 +8,13 @@ beforeEach(function () {
     $this->seed(PermissionSeeder::class);
 });
 
+test('guests are redirected to login', function () {
+    $this->get(route('statistics.index', ['year' => 2025, 'month' => 'all']))->assertRedirect(route('login'));
+});
+
 test('all-months leaderboard sums each controllers hours in SQL', function () {
+    $this->actingAs(User::factory()->create());
+
     $user = User::factory()->create(['rostered' => true, 'rating' => 5]);
 
     ControllerMonthlyStat::create([

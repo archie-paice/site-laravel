@@ -50,7 +50,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Contributors
-Route::get('/contributors', [ContributorsController::class, 'index'])->name('contributors.index');
+Route::get('/contributors', [ContributorsController::class, 'index'])->middleware('auth')->name('contributors.index');
 
 // ATC Bookings
 Route::post('/bookings', [AtcBookingController::class, 'store'])
@@ -58,7 +58,7 @@ Route::post('/bookings', [AtcBookingController::class, 'store'])
     ->name('bookings.store');
 
 // Roster
-Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
+Route::get('/roster', [RosterController::class, 'index'])->middleware('auth')->name('roster.index');
 
 // Visit
 Route::get('/visit', [VisitFacilityController::class, 'index'])->name('visit.index');
@@ -89,7 +89,7 @@ Route::resource('users', UserController::class, [
     'only' => ['show', 'edit', 'update'],
 ]);
 
-Route::prefix('users/{user}')->group(function () {
+Route::prefix('users/{user}')->middleware('auth')->group(function () {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
     Route::get('feedback', [UserController::class, 'feedback'])->middleware('auth')->name('users.show.feedback');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
@@ -101,6 +101,7 @@ Route::prefix('users/{user}')->group(function () {
 
 // Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])
+    ->middleware('auth')
     ->name('staff.index');
 
 // LOA
@@ -119,6 +120,7 @@ Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('auth
 
 // Controller Statistics
 Route::get('controllers/statistics', [StatisticsController::class, 'index'])
+    ->middleware('auth')
     ->name('statistics.index');
 
 // Publications

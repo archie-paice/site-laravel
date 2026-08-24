@@ -103,7 +103,10 @@ class User extends Authenticatable
         $user = static::upsert([
             'id' => $vatusaUser->cid,
             'first_name' => ucfirst($vatusaUser->firstName),
-            'last_name' => ucfirst($vatusaUser->lastName),
+            // VATUSA always sends the real last name regardless of the privacy flag;
+            // redaction to the CID happens locally and self-heals on the next sync
+            // if the controller later disables name privacy.
+            'last_name' => $vatusaUser->namePrivacy ? (string) $vatusaUser->cid : ucfirst($vatusaUser->lastName),
             'email' => $vatusaUser->email,
             'rating' => $vatusaUser->rating,
             'joined_at' => $vatusaUser->joinedFacility,

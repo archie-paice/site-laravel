@@ -8,6 +8,10 @@ use Database\Seeders\PermissionSeeder;
 
 beforeEach(fn () => $this->seed(PermissionSeeder::class));
 
+test('guests are redirected to login', function () {
+    $this->get(route('roster.index'))->assertRedirect(route('login'));
+});
+
 test('the roster shows the highest held abbreviation and uncertified otherwise', function () {
     $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX', 'order' => 1]);
     $ground = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'level' => 1, 'abbreviation' => 'GND']);
@@ -19,7 +23,7 @@ test('the roster shows the highest held abbreviation and uncertified otherwise',
     UserCertification::create(['user_id' => $certified->id, 'certification_level_id' => $ground->id]);
     UserCertification::create(['user_id' => $certified->id, 'certification_level_id' => $tower->id]);
 
-    $response = $this->get(route('roster.index'));
+    $response = $this->actingAs(User::factory()->create())->get(route('roster.index'));
 
     $response->assertStatus(200);
 

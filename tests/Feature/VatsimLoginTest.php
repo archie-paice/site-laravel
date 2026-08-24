@@ -61,3 +61,67 @@ test('a brand-new user can log in with a null subdivision without error', functi
     expect($created)->not->toBeNull();
     expect($created->facility)->toBeNull();
 });
+
+test('login does not undo a VATUSA name-privacy redaction applied by the roster sync', function () {
+    // last_name here mirrors what SyncRoster stores for a name-privacy user: their own CID.
+    $user = User::factory()->create([
+        'id' => 999003,
+        'last_name' => '999003',
+        'rostered' => true,
+    ]);
+
+    fakeVatsimLogin([
+        'cid' => 999003,
+        'first_name' => 'Updated',
+        'last_name' => 'RealName', // VATSIM Connect always reports the real name
+        'email' => 'private@example.com',
+        'division' => 'USA',
+        'facility' => null,
+        'rating' => 5,
+    ]);
+
+    $this->get(route('auth.callback'));
+
+    $user->refresh();
+    expect($user->last_name)->toBe('999003');    // redaction preserved
+    expect($user->first_name)->toBe('Updated');  // other fields still sync from VATSIM
+});
+
+test('login still syncs the real last name for a user without name privacy enabled', function () {
+    $user = User::factory()->create([
+        'id' => 999004,
+        'last_name' => 'OldName',
+        'rostered' => true,
+    ]);
+
+    fakeVatsimLogin([
+        'cid' => 999004,
+        'first_name' => 'Test',
+        'last_name' => 'NewName',
+        'email' => 'public@example.com',
+        'division' => 'USA',
+        'facility' => null,
+        'rating' => 5,
+    ]);
+
+    $this->get(route('auth.callback'));
+
+    expect($user->fresh()->last_name)->toBe('NewName');
+});
+
+test('a brand-new user with a numeric last name matching their CID logs in without being treated as redacted', function () {
+    // Edge case for the redaction heuristic: no existing row, so last_name must still be written.
+    fakeVatsimLogin([
+        'cid' => 999005,
+        'first_name' => 'New',
+        'last_name' => '999005',
+        'email' => 'edge@example.com',
+        'division' => 'USA',
+        'facility' => null,
+        'rating' => 2,
+    ]);
+
+    $this->get(route('auth.callback'))->assertRedirect();
+
+    expect(User::find(999005)->last_name)->toBe('999005');
+});
