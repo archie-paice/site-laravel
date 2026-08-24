@@ -3,6 +3,7 @@
     use \App\Enums\VisitRequestStatus;
     use \App\Models\Loa;
     use \App\Enums\LoaStatus;
+    use \App\Models\StaffingRequest;
 @endphp
 
 <div class="navbar bg-info text-primary-content z-10">
@@ -65,6 +66,15 @@
                     <li><a href={{ route('admin.events.index') }}>Events</a></li>
                     <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
                     <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
+                    @if(auth()->user()?->hasPermissionTo('staffing-requests:read'))
+                        <li>
+                            <a href={{ route('admin.staffing-requests.index') }}>Staffing Requests
+                                @if(StaffingRequest::where('closed', false)->count() > 0)
+                                    <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         @endif

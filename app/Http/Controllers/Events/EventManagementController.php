@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
+use App\Models\StaffingRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -99,17 +100,29 @@ class EventManagementController extends Controller
         return view('events.manage', compact('event', 'registrants', 'mostRequestedPosition', 'positionsAccess'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $event = new Event;
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
 
+        // When an event is created off the back of a staffing request, carry the
+        // requester's event name and description over so they aren't retyped.
+        // The id is looked up rather than passing the text through the query
+        // string, which keeps a 2000 character description out of the URL.
+        $staffingRequest = $request->filled('staffing_request')
+            ? StaffingRequest::find($request->query('staffing_request'))
+            : null;
+
         return view('events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
             'presetPositions' => $presetPositions,
+            'prefillTitle' => $staffingRequest?->name ?? '',
+            // The description is plain text; escape it and keep the requester's
+            // line breaks, since the editor renders it as HTML.
+            'prefillDescription' => $staffingRequest ? nl2br(e($staffingRequest->description)) : '',
         ]);
     }
 
