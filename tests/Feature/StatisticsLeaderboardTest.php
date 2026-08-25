@@ -46,6 +46,8 @@ test('all-months leaderboard sums each controllers hours in SQL', function () {
 });
 
 test('the all-time label uses the earliest year and month that actually occurred together', function () {
+    $this->actingAs(User::factory()->create());
+
     $user = User::factory()->create(['rostered' => true, 'rating' => 5]);
 
     foreach ([[2025, 6], [2025, 11], [2026, 1], [2026, 8]] as [$year, $month]) {
@@ -63,6 +65,8 @@ test('the all-time label uses the earliest year and month that actually occurred
 });
 
 test('given no statistics at all, when viewing the page, then there is no since date to label', function () {
+    $this->actingAs(User::factory()->create());
+
     $response = $this->get(route('statistics.index'))->assertOk();
 
     expect($response->viewData('allTimeSince'))->toBeNull();
