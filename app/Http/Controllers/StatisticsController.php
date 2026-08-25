@@ -142,9 +142,9 @@ class StatisticsController extends Controller
             'SUM(delivery_hours + ground_hours + tower_hours + approach_hours + center_hours) as total'
         )->value('total') ?? 0;
 
-        $earliest = ControllerMonthlyStat::selectRaw('MIN(year * 100 + month) as ym, MIN(year) as y, MIN(month) as m')->first();
-        $allTimeSince = ($earliest && $earliest->y)
-            ? Carbon::create($earliest->y, $earliest->m, 1)->format('M Y')
+        $earliestYearMonth = (int) ControllerMonthlyStat::selectRaw('MIN(year * 100 + month) as ym')->value('ym');
+        $allTimeSince = $earliestYearMonth > 0
+            ? Carbon::create(intdiv($earliestYearMonth, 100), $earliestYearMonth % 100, 1)->format('M Y')
             : null;
 
         return view('statistics.index', [
