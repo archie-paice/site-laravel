@@ -22,12 +22,12 @@
                         type="text"
                         class="input input-bordered w-full"
                         required
-                        value="{{ old('title') }}"
+                        value="{{ old('title', $prefillTitle) }}"
                     />
 
                     <h2 class="card-title">Description</h2>
 
-                    <x-markdown-editor name="description" :content="old('description')" />
+                    <x-markdown-editor name="description" :content="old('description', $prefillDescription)" />
 
                     <div class="flex gap-4 w-full">
                         <div class="flex-1">
