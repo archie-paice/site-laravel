@@ -51,9 +51,12 @@ RUN chown -R www-data:www-data /var/www/html/ \
 # stage 2: production stage
 FROM php:8.4-fpm-alpine
 
-RUN apk add --no-cache ca-certificates curl libcurl libpq-dev \
+RUN apk add --no-cache ca-certificates curl libcurl libpq-dev freetype libjpeg-turbo libpng \
     && docker-php-ext-install pdo pdo_pgsql \
-    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS \
+    && apk add --no-cache --virtual .build-deps $PHPIZE_DEPS freetype-dev libjpeg-turbo-dev libpng-dev \
+    && docker-php-ext-configure gd --with-freetype=/usr/include/ --with-jpeg=/usr/include/ \
+    && docker-php-ext-install -j$(nproc) gd \
+    && docker-php-ext-enable gd \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && apk del .build-deps
