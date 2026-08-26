@@ -4,17 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Publication;
 use App\Models\PublicationCategory;
+use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\File as FileRule;
 
 class AdminPublicationsController extends Controller
 {
-    private const DISK = 'public';
+    private const DISK = Publication::DISK;
 
     private const DIRECTORY = 'documents';
-
-    private const ALLOWED_MIMES = 'pdf,png,jpg,jpeg,json';
 
     private const MAX_KB = 10240;
 
@@ -119,10 +120,28 @@ class AdminPublicationsController extends Controller
             'description' => ['nullable', 'string'],
             'file' => [
                 $fileRequired ? 'required' : 'nullable',
-                'file',
-                'mimes:'.self::ALLOWED_MIMES,
-                'max:'.self::MAX_KB,
+                FileRule::types(Publication::allowedMimeTypes())
+                    ->extensions(array_keys(Publication::ALLOWED_TYPES))
+                    ->max(self::MAX_KB),
+                $this->contentMatchesExtension(),
             ],
         ]);
+    }
+
+    // types() and extensions() each check the allowlist alone, which still admits a JPEG named sop.pdf.
+    private function contentMatchesExtension(): Closure
+    {
+        return function (string $attribute, mixed $value, Closure $fail) {
+            if (! $value instanceof UploadedFile) {
+                return;
+            }
+
+            $extension = strtolower($value->getClientOriginalExtension());
+            $permitted = Publication::ALLOWED_TYPES[$extension] ?? [];
+
+            if (! in_array($value->getMimeType(), $permitted, true)) {
+                $fail("The uploaded file's contents do not match its .{$extension} extension.");
+            }
+        };
     }
 }

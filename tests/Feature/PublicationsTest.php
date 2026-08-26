@@ -32,18 +32,43 @@ function makePublication(string $filePath = 'documents/example.pdf', string $ori
     ]);
 }
 
+// Serving is decided by sniffing the stored bytes, so fixtures need real magic numbers.
+function pdfBytes(): string
+{
+    return "%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n%%EOF\n";
+}
+
+function pngBytes(): string
+{
+    ob_start();
+    imagepng(imagecreatetruecolor(4, 4));
+
+    return ob_get_clean();
+}
+
+function zipBytes(): string
+{
+    return "PK\x03\x04\x14\x00\x00\x00\x08\x00".str_repeat("\x00", 64);
+}
+
+/** Writes real bytes to the faked disk so the sniffed type matches the extension. */
+function storeFile(string $path, string $contents): void
+{
+    Storage::disk('public')->put($path, $contents);
+}
+
 // --- Public file serving (the 403 fix) ---
 
 test('the public file route serves a stored document without authentication', function () {
     Storage::fake('public');
-    Storage::disk('public')->put('documents/example.pdf', 'PDF-CONTENTS');
+    storeFile('documents/example.pdf', pdfBytes());
 
     $publication = makePublication();
 
     $response = $this->get(route('publications.file', $publication));
 
     $response->assertStatus(200);
-    expect($response->streamedContent())->toBe('PDF-CONTENTS');
+    expect($response->streamedContent())->toBe(pdfBytes());
 });
 
 test('the public file route returns 404 when the physical file is missing', function () {
@@ -148,6 +173,9 @@ test('the listing wraps the whole document row in one link rather than separate 
 const DOWNLOAD_ICON = 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4';
 
 test('a pdf is labelled View because it opens in a tab', function () {
+    Storage::fake('public');
+    storeFile('documents/example.pdf', pdfBytes());
+
     makePublication();
 
     $response = $this->get(route('publications.index'));
@@ -158,6 +186,9 @@ test('a pdf is labelled View because it opens in a tab', function () {
 });
 
 test('a json profile is labelled Download because it saves to disk', function () {
+    Storage::fake('public');
+    storeFile('documents/profile.json', '{"id":"ZJX"}');
+
     makePublication('documents/profile.json', 'profile.json');
 
     $response = $this->get(route('publications.index'));
@@ -220,6 +251,41 @@ test('a word document is rejected because official documents must be immutable P
     expect(Publication::where('name', 'Word SOP')->exists())->toBeFalse();
 });
 
+test('a zip renamed to .pdf is rejected because its contents are sniffed', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $user->assignRole('facilities', 'staff');
+    $category = makeCategory();
+
+    $response = $this->actingAs($user)->post(route('admin.publications.store'), [
+        'publication_category_id' => $category->id,
+        'name' => 'Zip Bomb',
+        'file' => UploadedFile::fake()->create('item.pdf', 200, 'application/zip'),
+    ]);
+
+    $response->assertSessionHasErrors('file');
+    expect(Publication::where('name', 'Zip Bomb')->exists())->toBeFalse();
+});
+
+test('an allowed type under the wrong allowed extension is rejected', function () {
+    Storage::fake('public');
+
+    $user = User::factory()->create();
+    $user->assignRole('facilities', 'staff');
+    $category = makeCategory();
+
+    // Both halves are individually on the allowlist; only the pairing is wrong.
+    $response = $this->actingAs($user)->post(route('admin.publications.store'), [
+        'publication_category_id' => $category->id,
+        'name' => 'Mislabelled Chart',
+        'file' => UploadedFile::fake()->create('chart.pdf', 200, 'image/jpeg'),
+    ]);
+
+    $response->assertSessionHasErrors('file');
+    expect(Publication::where('name', 'Mislabelled Chart')->exists())->toBeFalse();
+});
+
 test('an image can still be uploaded for maps and charts', function () {
     Storage::fake('public');
 
@@ -258,7 +324,7 @@ test('a json file can be uploaded', function () {
 
 test('a pdf is served inline so it opens in a browser tab', function () {
     Storage::fake('public');
-    Storage::disk('public')->put('documents/example.pdf', 'PDF-CONTENTS');
+    storeFile('documents/example.pdf', pdfBytes());
 
     $publication = makePublication();
 
@@ -266,11 +332,12 @@ test('a pdf is served inline so it opens in a browser tab', function () {
 
     $response->assertOk();
     expect($response->headers->get('Content-Disposition'))->toStartWith('inline');
+    expect($response->headers->get('Content-Type'))->toBe('application/pdf');
 });
 
 test('a json profile is served as a download rather than raw text in a tab', function () {
     Storage::fake('public');
-    Storage::disk('public')->put('documents/profile.json', '{"id":"ZJX"}');
+    storeFile('documents/profile.json', '{"id":"ZJX"}');
 
     $publication = makePublication('documents/profile.json', 'profile.json');
 
@@ -282,7 +349,7 @@ test('a json profile is served as a download rather than raw text in a tab', fun
 
 test('an image is served inline so it opens in a browser tab', function () {
     Storage::fake('public');
-    Storage::disk('public')->put('documents/map.png', 'PNG-CONTENTS');
+    storeFile('documents/map.png', pngBytes());
 
     $publication = makePublication('documents/map.png', 'map.png');
 
@@ -290,6 +357,32 @@ test('an image is served inline so it opens in a browser tab', function () {
 
     $response->assertOk();
     expect($response->headers->get('Content-Disposition'))->toStartWith('inline');
+    expect($response->headers->get('Content-Type'))->toBe('image/png');
+});
+
+test('every served file carries nosniff so a mislabelled upload cannot run as HTML', function () {
+    Storage::fake('public');
+    storeFile('documents/example.pdf', pdfBytes());
+
+    $publication = makePublication();
+
+    $this->get(route('publications.file', $publication))
+        ->assertOk()
+        ->assertHeader('X-Content-Type-Options', 'nosniff');
+});
+
+test('a file whose contents do not match its extension is served as a download, not inline', function () {
+    Storage::fake('public');
+    // A zip that slipped in as .pdf before this validation existed.
+    storeFile('documents/legacy.pdf', zipBytes());
+
+    $publication = makePublication('documents/legacy.pdf', 'legacy.pdf');
+
+    $response = $this->get(route('publications.file', $publication));
+
+    $response->assertOk();
+    expect($response->headers->get('Content-Disposition'))->toStartWith('attachment');
+    expect($response->headers->get('Content-Type'))->toBe('application/octet-stream');
 });
 
 test('a description is still saved and shown when one is written', function () {
