@@ -25,7 +25,7 @@ and `config/mail.php`.
 | `vatusa_api_key` | `VATUSA_API_KEY` | Facility API key; sent as the `apikey` parameter on every VATUSA request. |
 | `vatusa_facility` | `VATUSA_FACILITY` | Facility identifier, `ZJX`. Interpolated into facility-scoped endpoints and used in a few email subjects/recipients. |
 | `vatsim_api_url` | `VATSIM_API_URL` | Base URL of the VATSIM API used for the online-controller feed. |
-| `vatsim_statistics_page_size` | `VATSIM_STATISTICS_PAGE_SIZE` | Number of Core API sessions read per `limit`/`offset` page (default: `100`). |
+| `vatsim_statistics_page_size` | `VATSIM_STATISTICS_PAGE_SIZE` | Number of Core API sessions read per `limit`/`offset` page (default: `25`). |
 | `vatsim_auth_url` | `VATSIM_AUTH_URL` | VATSIM Connect OAuth base (covered in the auth doc, not here). |
 | `vatsim_client_id` / `vatsim_client_secret` | `VATSIM_CLIENT_ID` / `VATSIM_CLIENT_SECRET` | VATSIM Connect OAuth credentials (auth doc). |
 | `training_request_webhook_url` | `TRAINING_REQUEST_WEBHOOK_URL` | Discord webhook URL for training-assignment notifications. |
@@ -175,22 +175,28 @@ always reflects the last successful poll.
 
 `SyncVatsimSessions` imports eligible historical controller sessions from
 `GET {vatsim_api_url}/v2/atc/history`. It sends a bounded UTC `start_date` /
-`end_date` window and reads the result through `limit` / `offset` pages until
-the API has returned the complete result. Every session is identified by its
-`connection_id.id`, stored by upsert in `controller_sessions`, and then used to
-recompute the affected controller-month totals.
+`end_date` window. Each queued job imports one `limit` / `offset` page, then
+queues the next offset when the page is full. This keeps individual queue jobs
+short while continuing until the API has returned the complete result. Every
+session is identified by its `connection_id.id`, stored by upsert in
+`controller_sessions`, and then used to recompute the affected controller-month
+totals once the final page is complete.
 
 The importer accepts only sessions with a configured statistics-prefix callsign,
 a currently rostered controller, and an eligible position suffix (`DEL`, `GND`,
-`TWR`, `APP`/`DEP`, `CTR`/`FSS`). It logs pages read plus accepted/skipped counts.
-The scheduled overlap makes repeated requests safe and recovers sessions missed
-while a worker was unavailable.
+`TWR`, `APP`/`DEP`, `CTR`/`FSS`). It logs each page's offset plus its
+accepted/skipped counts. The scheduled overlap makes repeated requests safe and
+recovers sessions missed while a worker was unavailable.
+
+The configured prefix list and rostered-CID set are cached for one hour,
+shared by all pages in a sync. Prefix changes and a successful roster sync
+invalidate their respective cache entries immediately.
 
 Before the initial Core backfill, remove legacy StatSim session rows so their
 identifiers cannot collide with VATSIM Core connection IDs. Staff with the
 `statistics:write` permission can queue an explicit UTC date range from the
-admin dashboard; `php artisan statistics:sync [from] [to]` runs the same import
-synchronously for operational use.
+admin dashboard; `php artisan statistics:sync [from] [to]` queues the same
+import for operational use.
 
 ## Data transfer objects — `app/DTOs/`
 

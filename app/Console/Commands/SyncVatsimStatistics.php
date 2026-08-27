@@ -34,8 +34,8 @@ class SyncVatsimStatistics extends Command
             return self::FAILURE;
         }
 
-        $this->info("Syncing VATSIM Core statistics from {$from->toIso8601String()} to {$to->toIso8601String()}.");
-        (new SyncVatsimSessions($from->toIso8601String(), $to->toIso8601String()))->handle();
+        SyncVatsimSessions::dispatch($from->toIso8601String(), $to->toIso8601String());
+        $this->info("Queued VATSIM Core statistics sync from {$from->toIso8601String()} to {$to->toIso8601String()}.");
 
         return self::SUCCESS;
     }

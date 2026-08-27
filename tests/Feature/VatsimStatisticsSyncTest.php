@@ -6,10 +6,12 @@ use App\Models\ControllerSession;
 use App\Models\StatisticsPrefixes;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function () {
+    Cache::flush();
     $this->seed(PermissionSeeder::class);
     config()->set('app.vatsim_api_url', 'https://api.vatsim.net');
     config()->set('app.vatsim_statistics_page_size', 2);
@@ -28,9 +30,10 @@ function vatsimAtcSession(int $connectionId, int $cid, string $callsign, string 
     ];
 }
 
-test('it reads Core API history through limit and offset pages and stores eligible sessions', function () {
+test('it processes one Core API history page and queues the next offset', function () {
     $user = User::factory()->create(['id' => 10000001, 'rostered' => true]);
     StatisticsPrefixes::create(['name' => 'JAX']);
+    Queue::fake();
 
     Http::fake(function ($request) use ($user) {
         parse_str(parse_url($request->url(), PHP_URL_QUERY), $query);
@@ -60,8 +63,23 @@ test('it reads Core API history through limit and offset pages and stores eligib
 
     (new SyncVatsimSessions('2026-01-01T00:00:00Z', '2026-01-31T23:59:59Z'))->handle();
 
-    expect(ControllerSession::count())->toBe(2)
+    expect(ControllerSession::count())->toBe(1)
         ->and(ControllerSession::find(101)->callsign)->toBe('JAX_DEL')
+        ->and(ControllerSession::find(103))->toBeNull()
+        ->and(ControllerMonthlyStat::count())->toBe(0);
+
+    Queue::assertPushed(SyncVatsimSessions::class, function (SyncVatsimSessions $job) {
+        return $job->offset === 2
+            && $job->touchedMonths === [10000001 => ['2026-01' => [2026, 1]]];
+    });
+
+    StatisticsPrefixes::query()->delete();
+    $user->update(['rostered' => false]);
+
+    $nextPage = Queue::pushed(SyncVatsimSessions::class)->sole();
+    $nextPage->handle();
+
+    expect(ControllerSession::count())->toBe(2)
         ->and(ControllerSession::find(103)->facility_level)->toBe(6);
 
     $monthly = ControllerMonthlyStat::where('user_id', $user->id)->firstOrFail();
@@ -69,6 +87,7 @@ test('it reads Core API history through limit and offset pages and stores eligib
         ->and($monthly->center_hours)->toBe(2.0);
 
     Http::assertSentCount(2);
+    Queue::assertPushed(SyncVatsimSessions::class, 1);
 });
 
 test('statistics writers can queue a Core API sync from the admin form', function () {
@@ -94,7 +113,25 @@ test('statistics writers can queue a Core API sync from the admin form', functio
 
     Queue::assertPushed(SyncVatsimSessions::class, function (SyncVatsimSessions $job) {
         return $job->from === '2026-01-01T00:00:00+00:00'
-            && $job->to === '2026-01-31T23:59:59+00:00';
+            && $job->to === '2026-01-31T23:59:59+00:00'
+            && $job->offset === 0;
+    });
+});
+
+test('the statistics sync command queues the first Core API page', function () {
+    Queue::fake();
+
+    $this->artisan('statistics:sync', [
+        'from' => '2026-01-01',
+        'to' => '2026-01-31',
+    ])
+        ->expectsOutput('Queued VATSIM Core statistics sync from 2026-01-01T00:00:00+00:00 to 2026-01-31T00:00:00+00:00.')
+        ->assertSuccessful();
+
+    Queue::assertPushed(SyncVatsimSessions::class, function (SyncVatsimSessions $job) {
+        return $job->from === '2026-01-01T00:00:00+00:00'
+            && $job->to === '2026-01-31T00:00:00+00:00'
+            && $job->offset === 0;
     });
 });
 

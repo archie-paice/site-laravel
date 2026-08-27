@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -17,145 +18,200 @@ class SyncVatsimSessions implements ShouldQueue
 {
     use Queueable;
 
+    private const PREFIXES_CACHE_KEY = 'vatsim-statistics:prefixes';
+
+    private const ROSTERED_CIDS_CACHE_KEY = 'vatsim-statistics:rostered-cids';
+
+    private const ELIGIBILITY_CACHE_MINUTES = 60;
+
     public int $timeout = 300;
 
     public int $tries = 3;
 
     public array $backoff = [60, 300];
 
-    public function __construct(public string $from, public string $to) {}
+    public int $offset = 0;
+
+    public array $touchedMonths = [];
+
+    public function __construct(public string $from, public string $to, int $offset = 0, array $touchedMonths = [])
+    {
+        $this->offset = $offset;
+        $this->touchedMonths = $touchedMonths;
+    }
 
     public function handle(): void
     {
         $from = Carbon::parse($this->from)->utc();
         $to = Carbon::parse($this->to)->utc();
-        $limit = max(1, config('app.vatsim_statistics_page_size'));
-        $offset = 0;
-        $pages = 0;
+        $limit = max(1, (int) config('app.vatsim_statistics_page_size'));
         $accepted = 0;
         $skipped = 0;
-        $touchedMonths = [];
-        $prefixes = StatisticsPrefixes::pluck('name')->all();
-        $rosteredCids = User::where('rostered', true)->pluck('id')->flip();
+        $touchedMonths = $this->touchedMonths;
+        $expiresAt = now()->addMinutes(self::ELIGIBILITY_CACHE_MINUTES);
+        $prefixes = Cache::remember(self::PREFIXES_CACHE_KEY, $expiresAt, fn () => StatisticsPrefixes::pluck('name')->all());
+        $rosteredCids = array_fill_keys(
+            Cache::remember(
+                self::ROSTERED_CIDS_CACHE_KEY,
+                $expiresAt,
+                fn () => User::where('rostered', true)->pluck('id')->all(),
+            ),
+            true,
+        );
 
-        do {
-            try {
-                $response = Http::timeout(60)
-                    ->retry(3, fn (int $attempt) => $attempt * 1000)
-                    ->get(rtrim(config('app.vatsim_api_url'), '/').'/v2/atc/history', [
-                        'start_date' => $from->toIso8601String(),
-                        'end_date' => $to->toIso8601String(),
-                        'limit' => $limit,
-                        'offset' => $offset,
-                    ]);
-            } catch (\Throwable $exception) {
-                Log::error('VATSIM statistics sync request failed', [
-                    'exception' => $exception::class,
-                    'message' => $exception->getMessage(),
-                    'from' => $from->toIso8601String(),
-                    'to' => $to->toIso8601String(),
-                    'pages' => $pages,
+        Log::debug('Requesting VATSIM statistics sync page', [
+            'from' => $from->toIso8601String(),
+            'to' => $to->toIso8601String(),
+            'limit' => $limit,
+            'offset' => $this->offset,
+        ]);
+
+        try {
+            $response = Http::timeout(15)
+                ->retry(2, fn (int $attempt) => $attempt * 1000)
+                ->get(rtrim(config('app.vatsim_api_url'), '/').'/v2/atc/history', [
+                    'start_date' => $from->toIso8601String(),
+                    'end_date' => $to->toIso8601String(),
+                    'limit' => $limit,
+                    'offset' => $this->offset,
                 ]);
+        } catch (\Throwable $exception) {
+            Log::error('VATSIM statistics sync request failed', [
+                'exception' => $exception::class,
+                'message' => $exception->getMessage(),
+                'from' => $from->toIso8601String(),
+                'to' => $to->toIso8601String(),
+                'offset' => $this->offset,
+            ]);
 
-                return;
+            return;
+        }
+
+        if (! $response->successful()) {
+            Log::error('VATSIM statistics sync failed', [
+                'status' => $response->status(),
+                'body' => Str::limit($response->body(), 500),
+                'from' => $from->toIso8601String(),
+                'to' => $to->toIso8601String(),
+                'offset' => $this->offset,
+            ]);
+
+            return;
+        }
+
+        $payload = $response->json();
+        $sessions = $payload['items'] ?? null;
+
+        if (! is_array($sessions)) {
+            Log::error('VATSIM statistics sync returned an unexpected payload', [
+                'from' => $from->toIso8601String(),
+                'to' => $to->toIso8601String(),
+                'offset' => $this->offset,
+            ]);
+
+            return;
+        }
+
+        Log::debug('Received VATSIM statistics sync page', [
+            'from' => $from->toIso8601String(),
+            'to' => $to->toIso8601String(),
+            'limit' => $limit,
+            'offset' => $this->offset,
+            'status' => $response->status(),
+            'result_count' => $payload['count'] ?? null,
+            'session_count' => count($sessions),
+        ]);
+
+        foreach ($sessions as $session) {
+            $connection = $session['connection_id'] ?? null;
+            $connectionId = $connection['id'] ?? null;
+            $callsign = $connection['callsign'] ?? null;
+            $vatsimId = $connection['vatsim_id'] ?? null;
+            $loggedOn = $connection['start'] ?? null;
+            $loggedOff = $connection['end'] ?? null;
+
+            if (! $connectionId || ! $callsign || ! $vatsimId || ! $loggedOn || ! $loggedOff) {
+                $skipped++;
+
+                continue;
             }
 
-            if (! $response->successful()) {
-                Log::error('VATSIM statistics sync failed', [
-                    'status' => $response->status(),
-                    'body' => Str::limit($response->body(), 500),
-                    'from' => $from->toIso8601String(),
-                    'to' => $to->toIso8601String(),
-                    'pages' => $pages,
-                ]);
+            $start = Carbon::parse($loggedOn)->utc();
+            $end = Carbon::parse($loggedOff)->utc();
+            $userId = (int) $vatsimId;
 
-                return;
+            if ($start->lessThan($from) || $start->greaterThan($to)
+                || ! Str::startsWith($callsign, $prefixes)
+                || ! isset($rosteredCids[$userId])) {
+                $skipped++;
+
+                continue;
             }
 
-            $payload = $response->json();
-            $sessions = $payload['items'] ?? null;
+            $facilityLevel = $this->facilityLevel(Str::upper(Str::substr($callsign, -3)));
+            if ($facilityLevel < 2) {
+                $skipped++;
 
-            if (! is_array($sessions)) {
-                Log::error('VATSIM statistics sync returned an unexpected payload', [
-                    'from' => $from->toIso8601String(),
-                    'to' => $to->toIso8601String(),
-                    'pages' => $pages,
-                ]);
-
-                return;
+                continue;
             }
 
-            $pages++;
+            $existing = ControllerSession::find($connectionId);
 
-            foreach ($sessions as $session) {
-                $connection = $session['connection_id'] ?? null;
-                $connectionId = $connection['id'] ?? null;
-                $callsign = $connection['callsign'] ?? null;
-                $vatsimId = $connection['vatsim_id'] ?? null;
-                $loggedOn = $connection['start'] ?? null;
-                $loggedOff = $connection['end'] ?? null;
-
-                if (! $connectionId || ! $callsign || ! $vatsimId || ! $loggedOn || ! $loggedOff) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $start = Carbon::parse($loggedOn)->utc();
-                $end = Carbon::parse($loggedOff)->utc();
-                $userId = (int) $vatsimId;
-
-                if ($start->lessThan($from) || $start->greaterThan($to)
-                    || ! Str::startsWith($callsign, $prefixes)
-                    || ! $rosteredCids->has($userId)) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $facilityLevel = $this->facilityLevel(Str::upper(Str::substr($callsign, -3)));
-                if ($facilityLevel < 2) {
-                    $skipped++;
-
-                    continue;
-                }
-
-                $existing = ControllerSession::find($connectionId);
-
-                if ($existing) {
-                    $this->touchMonth($touchedMonths, $existing->user_id, $existing->start);
-                }
-
-                ControllerSession::updateOrCreate(
-                    ['id' => $connectionId],
-                    [
-                        'callsign' => $callsign,
-                        'user_id' => $userId,
-                        'facility_level' => $facilityLevel,
-                        'start' => $start,
-                        'end' => $end,
-                    ]
-                );
-
-                $this->touchMonth($touchedMonths, $userId, $start);
-                $accepted++;
+            if ($existing) {
+                $this->touchMonth($touchedMonths, $existing->user_id, $existing->start);
             }
 
-            $offset += count($sessions);
-        } while (count($sessions) === $limit);
+            ControllerSession::updateOrCreate(
+                ['id' => $connectionId],
+                [
+                    'callsign' => $callsign,
+                    'user_id' => $userId,
+                    'facility_level' => $facilityLevel,
+                    'start' => $start,
+                    'end' => $end,
+                ]
+            );
 
-        foreach ($touchedMonths as $userId => $months) {
-            foreach ($months as [$year, $month]) {
-                $this->recomputeMonthlyStats($userId, $year, $month);
+            $this->touchMonth($touchedMonths, $userId, $start);
+            $accepted++;
+        }
+
+        $nextOffset = $this->offset + count($sessions);
+        $recomputedMonths = 0;
+
+        if (count($sessions) === $limit) {
+            Log::debug('Queueing next VATSIM statistics sync page', [
+                'from' => $from->toIso8601String(),
+                'to' => $to->toIso8601String(),
+                'offset' => $this->offset,
+                'next_offset' => $nextOffset,
+            ]);
+
+            self::dispatch($this->from, $this->to, $nextOffset, $touchedMonths);
+        } else {
+            Log::debug('Recomputing monthly VATSIM statistics after final page', [
+                'from' => $from->toIso8601String(),
+                'to' => $to->toIso8601String(),
+                'offset' => $this->offset,
+                'touched_months' => array_sum(array_map(count(...), $touchedMonths)),
+            ]);
+
+            foreach ($touchedMonths as $userId => $months) {
+                foreach ($months as [$year, $month]) {
+                    $this->recomputeMonthlyStats($userId, $year, $month);
+                    $recomputedMonths++;
+                }
             }
         }
 
-        Log::info('VATSIM statistics sync complete', [
+        Log::info('VATSIM statistics sync page complete', [
             'from' => $from->toIso8601String(),
             'to' => $to->toIso8601String(),
-            'pages' => $pages,
+            'offset' => $this->offset,
+            'next_offset' => count($sessions) === $limit ? $nextOffset : null,
             'accepted' => $accepted,
             'skipped' => $skipped,
+            'recomputed_months' => $recomputedMonths,
         ]);
     }
 
