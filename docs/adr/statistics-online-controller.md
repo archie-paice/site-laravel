@@ -62,8 +62,8 @@ sequenceDiagram
     Worker->>VATSIM: GET /v2/atc/history<br/>with limit and offset
     VATSIM-->>Worker: 200 OK + paginated sessions
     Worker->>DB: Load statistics prefixes and rostered controllers
-    DB-->>Worker: Eligibility data
-
+    DB-->>Worker: Statistic Prefixes 
+    Worker->>Worker: Parse JSON for prefix matches 
     loop Each eligible session
         Worker->>DB: Upsert by VATSIM session ID
         DB-->>Worker: Inserted or updated
