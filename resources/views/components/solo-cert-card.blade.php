@@ -1,7 +1,7 @@
 <li class="text-lg mb-2">
     <div class='card border-2 border-base-300'>
         <div class='flex flex-row items-center gap-4 p-4'>
-            <img class='w-17 h-17 rounded-full shrink-0' src="{{ asset($soloCert->user->profile_image_route) }}" alt="">
+            <img class='w-17 h-17 rounded-full shrink-0' src="{{ $soloCert->user->profile_image_url }}" alt="">
 
             <div class='flex flex-col min-w-0 flex-1 gap-1'>
                 <div class='flex items-center justify-between gap-2'>

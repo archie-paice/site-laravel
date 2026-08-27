@@ -225,7 +225,7 @@ class EventManagementController extends Controller
         ], self::IMAGE_MESSAGES);
 
         $event = Event::findOrFail($id);
-        $oldImagePath = $event->event_image_route;
+        $oldImagePath = $event->bannerStoragePath();
 
         $event->title = $validated['title'];
         $event->description = Purify::clean($validated['description']);
@@ -239,8 +239,7 @@ class EventManagementController extends Controller
 
             // For the sake of storage, delete the old image
             if ($oldImagePath && $oldImagePath !== $event->event_image_route) {
-                $cleanPath = str_replace('storage/', '', $oldImagePath);
-                Storage::disk('public')->delete($cleanPath);
+                Storage::disk('public')->delete($oldImagePath);
             }
         }
 
@@ -254,8 +253,8 @@ class EventManagementController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        if ($event->event_image_route) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $event->event_image_route));
+        if ($path = $event->bannerStoragePath()) {
+            Storage::disk('public')->delete($path);
         }
 
         $event->delete();
@@ -284,6 +283,6 @@ class EventManagementController extends Controller
         $image = $request->file('image');
         $imageName = 'event_'.$event->id.'.'.$image->extension();
 
-        return 'storage/'.$image->storeAs('event', $imageName, 'public');
+        return $image->storeAs('event', $imageName, 'public');
     }
 }

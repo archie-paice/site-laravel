@@ -8,6 +8,8 @@ use App\Models\FeaturedField;
 use App\Models\News;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 
 beforeEach(function () {
@@ -104,6 +106,38 @@ test('the edit form keeps the events existing start time', function () {
     $this->get(route('admin.events.edit', ['event' => $event->id]))
         ->assertOk()
         ->assertSee($event->start->format('Y-m-d\TH:i'));
+});
+
+test('event banners use public-disk URLs and retain access to legacy stored paths', function () {
+    Storage::fake('public');
+
+    $event = makeEvent(['event_image_route' => 'storage/event/legacy-banner.png']);
+
+    expect($event->banner_url)->toBe(Storage::disk('public')->url('event/legacy-banner.png'));
+
+    $this->get(route('events.show', $event))
+        ->assertOk()
+        ->assertSee($event->banner_url, false);
+});
+
+test('new event banners store a public-disk path instead of a hand-built URL', function () {
+    Storage::fake('public');
+    $this->actingAs(makeEventsStaff());
+
+    $this->post(route('admin.events.store'), [
+        'title' => 'Banner Event',
+        'description' => 'Event with a banner.',
+        'start' => now()->addDay()->format('Y-m-d H:i:s'),
+        'end' => now()->addDay()->addHours(2)->format('Y-m-d H:i:s'),
+        'type' => EventType::HOME->value,
+        'image' => UploadedFile::fake()->image('banner.png', 1200, 400),
+    ])->assertRedirect(route('admin.events.index'));
+
+    $event = Event::where('title', 'Banner Event')->sole();
+
+    expect($event->event_image_route)->toBe("event/event_{$event->id}.png")
+        ->and($event->banner_url)->toBe(Storage::disk('public')->url($event->event_image_route));
+    Storage::disk('public')->assertExists($event->event_image_route);
 });
 
 test('an injected assignment key for another event is never processed by saveAll', function () {

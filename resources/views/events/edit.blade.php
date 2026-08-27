@@ -96,9 +96,9 @@
                 <div>
                     <h2 class="card-title">Banner Image</h2>
 
-                    @if ($event->event_image_route)
+                    @if ($event->banner_url)
                         <img
-                            src="{{ asset($event->event_image_route) }}"
+                            src="{{ $event->banner_url }}"
                             alt="Current banner for {{ $event->title }}"
                             class="rounded-box max-h-48 w-auto mb-3"
                         />

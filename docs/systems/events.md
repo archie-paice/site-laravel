@@ -12,7 +12,7 @@ An **event** is a scheduled VATSIM activity (for example a Friday Night Operatio
 
 ## Key concepts
 
-- **Event** (`app/Models/Event.php`) — the core record. Carries a name, description, `start`/`end` timestamps, a `type`, an optional `image_url`, an array of `featured_fields`, and an array of `presetPositions` (the positions copied from a preset at creation time).
+- **Event** (`app/Models/Event.php`) — the core record. Carries a name, description, `start`/`end` timestamps, a `type`, an optional banner, an array of `featured_fields`, and an array of `presetPositions` (the positions copied from a preset at creation time). Banners are stored on Laravel's `public` disk under `event/`; the model derives their browser URL through that disk, so deployments can use the configured `public/storage` link or a public asset host.
 - **Event type** (`app/Enums/EventType.php`) — a string-backed enum cast on the `type` column. Cases:
   - `HOME`
   - `SUPPORT_REQUIRED`
