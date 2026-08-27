@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
             return $socialite->buildProvider(VatsimProvider::class, $config);
         });
 
-        // Force IPv4 for every outbound Http:: facade call (VATUSA/VATSIM/STATSIM/GitHub) —
+        // Force IPv4 for every outbound Http:: facade call (VATUSA/VATSIM/GitHub) —
         // rules out flaky/blackholed IPv6 routing as a source of intermittent connect timeouts.
         Http::globalOptions([
             'curl' => [

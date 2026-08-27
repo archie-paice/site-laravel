@@ -109,45 +109,16 @@
         <x-card-component title="Manual Statistics Sync">
             <form method="POST" action="{{ route('statistics.sync') }}" class="mt-5 space-y-3">
                 @csrf
-                @php
-                    $months = range(1, 12);
-                    $years  = range(2020, now()->year);
-                @endphp
-                <p class="text-sm font-semibold">Sync StatsSim Statistics</p>
+                <p class="text-sm font-semibold">Sync VATSIM Core Statistics</p>
+                <p class="text-sm text-base-content/60">The Core API reads all sessions in this date range and stores eligible rostered-controller sessions.</p>
                 <div class="flex flex-wrap gap-3 items-end">
                     <div class="flex flex-col gap-1">
-                        <label class="text-xs text-base-content/60">From</label>
-                        <div class="flex gap-2">
-                            <select name="from_year" class="select select-sm" style="min-width: 5.5rem">
-                                @foreach($years as $y)
-                                    <option value="{{ $y }}" @selected(old('from_year', now()->subMonthNoOverflow()->year) == $y)>{{ $y }}</option>
-                                @endforeach
-                            </select>
-                            <select name="from_month" class="select select-sm">
-                                @foreach($months as $m)
-                                    <option value="{{ $m }}" @selected(old('from_month', now()->subMonthNoOverflow()->month) == $m)>
-                                        {{ \Illuminate\Support\Carbon::create(null, $m)->format('M') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <label for="statistics-from-date" class="text-xs text-base-content/60">From (UTC)</label>
+                        <input id="statistics-from-date" name="from_date" type="date" class="input input-sm" value="{{ old('from_date', $statisticsSyncFromDate) }}" required>
                     </div>
                     <div class="flex flex-col gap-1">
-                        <label class="text-xs text-base-content/60">To</label>
-                        <div class="flex gap-2">
-                            <select name="to_year" class="select select-sm" style="min-width: 5.5rem">
-                                @foreach($years as $y)
-                                    <option value="{{ $y }}" @selected(old('to_year', now()->year) == $y)>{{ $y }}</option>
-                                @endforeach
-                            </select>
-                            <select name="to_month" class="select select-sm">
-                                @foreach($months as $m)
-                                    <option value="{{ $m }}" @selected(old('to_month', now()->month) == $m)>
-                                        {{ \Illuminate\Support\Carbon::create(null, $m)->format('M') }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <label for="statistics-to-date" class="text-xs text-base-content/60">To (UTC)</label>
+                        <input id="statistics-to-date" name="to_date" type="date" class="input input-sm" value="{{ old('to_date', $statisticsSyncToDate) }}" required>
                     </div>
                     <button type="submit" class="btn btn-primary btn-sm">Sync</button>
                 </div>
