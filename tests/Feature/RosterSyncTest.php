@@ -8,6 +8,61 @@ use Illuminate\Contracts\Broadcasting\ShouldBeUnique as BroadcastingShouldBeUniq
 use Illuminate\Contracts\Queue\ShouldBeUnique as QueueShouldBeUnique;
 use Illuminate\Support\Facades\Http;
 
+function rosterEntry(int $cid, string $lastName, bool $namePrivacy): array
+{
+    $now = (new DateTime)->format('Y-m-d H:i:s');
+
+    return [
+        'cid' => $cid,
+        'fname' => 'Test',
+        'lname' => $lastName,
+        'rating' => 6,
+        'email' => 'test'.$cid.'@test.com',
+        'facility' => 'ZJX',
+        'created_at' => $now,
+        'updated_at' => $now,
+        'flag_needbasic' => false,
+        'flag_xferOverride' => false,
+        'facility_join' => $now,
+        'flag_homecontroller' => true,
+        'lastactivity' => $now,
+        'flag_broadcastOptedIn' => false,
+        'flag_preventStaffAssign' => false,
+        'discord_id' => null,
+        'flag_nameprivacy' => $namePrivacy,
+        'last_competency_date' => $now,
+        'promotion_eligible' => false,
+        'transfer_eligible' => false,
+        'roles' => [],
+        'isMentor' => false,
+        'isSupIns' => false,
+        'last_promotion' => $now,
+    ];
+}
+
+function fakeFacilityInfo(int $atmCid): array
+{
+    $now = (new DateTime)->format('Y-m-d H:i:s');
+
+    return [
+        'data' => [
+            'facility' => [
+                'info' => [
+                    'atm' => $atmCid,
+                    'datm' => $atmCid,
+                    'ta' => $atmCid,
+                    'wm' => $atmCid,
+                    'ec' => $atmCid,
+                    'fe' => $atmCid,
+                ],
+                'roles' => [
+                    ['cid' => $atmCid, 'role' => 'ATM', 'created_at' => $now],
+                ],
+            ],
+        ],
+    ];
+}
+
 test('the roster sync job is queue-unique so it cannot run twice concurrently', function () {
     $job = new SyncRoster;
 
@@ -95,4 +150,53 @@ test('given a roster sync, when it completes, then the rostered role matches ros
     expect($joiningUser->fresh()->hasRole('rostered'))->toBeTrue();
     expect($leavingUser->fresh()->rostered)->toBeFalse();
     expect($leavingUser->fresh()->hasRole('rostered'))->toBeFalse();
+});
+
+test('given a roster sync, when a controller has VATUSA name privacy enabled, then their last name is replaced with their CID', function () {
+    $this->seed(PermissionSeeder::class);
+
+    Http::fake([
+        '*/roster/both*' => Http::response([
+            'data' => [rosterEntry(300, 'Private', true)],
+        ]),
+        '*/v2/facility/*' => Http::response(fakeFacilityInfo(300)),
+    ]);
+
+    (new SyncRoster)->handle();
+
+    $user = User::find(300);
+    expect($user->last_name)->toBe('300');
+    expect($user->first_name)->toBe('Test');
+});
+
+test('given a roster sync, when a controller does not have VATUSA name privacy enabled, then their real last name is stored', function () {
+    $this->seed(PermissionSeeder::class);
+
+    Http::fake([
+        '*/roster/both*' => Http::response([
+            'data' => [rosterEntry(400, 'Public', false)],
+        ]),
+        '*/v2/facility/*' => Http::response(fakeFacilityInfo(400)),
+    ]);
+
+    (new SyncRoster)->handle();
+
+    expect(User::find(400)->last_name)->toBe('Public');
+});
+
+test('given a controller who previously had name privacy enabled, when a later sync reports it disabled, then their real last name is restored', function () {
+    $this->seed(PermissionSeeder::class);
+
+    $user = User::factory()->create(['id' => 500, 'last_name' => '500', 'rostered' => true]);
+
+    Http::fake([
+        '*/roster/both*' => Http::response([
+            'data' => [rosterEntry(500, 'Restored', false)],
+        ]),
+        '*/v2/facility/*' => Http::response(fakeFacilityInfo(500)),
+    ]);
+
+    (new SyncRoster)->handle();
+
+    expect($user->fresh()->last_name)->toBe('Restored');
 });

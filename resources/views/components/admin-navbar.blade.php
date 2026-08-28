@@ -1,6 +1,9 @@
 @php
     use \App\Models\VisitorRequest;
     use \App\Enums\VisitRequestStatus;
+    use \App\Models\Loa;
+    use \App\Enums\LoaStatus;
+    use \App\Models\StaffingRequest;
 @endphp
 
 <div class="navbar bg-info text-primary-content z-10">
@@ -9,6 +12,14 @@
     </div>
 
     <ul class='menu menu-horizontal items-center gap-x-5 justify-center'>
+        @if(auth()->user()?->can('manage faqs'))
+            <div class="">
+                <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
+                    <a href="{{ route('admin.faqs.index') }}">FAQs</a>
+                </div>
+            </div>
+        @endif
+
         @if(auth()->user()?->hasRole('training'))
             <div class="dropdown dropdown-end">
                 <div tabindex="0" role="button" class="m-1 flex items-center gap-2">
@@ -55,7 +66,15 @@
                     <li><a href={{ route('admin.events.index') }}>Events</a></li>
                     <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
                     <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
-                    <li><a href={{ route('admin.index') }}>Staffing Requests</a></li>
+                    @if(auth()->user()?->hasPermissionTo('staffing-requests:read'))
+                        <li>
+                            <a href={{ route('admin.staffing-requests.index') }}>Staffing Requests
+                                @if(StaffingRequest::where('closed', false)->count() > 0)
+                                    <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         @endif
@@ -77,6 +96,14 @@
                         </a>
                     </li>
                     <li><a href={{ route('statistics.quarterly') }}>Roster Purge Assistant</a></li>
+                    <li>
+                        <a href={{ route('loa.manage') }}>LOA Requests
+                            @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
+                                <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li><a href="{{ route('admin.news.index') }}">News Management</a></li>
                     <li><a href={{ route('logs.index') }}>Audit Log</a></li>
                 </ul>
             </div>

@@ -11,6 +11,7 @@ use Http;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class SyncRoster implements ShouldBeUnique, ShouldQueue
@@ -35,7 +36,7 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
     {
         $ROSTER_API_ENDPOINT = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility').'/roster/both';
 
-        $rosterData = Http::get($ROSTER_API_ENDPOINT, [
+        $rosterData = Http::retry(4, fn ($attempt) => $attempt * 1000)->timeout(20)->get($ROSTER_API_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key'),
         ]);
 
@@ -120,7 +121,7 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
     private function updateStaffMembers()
     {
         $FACILITY_INFO_ENDPOINT = config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility');
-        $facilityInfo = Http::get($FACILITY_INFO_ENDPOINT, [
+        $facilityInfo = Http::retry(4, fn ($attempt) => $attempt * 1000)->timeout(20)->get($FACILITY_INFO_ENDPOINT, [
             'apikey' => config('app.vatusa_api_key'),
         ]);
 
@@ -163,11 +164,12 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
             }
 
             $this->syncRosteredRole();
+            Cache::forget('vatsim-statistics:rostered-cids');
 
             Log::info('Roster sync completed successfully.');
         } catch (\Exception $e) {
             // Log error
-            Log::error('Error syncing roster: '.$e->getMessage().'\n'.$e->getTraceAsString(), [
+            Log::error('Error syncing roster: '.$e->getMessage()."\n".$e->getTraceAsString(), [
                 'url' => config('app.vatusa_api_url').'/v2/facility/'.config('app.vatusa_facility'),
                 'environment' => App::environment(),
                 'exception' => get_class($e),

@@ -28,39 +28,50 @@
 
         @yield('secondary-navbar')
 
-        @if ($errors->any())
-            <div x-data="{open: true}" x-show='open' class="alert alert-error alert-dismissible fade show" role="alert">
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
-            </div>
-        @endif
-
-        @if(session('error'))
-            <div x-data="{open: true}" x-show='open' class="alert alert-error alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
-            </div>
-        @endif
-
-        @if(session('success'))
-            <div x-data="{open: true}" x-show='open' class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class='btn btn-ghost cursor-pointer' x-on:click='open = false'>Close</button>
-            </div>
-        @endif
+        <div
+            x-data="{
+                alerts: [
+                    @if ($errors->any())
+                        { id: 'validation', type: 'error', message: @js(implode(' ', $errors->all())) },
+                    @endif
+                    @if (session('error'))
+                        { id: 'session-error', type: 'error', message: @js(session('error')) },
+                    @endif
+                    @if (session('success'))
+                        { id: 'session-success', type: 'success', message: @js(session('success')) },
+                    @endif
+                ]
+            }"
+            x-on:notify.window="alerts.push({ id: Date.now() + '-' + Math.random(), type: $event.detail.type ?? 'info', message: $event.detail.message })"
+            class="flex flex-col gap-2 px-2 sm:px-0"
+        >
+            <template x-for="alert in alerts" :key="alert.id">
+                <div
+                    role="alert"
+                    class="alert"
+                    :class="{
+                        'alert-error': alert.type === 'error',
+                        'alert-success': alert.type === 'success',
+                        'alert-warning': alert.type === 'warning',
+                        'alert-info': alert.type === 'info',
+                    }"
+                >
+                    <span x-text="alert.message"></span>
+                    <button type="button" class="btn btn-ghost btn-sm" @click="alerts = alerts.filter(a => a.id !== alert.id)">Close</button>
+                </div>
+            </template>
+        </div>
 
         @yield('body-nopad')
 
-        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 ml-5 mt-5">
-            <h1 class='font-bold text-2xl'>@yield('title')</h1>
-            @hasSection('title-extra')
-                @yield('title-extra')
-            @endif
-        </div>
+        @unless($__env->hasSection('hide-heading'))
+            <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1 ml-5 mt-5">
+                <h1 class='font-bold text-2xl'>@yield('title')</h1>
+                @hasSection('title-extra')
+                    @yield('title-extra')
+                @endif
+            </div>
+        @endunless
 
         <div class="p-5 flex-1">
             @yield('body')
@@ -93,6 +104,7 @@
                 <h1 class="text-xl font-bold">Virtual Jacksonville ARTCC</h1>
 
                 <div class="flex gap-x-10">
+                    <a class="link text-lg" href="{{ route('faq.index') }}">FAQ &amp; Help</a>
                     <a class="link text-lg" href="https://github.com/zjx-artcc" target="_blank">GitHub</a>
                     <a class="link text-lg" href="https://vatusa.net" target="_blank">VATUSA</a>
                     <a class="link text-lg" href="https://vatsim.net" target="_blank">VATSIM</a>
