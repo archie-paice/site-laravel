@@ -111,9 +111,9 @@ test('the edit form keeps the events existing start time', function () {
 test('event banners use public-disk URLs and retain access to legacy stored paths', function () {
     Storage::fake('public');
 
-    $event = makeEvent(['event_image_route' => 'storage/event/legacy-banner.png']);
+    $event = makeEvent(['event_image_route' => 'storage/events/legacy-banner.png']);
 
-    expect($event->banner_url)->toBe(Storage::disk('public')->url('event/legacy-banner.png'));
+    expect($event->banner_url)->toBe(Storage::disk('public')->url('events/legacy-banner.png'));
 
     $this->get(route('events.show', $event))
         ->assertOk()

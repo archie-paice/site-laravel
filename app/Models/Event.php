@@ -12,7 +12,7 @@ class Event extends Model
 {
     use HasFactory;
 
-    private const BANNER_DIRECTORY = 'event/';
+    private const BANNER_DIRECTORIES = ['event/', 'events/'];
 
     protected $fillable = [
         'title',
@@ -86,7 +86,10 @@ class Event extends Model
         $path = ltrim($this->event_image_route, '/');
         $path = str_starts_with($path, 'storage/') ? substr($path, strlen('storage/')) : $path;
 
-        return str_starts_with($path, self::BANNER_DIRECTORY) ? $path : null;
+        return collect(self::BANNER_DIRECTORIES)
+            ->contains(fn (string $directory) => str_starts_with($path, $directory))
+            ? $path
+            : null;
     }
 
     /**

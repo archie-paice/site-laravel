@@ -74,9 +74,11 @@ the Laravel runtime before serving. In order it:
 3. Fixes permissions: if the container runs as root (`id -u` = 0) it `chown`s
    `storage` and `bootstrap/cache` to `www-data`; it always applies `chmod -R ug+rwX`
    to those paths.
-4. Creates the `public/storage` symlink via `php artisan storage:link`, but only if
-   `public/storage` does not already exist. If it exists as a non-symlink it is left
-   untouched with a warning.
+4. Verifies that `public/storage` is a symlink to `storage/app/public`. A stale or
+   broken symlink is recreated with `php artisan storage:link`; a real directory at
+   `public/storage` stops startup with an actionable error rather than serving broken
+   asset URLs. Do not mount a volume at `public/storage`; persist or mount
+   `storage/app/public` instead.
 
    Public assets such as event banners and profile photos are stored on Laravel's `public`
    disk. Application code must generate their URLs with `Storage::disk('public')->url(...)` instead of
