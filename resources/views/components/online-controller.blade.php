@@ -1,7 +1,7 @@
 <div class='card border-2 border-base-300 mt-2'>
     <div class='flex flex-row align-middle justify-left'>
             @unless(is_null($user))
-                <img class='w-17 h-17 ml-4 rounded-full place-self-center' src="{{ asset($user->profile_image_route) }}" alt="">
+                <img class='w-17 h-17 ml-4 rounded-full place-self-center' src="{{ $user->profile_image_url }}" alt="">
             @else
                 <img class='w-17 h-17 ml-4 rounded-full place-self-center' src="{{ asset('images/default_profile.jpg') }}" alt="">
             @endunless

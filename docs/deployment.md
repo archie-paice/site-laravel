@@ -77,6 +77,13 @@ the Laravel runtime before serving. In order it:
 4. Creates the `public/storage` symlink via `php artisan storage:link`, but only if
    `public/storage` does not already exist. If it exists as a non-symlink it is left
    untouched with a warning.
+
+   Public assets such as event banners and profile photos are stored on Laravel's `public`
+   disk. Application code must generate their URLs with `Storage::disk('public')->url(...)` instead of
+   manually prefixing stored paths with `storage/`; this keeps those links correct when
+   the disk uses a custom public URL or an asset host. Publications are served by their
+   controller so the application can validate the stored type and apply the appropriate
+   `Content-Disposition` and `X-Content-Type-Options` headers.
 5. Optimizes caches, but **only when `LARAVEL_OPTIMIZE` is `true`** (this is the
    default when the variable is unset). When enabled it runs `optimize:clear`,
    `config:cache`, `route:cache`, and `view:cache`. This step is also gated so it only
