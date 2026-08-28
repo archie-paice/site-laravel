@@ -47,7 +47,8 @@ class SyncVatsimSessions implements ShouldQueue
         $limit = max(1, (int) config('app.vatsim_statistics_page_size'));
         $accepted = 0;
         $skipped = 0;
-        $touchedMonths = $this->touchedMonths;
+        $recomputeOperations = $this->recomputeDeferredMonths();
+        $touchedMonths = [];
         $expiresAt = now()->addMinutes(self::ELIGIBILITY_CACHE_MINUTES);
         $prefixes = Cache::remember(self::PREFIXES_CACHE_KEY, $expiresAt, fn () => StatisticsPrefixes::pluck('name')->all());
         $rosteredCids = array_fill_keys(
@@ -84,7 +85,7 @@ class SyncVatsimSessions implements ShouldQueue
                 'offset' => $this->offset,
             ]);
 
-            return;
+            throw $exception;
         }
 
         if (! $response->successful()) {
@@ -96,7 +97,7 @@ class SyncVatsimSessions implements ShouldQueue
                 'offset' => $this->offset,
             ]);
 
-            return;
+            throw new \RuntimeException("VATSIM statistics sync returned HTTP {$response->status()}.");
         }
 
         $payload = $response->json();
@@ -109,7 +110,7 @@ class SyncVatsimSessions implements ShouldQueue
                 'offset' => $this->offset,
             ]);
 
-            return;
+            throw new \UnexpectedValueException('VATSIM statistics sync returned an unexpected payload.');
         }
 
         Log::debug('Received VATSIM statistics sync page', [
@@ -157,7 +158,7 @@ class SyncVatsimSessions implements ShouldQueue
 
             $existing = ControllerSession::find($connectionId);
 
-            if ($existing) {
+            if ($existing && ($existing->user_id !== $userId || $existing->start->format('Y-m') !== $start->format('Y-m'))) {
                 $this->touchMonth($touchedMonths, $existing->user_id, $existing->start);
             }
 
@@ -176,8 +177,9 @@ class SyncVatsimSessions implements ShouldQueue
             $accepted++;
         }
 
+        $recomputeOperations += $this->recomputeTouchedMonths($touchedMonths);
+
         $nextOffset = $this->offset + count($sessions);
-        $recomputedMonths = 0;
 
         if (count($sessions) === $limit) {
             Log::debug('Queueing next VATSIM statistics sync page', [
@@ -187,21 +189,7 @@ class SyncVatsimSessions implements ShouldQueue
                 'next_offset' => $nextOffset,
             ]);
 
-            self::dispatch($this->from, $this->to, $nextOffset, $touchedMonths);
-        } else {
-            Log::debug('Recomputing monthly VATSIM statistics after final page', [
-                'from' => $from->toIso8601String(),
-                'to' => $to->toIso8601String(),
-                'offset' => $this->offset,
-                'touched_months' => array_sum(array_map(count(...), $touchedMonths)),
-            ]);
-
-            foreach ($touchedMonths as $userId => $months) {
-                foreach ($months as [$year, $month]) {
-                    $this->recomputeMonthlyStats($userId, $year, $month);
-                    $recomputedMonths++;
-                }
-            }
+            self::dispatch($this->from, $this->to, $nextOffset);
         }
 
         Log::info('VATSIM statistics sync page complete', [
@@ -211,7 +199,7 @@ class SyncVatsimSessions implements ShouldQueue
             'next_offset' => count($sessions) === $limit ? $nextOffset : null,
             'accepted' => $accepted,
             'skipped' => $skipped,
-            'recomputed_months' => $recomputedMonths,
+            'recompute_operations' => $recomputeOperations,
         ]);
     }
 
@@ -227,9 +215,36 @@ class SyncVatsimSessions implements ShouldQueue
         };
     }
 
+    private function recomputeDeferredMonths(): int
+    {
+        $recomputedMonths = $this->recomputeTouchedMonths($this->touchedMonths);
+
+        if ($recomputedMonths > 0) {
+            Log::debug('Recomputed monthly statistics deferred by an earlier sync page', [
+                'recomputed_months' => $recomputedMonths,
+            ]);
+        }
+
+        return $recomputedMonths;
+    }
+
     private function touchMonth(array &$touchedMonths, int $userId, Carbon $start): void
     {
         $touchedMonths[$userId][$start->format('Y-m')] = [$start->year, $start->month];
+    }
+
+    private function recomputeTouchedMonths(array $touchedMonths): int
+    {
+        $recomputedMonths = 0;
+
+        foreach ($touchedMonths as $userId => $months) {
+            foreach ($months as [$year, $month]) {
+                $this->recomputeMonthlyStats($userId, $year, $month);
+                $recomputedMonths++;
+            }
+        }
+
+        return $recomputedMonths;
     }
 
     private function recomputeMonthlyStats(int $userId, int $year, int $month): void
