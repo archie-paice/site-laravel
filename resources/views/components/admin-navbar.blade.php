@@ -130,10 +130,10 @@
         <div x-show="open" x-cloak
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
-            class="fixed inset-y-0 left-0 z-50 w-52 max-w-[75vw] bg-base-300 text-base-content shadow-xl flex flex-col">
+            class="fixed inset-y-0 left-0 z-50 w-56 max-w-[75vw] bg-base-300 text-base-content shadow-xl flex flex-col">
 
-            {{-- Header: title, or back button when inside a sub-screen --}}
-            <div class="flex items-center justify-between bg-info text-white px-3 py-3 shrink-0">
+            {{-- Header: title, or back button when inside a sub-screen. min-h-16 matches the .navbar behind it --}}
+            <div class="flex items-center justify-between gap-2 bg-info text-white px-3 min-h-16 shrink-0">
                 <template x-if="screen === null">
                     <span class="text-xl font-bold">Admin Menu</span>
                 </template>
@@ -143,7 +143,7 @@
                         <span class="font-semibold text-lg">Back</span>
                     </button>
                 </template>
-                <button type="button" class="btn btn-ghost btn-sm btn-circle" @click="open = false" aria-label="Close menu">
+                <button type="button" class="btn btn-ghost btn-sm btn-circle shrink-0" @click="open = false" aria-label="Close menu">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>

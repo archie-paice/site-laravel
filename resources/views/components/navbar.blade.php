@@ -112,20 +112,20 @@
         <div x-show="open" x-cloak
             x-transition:enter="transition ease-out duration-200" x-transition:enter-start="-translate-x-full" x-transition:enter-end="translate-x-0"
             x-transition:leave="transition ease-in duration-150" x-transition:leave-start="translate-x-0" x-transition:leave-end="-translate-x-full"
-            class="fixed inset-y-0 left-0 z-50 w-52 max-w-[75vw] bg-base-300 text-base-content shadow-xl flex flex-col">
+            class="fixed inset-y-0 left-0 z-50 w-56 max-w-[75vw] bg-base-300 text-base-content shadow-xl flex flex-col">
 
-            {{-- Header: logo, or back button when inside a sub-screen --}}
-            <div class="flex items-center justify-between bg-primary text-primary-content px-3 py-3 shrink-0">
+            {{-- Header: logo, or back button when inside a sub-screen. min-h-16 matches the .navbar behind it --}}
+            <div class="flex items-center justify-between gap-2 bg-primary text-primary-content px-3 min-h-16 shrink-0">
                 <template x-if="screen === null">
-                    <img src="{{ asset('images/zjx_wide.png') }}" alt="ZJX ARTCC" class="h-6 w-auto" />
+                    <img src="{{ asset('images/zjx_wide.png') }}" alt="ZJX ARTCC" class="h-6 w-auto max-w-full shrink" />
                 </template>
                 <template x-if="screen !== null">
-                    <button type="button" class="flex items-center gap-2" @click="screen = null">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                    <button type="button" class="flex items-center gap-2 min-w-0" @click="screen = null">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
                         <span class="font-semibold text-lg">Back</span>
                     </button>
                 </template>
-                <button type="button" class="btn btn-ghost btn-sm btn-circle text-primary-content" @click="open = false" aria-label="Close menu">
+                <button type="button" class="btn btn-ghost btn-sm btn-circle text-primary-content shrink-0" @click="open = false" aria-label="Close menu">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
                 </button>
             </div>
@@ -173,7 +173,7 @@
                         <div class="divider w-full my-1 mx-0"></div>
 
                         @if(auth()->user())
-                            <li class="menu-title text-sm uppercase tracking-wide px-3 pt-2">Profile</li>
+                            <li class="px-3 pt-3 pb-1 text-lg font-bold text-base-content">Profile</li>
                             <li><a href="{{ route('users.show', [auth()->user()->id]) }}" class="rounded-none px-3 py-3.5 text-lg">{{ auth()->user()->first_name }} {{ auth()->user()->last_name }} - {{ auth()->user()->rating->mapToString() }}</a></li>
                             <li><a href="{{ route('auth.logout') }}" class="rounded-none px-3 py-3 text-error">Logout</a></li>
                         @else
