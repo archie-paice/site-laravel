@@ -1,6 +1,6 @@
 <div class='flex flex-row align-middle justify-left'>
     @unless(is_null($user))
-        <img class='w-17 h-17 rounded-full place-self-center' src="{{ asset($user->profile_image_route) }}" alt="">
+        <img class='w-17 h-17 rounded-full place-self-center' src="{{ $user->profile_image_url }}" alt="">
     @else
         <img class='w-17 h-17 rounded-full place-self-center' src="{{ asset('images/default_profile.jpg') }}" alt="">
     @endunless

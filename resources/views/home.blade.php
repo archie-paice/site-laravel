@@ -1,12 +1,16 @@
 @extends('layouts.main')
 
+@php
+    use Stevebauman\Purify\Facades\Purify;
+@endphp
+
 @section('title', 'Home')
 @section('hide-heading')@endsection
 
 @section('body-nopad')
     <div
         class="hero min-h-[260px] h-[42vh] sm:h-[36vh] lg:h-[30vh] w-full bg-cover bg-center"
-        style="background-image: url('{{ asset('images/fake_background.png') }}')"
+        style="background-image: url('{{ asset('images/hero_banner.jpg') }}')"
     >
         <div class="hero-overlay bg-black/50"></div>
 
@@ -171,9 +175,9 @@
                                     {{ $n->published_at }}
                                 </p>
 
-                                <p class="py-4">
-                                    {{ $n->content }}
-                                </p>
+                                <div class="py-4">
+                                    {!! Purify::clean($n->content) !!}
+                                </div>
 
                                 <div class="modal-action">
                                     <form method="dialog">

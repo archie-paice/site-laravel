@@ -8,6 +8,7 @@ use App\Models\Event;
 use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
+use App\Models\StaffingRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -99,17 +100,29 @@ class EventManagementController extends Controller
         return view('events.manage', compact('event', 'registrants', 'mostRequestedPosition', 'positionsAccess'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
         $event = new Event;
         $types = EventType::cases();
         $featuredFields = FeaturedField::orderBy('name')->pluck('name');
         $presetPositions = EventPositionPreset::orderBy('name')->pluck('name');
 
+        // When an event is created off the back of a staffing request, carry the
+        // requester's event name and description over so they aren't retyped.
+        // The id is looked up rather than passing the text through the query
+        // string, which keeps a 2000 character description out of the URL.
+        $staffingRequest = $request->filled('staffing_request')
+            ? StaffingRequest::find($request->query('staffing_request'))
+            : null;
+
         return view('events.create', [
             'types' => $types,
             'featuredFields' => $featuredFields,
             'presetPositions' => $presetPositions,
+            'prefillTitle' => $staffingRequest?->name ?? '',
+            // The description is plain text; escape it and keep the requester's
+            // line breaks, since the editor renders it as HTML.
+            'prefillDescription' => $staffingRequest ? nl2br(e($staffingRequest->description)) : '',
         ]);
     }
 
@@ -212,7 +225,7 @@ class EventManagementController extends Controller
         ], self::IMAGE_MESSAGES);
 
         $event = Event::findOrFail($id);
-        $oldImagePath = $event->event_image_route;
+        $oldImagePath = $event->bannerStoragePath();
 
         $event->title = $validated['title'];
         $event->description = Purify::clean($validated['description']);
@@ -226,8 +239,7 @@ class EventManagementController extends Controller
 
             // For the sake of storage, delete the old image
             if ($oldImagePath && $oldImagePath !== $event->event_image_route) {
-                $cleanPath = str_replace('storage/', '', $oldImagePath);
-                Storage::disk('public')->delete($cleanPath);
+                Storage::disk('public')->delete($oldImagePath);
             }
         }
 
@@ -241,8 +253,8 @@ class EventManagementController extends Controller
     {
         $event = Event::findOrFail($id);
 
-        if ($event->event_image_route) {
-            Storage::disk('public')->delete(str_replace('storage/', '', $event->event_image_route));
+        if ($path = $event->bannerStoragePath()) {
+            Storage::disk('public')->delete($path);
         }
 
         $event->delete();
@@ -271,6 +283,6 @@ class EventManagementController extends Controller
         $image = $request->file('image');
         $imageName = 'event_'.$event->id.'.'.$image->extension();
 
-        return 'storage/'.$image->storeAs('event', $imageName, 'public');
+        return $image->storeAs('event', $imageName, 'public');
     }
 }

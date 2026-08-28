@@ -103,9 +103,9 @@
 
         <div class="w-full lg:w-1/3 flex flex-col justify-start items-center gap-6">
             <div class="card card-dash bg-base-100 w-full max-w-xl shadow-sm overflow-hidden">
-                @if ($event->event_image_route)
+                @if ($event->banner_url)
                     <figure>
-                        <img class='' src="{{ asset($event->event_image_route) }}" alt=""/>
+                        <img class='' src="{{ $event->banner_url }}" alt=""/>
                     </figure>
                 @endif
                 <div class="card-body bg-neutral">

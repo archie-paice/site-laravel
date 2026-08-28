@@ -13,6 +13,13 @@
 
                     @auth
                     @php($isOwner = Auth::id() == $user->id)
+                    @if($isOwner)
+                    <a
+                    role="tab"
+                    href='{{ route("users.show.loa", $user) }}'
+                    @class(['tab whitespace-nowrap', 'tab-active' => request()->routeIs('users.show.loa')])
+                    >LOA</a>
+                    @endif
                     @if($isOwner || Auth::user()?->can('feedback:read'))
                     <a
                     role="tab"

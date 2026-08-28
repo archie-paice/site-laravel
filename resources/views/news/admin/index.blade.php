@@ -15,6 +15,7 @@
                     <th>Title</th>
                     <th>Published</th>
                     <th>Content</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -24,7 +25,10 @@
                         <td class="py-3 border-r-1 border-base-300 whitespace-nowrap">
                             {{ $n->published_at?->format('m/d/Y H:i') }}z
                         </td>
-                        <td class="py-3">{{ $n->content }}</td>
+                        <td class="py-3 border-r-1 border-base-300">{{ Str::limit(strip_tags($n->content), 120) }}</td>
+                        <td class="py-3 text-right">
+                            <a href="{{ route('admin.news.edit', $n) }}" class="btn btn-sm btn-outline">Edit</a>
+                        </td>
                     </tr>
                 @endforeach
             </tbody>

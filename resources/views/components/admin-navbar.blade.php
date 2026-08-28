@@ -1,6 +1,9 @@
 @php
     use \App\Models\VisitorRequest;
     use \App\Enums\VisitRequestStatus;
+    use \App\Models\Loa;
+    use \App\Enums\LoaStatus;
+    use \App\Models\StaffingRequest;
     $pendingVisitorRequests = VisitorRequest::where('status', VisitRequestStatus::PENDING)->count();
 @endphp
 
@@ -65,6 +68,15 @@
                     <li><a href={{ route('admin.events.index') }}>Events</a></li>
                     <li><a href="{{ route('admin.events.position-presets.index') }}">Position Presets</a></li>
                     <li><a href="{{ route('admin.events.event-fields.index') }}">Event Field Presets</a></li>
+                    @if(auth()->user()?->hasPermissionTo('staffing-requests:read'))
+                        <li>
+                            <a href={{ route('admin.staffing-requests.index') }}>Staffing Requests
+                                @if(StaffingRequest::where('closed', false)->count() > 0)
+                                    <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
+                                @endif
+                            </a>
+                        </li>
+                    @endif
                 </ul>
             </div>
         @endif
@@ -82,6 +94,13 @@
                         <a href={{ route('visit.manage') }}>Visitor Requests
                             @if($pendingVisitorRequests > 0)
                                 <span class='badge badge-primary'>{{ $pendingVisitorRequests }}</span>
+                            @endif
+                        </a>
+                    </li>
+                    <li>
+                        <a href={{ route('loa.manage') }}>LOA Requests
+                            @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
+                                <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
                             @endif
                         </a>
                     </li>
@@ -232,7 +251,15 @@
                             <li><a href={{ route('admin.events.index') }} class="rounded-none px-3 py-3.5 text-lg">Events</a></li>
                             <li><a href="{{ route('admin.events.position-presets.index') }}" class="rounded-none px-3 py-3.5 text-lg">Position Presets</a></li>
                             <li><a href="{{ route('admin.events.event-fields.index') }}" class="rounded-none px-3 py-3.5 text-lg">Event Field Presets</a></li>
-                            <li><a href={{ route('admin.index') }} class="rounded-none px-3 py-3.5 text-lg">Staffing Requests</a></li>
+                            @if(auth()->user()?->can('staffing-requests:read'))
+                                <li>
+                                    <a href={{ route('admin.staffing-requests.index') }} class="rounded-none px-3 py-3.5 text-lg">Staffing Requests
+                                        @if(StaffingRequest::where('closed', false)->count() > 0)
+                                            <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
+                                        @endif
+                                    </a>
+                                </li>
+                            @endif
                         </ul>
                     </div>
                 @endif
@@ -253,6 +280,13 @@
                                 <a href={{ route('visit.manage') }} class="rounded-none px-3 py-3.5 text-lg">Visitor Requests
                                     @if($pendingVisitorRequests > 0)
                                         <span class='badge badge-primary'>{{ $pendingVisitorRequests }}</span>
+                                    @endif
+                                </a>
+                            </li>
+                            <li>
+                                <a href={{ route('loa.manage') }} class="rounded-none px-3 py-3.5 text-lg">LOA Requests
+                                    @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
+                                        <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
                                     @endif
                                 </a>
                             </li>

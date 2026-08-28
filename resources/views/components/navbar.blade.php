@@ -17,6 +17,7 @@
             </div>
             <ul tabindex="-1" class="dropdown-content text-base-content menu bg-base-100 rounded-box z-50 w-52 p-2 shadow-sm">
                 <li><a href="{{ route('events.index') }}">Upcoming Events</a></li>
+                <li><a href="{{ route('staffing-requests.index') }}">Request Staffing</a></li>
             </ul>
         </div>
 
@@ -191,6 +192,7 @@
                     </div>
                     <ul class="menu w-full flex-col flex-nowrap px-0 py-2 gap-0">
                         <li><a href="{{ route('events.index') }}" class="rounded-none px-3 py-3.5 text-lg">Upcoming Events</a></li>
+                        <li><a href="{{ route('staffing-requests.index') }}" class="rounded-none px-3 py-3.5 text-lg">Request Staffing</a></li>
                     </ul>
                 </div>
 

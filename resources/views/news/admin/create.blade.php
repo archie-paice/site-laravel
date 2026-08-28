@@ -25,7 +25,18 @@
 
                 <div>
                     <label for="content" class="label font-bold text-base-content">Content</label>
-                    <textarea class="textarea bg-base-100 text-base-content min-h-50 w-full" name="content"> {{ old('content') }}</textarea>
+                    <x-markdown-editor name="content" :content="old('content')" />
+                </div>
+
+                <div class="form-control">
+                    <label class="label cursor-not-allowed gap-3 w-fit">
+                        <input type="checkbox" class="checkbox" disabled>
+                        <span class="label-text">Send email to opted-in users</span>
+                    </label>
+                    <p class="text-sm opacity-70">
+                        Not yet implemented — publishing an announcement does not send any email. It will only
+                        appear on the homepage.
+                    </p>
                 </div>
 
                 <div class="card-actions mt-5">

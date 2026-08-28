@@ -16,10 +16,12 @@ use App\Http\Controllers\Events\EventPositionPresetController;
 use App\Http\Controllers\FaqController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoaController;
 use App\Http\Controllers\News\NewsController;
 use App\Http\Controllers\PublicationsController;
 use App\Http\Controllers\RosterController;
 use App\Http\Controllers\StaffController;
+use App\Http\Controllers\StaffingRequestController;
 use App\Http\Controllers\StatisticsController;
 use App\Http\Controllers\StatisticsPrefixesController;
 use App\Http\Controllers\Training\SoloCertController;
@@ -49,7 +51,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Contributors
-Route::get('/contributors', [ContributorsController::class, 'index'])->name('contributors.index');
+Route::get('/contributors', [ContributorsController::class, 'index'])->middleware('auth')->name('contributors.index');
 
 // ATC Bookings
 Route::post('/bookings', [AtcBookingController::class, 'store'])
@@ -57,7 +59,7 @@ Route::post('/bookings', [AtcBookingController::class, 'store'])
     ->name('bookings.store');
 
 // Roster
-Route::get('/roster', [RosterController::class, 'index'])->name('roster.index');
+Route::get('/roster', [RosterController::class, 'index'])->middleware('auth')->name('roster.index');
 
 // Visit
 Route::get('/visit', [VisitFacilityController::class, 'index'])->name('visit.index');
@@ -88,18 +90,27 @@ Route::resource('users', UserController::class, [
     'only' => ['show', 'edit', 'update'],
 ]);
 
-Route::prefix('users/{user}')->group(function () {
+Route::prefix('users/{user}')->middleware('auth')->group(function () {
     Route::get('/', [UserController::class, 'show'])->name('users.show');
     Route::get('feedback', [UserController::class, 'feedback'])->middleware('auth')->name('users.show.feedback');
     Route::get('training-tickets', [UserController::class, 'trainingTickets'])->middleware('auth')->name('users.show.training-tickets');
     Route::get('training-assignments', [UserController::class, 'trainingAssignments'])->middleware('auth')->name('users.show.training-assignments');
     Route::get('solo-certs', [UserController::class, 'soloCerts'])->middleware('auth')->name('users.show.solo-certs');
+    Route::get('loa', [UserController::class, 'loa'])->middleware('auth')->name('users.show.loa');
     Route::get('registered-events', [UserController::class, 'registeredEvents'])->middleware('auth')->name('users.show.registered-events');
 });
 
 // Staff Directory
 Route::get('/staff', [StaffController::class, 'index'])
+    ->middleware('auth')
     ->name('staff.index');
+
+// LOA
+Route::prefix('loa')->middleware('auth')->name('loa.')->group(function () {
+    Route::post('/', [LoaController::class, 'store'])->name('store');
+    Route::put('{loa}', [LoaController::class, 'update'])->name('update');
+    Route::delete('{loa}', [LoaController::class, 'destroy'])->name('destroy');
+});
 
 // FAQ (public)
 Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
@@ -108,8 +119,13 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq.index');
 Route::get('/feedback', [FeedbackController::class, 'index'])->middleware('auth')->name('feedback.index');
 Route::post('/feedback', [FeedbackController::class, 'store'])->middleware('auth')->name('feedback.store');
 
+// Staffing Requests
+Route::get('/staffing-requests', [StaffingRequestController::class, 'index'])->middleware('auth')->name('staffing-requests.index');
+Route::post('/staffing-requests', [StaffingRequestController::class, 'store'])->middleware('auth')->name('staffing-requests.store');
+
 // Controller Statistics
 Route::get('controllers/statistics', [StatisticsController::class, 'index'])
+    ->middleware('auth')
     ->name('statistics.index');
 
 // Publications
@@ -159,6 +175,12 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
 
         Route::post('/', [NewsController::class, 'store'])
             ->name('admin.news.store');
+
+        Route::get('{news}/edit', [NewsController::class, 'edit'])
+            ->name('admin.news.edit');
+
+        Route::put('{news}', [NewsController::class, 'update'])
+            ->name('admin.news.update');
     });
 
     // User Management
@@ -183,6 +205,17 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         Route::post('feedback/{feedback}/comments', [FeedbackController::class, 'storeComment'])->name('admin.feedback.comments.store');
     });
 
+    // Staffing Requests
+    Route::middleware('permission:staffing-requests:read')->group(function () {
+        Route::get('staffing-requests', [StaffingRequestController::class, 'manage'])->name('admin.staffing-requests.index');
+        Route::get('staffing-requests/{staffingRequest}', [StaffingRequestController::class, 'show'])->name('admin.staffing-requests.show');
+    });
+
+    Route::middleware('permission:staffing-requests:write')->group(function () {
+        Route::patch('staffing-requests/{staffingRequest}/close', [StaffingRequestController::class, 'close'])->name('admin.staffing-requests.close');
+        Route::patch('staffing-requests/{staffingRequest}/reopen', [StaffingRequestController::class, 'reopen'])->name('admin.staffing-requests.reopen');
+    });
+
     Route::middleware('permission:manage visiting controllers')->group(function () {
         Route::get('visit-requests/{visitRequest}', [VisitFacilityController::class, 'show'])
             ->name('visit.show');
@@ -198,6 +231,14 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
 
         Route::put('visit-requests/{visitRequest}/deny', [VisitFacilityController::class, 'deny'])
             ->name('visit.deny');
+    });
+
+    Route::middleware('permission:manage loas')->group(function () {
+        Route::get('loas', [LoaController::class, 'manage'])->name('loa.manage');
+        Route::get('loas/{loa}', [LoaController::class, 'show'])->name('loa.show');
+        Route::put('loas/{loa}/approve', [LoaController::class, 'approve'])->name('loa.approve');
+        Route::put('loas/{loa}/deny', [LoaController::class, 'deny'])->name('loa.deny');
+        Route::put('loas/{loa}/revoke', [LoaController::class, 'revoke'])->name('loa.revoke');
     });
 
     // Contributors
@@ -224,8 +265,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         });
     });
 
-    // Senior Staff / Web Team
-    Route::middleware('role:admin')->group(function () {
+    // Facilities staff
+    Route::middleware('permission:statistics:write')->group(function () {
         Route::post('statistics/sync', [StatisticsController::class, 'sync'])
             ->name('statistics.sync');
     });
