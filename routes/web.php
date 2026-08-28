@@ -265,8 +265,8 @@ Route::prefix('admin')->middleware('permission:view dashboard')->group(function 
         });
     });
 
-    // Senior Staff / Web Team
-    Route::middleware('role:admin')->group(function () {
+    // Facilities staff
+    Route::middleware('permission:statistics:write')->group(function () {
         Route::post('statistics/sync', [StatisticsController::class, 'sync'])
             ->name('statistics.sync');
     });

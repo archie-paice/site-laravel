@@ -27,7 +27,7 @@ This answers **who is online right now?** A failed run may leave the display sta
 
 A separate queued job will run every six hours and synchronize historical ATC sessions from the VATSIM Core API.
 
-The VATSIM history endpoint is paginated (`limit` and `offset`); it is not a date-range endpoint. The client will paginate as needed to cover a configured lookback period, then apply the cutoff locally using the session start time. Endpoint ordering, retention, and rate limits must be verified before setting that interval.
+The VATSIM history endpoint accepts a UTC date range and is paginated (`limit` and `offset`). The client will request an overlapping lookback period, read every returned page, and apply the cutoff locally using the session start time.
 
 For every returned session, the job will:
 
@@ -36,7 +36,7 @@ For every returned session, the job will:
 3. Upsert the eligible session and recompute the affected controller-month totals.
 4. Log the run outcome, including pages read, accepted and skipped sessions, and any failure.
 
-The Core session identifier must be confirmed compatible with the existing `controller_sessions.id` values before deployment. If it is not, the implementation must add a source-specific identifier or migrate the existing rows; it must not assume that the current StatSim `id` is the Core API identifier.
+The Core connection identifier is stored as `controller_sessions.id`. Before the initial Core backfill, legacy StatSim session rows must be cleared so their IDs cannot collide.
 
 VATSIM is authoritative for raw session data. The local statistics report only sessions that satisfy the subdivision's eligibility rules.
 
