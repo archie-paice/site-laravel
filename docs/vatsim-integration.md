@@ -180,7 +180,11 @@ queues the next offset when the page is full. This keeps individual queue jobs
 short while continuing until the API has returned the complete result. Every
 session is identified by its `connection_id.id`, stored by upsert in
 `controller_sessions`, and then used to recompute the affected controller-month
-totals once the final page is complete.
+totals after each queued page.
+
+Failures are allowed to reach Laravel's queue worker, which retries the same
+offset using the job's configured attempts and backoff rather than silently
+ending the pagination chain.
 
 The importer accepts only sessions with a configured statistics-prefix callsign,
 a currently rostered controller, and an eligible position suffix (`DEL`, `GND`,

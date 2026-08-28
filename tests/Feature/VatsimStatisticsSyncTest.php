@@ -6,6 +6,7 @@ use App\Models\ControllerSession;
 use App\Models\StatisticsPrefixes;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
@@ -66,11 +67,10 @@ test('it processes one Core API history page and queues the next offset', functi
     expect(ControllerSession::count())->toBe(1)
         ->and(ControllerSession::find(101)->callsign)->toBe('JAX_DEL')
         ->and(ControllerSession::find(103))->toBeNull()
-        ->and(ControllerMonthlyStat::count())->toBe(0);
+        ->and(ControllerMonthlyStat::where('user_id', $user->id)->firstOrFail()->delivery_hours)->toBe(1.5);
 
     Queue::assertPushed(SyncVatsimSessions::class, function (SyncVatsimSessions $job) {
-        return $job->offset === 2
-            && $job->touchedMonths === [10000001 => ['2026-01' => [2026, 1]]];
+        return $job->offset === 2;
     });
 
     StatisticsPrefixes::query()->delete();
@@ -134,6 +134,13 @@ test('the statistics sync command queues the first Core API page', function () {
             && $job->offset === 0;
     });
 });
+
+test('it throws a failed Core API request so the queue retries the page', function () {
+    Http::fake(fn () => Http::response([], 503));
+
+    (new SyncVatsimSessions('2026-01-01T00:00:00Z', '2026-01-31T23:59:59Z'))
+        ->handle();
+})->throws(RequestException::class);
 
 test('statistics sync requires a valid date range', function () {
     $user = User::factory()->create();
