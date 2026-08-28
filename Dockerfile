@@ -74,6 +74,10 @@ COPY ./php.ini "$PHP_INI_DIR/conf.d/zzz-app.ini"
 COPY ./entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Include the public-disk symlink in the image as well as verifying it at
+# startup. Some deployment platforms override CMD, which would otherwise skip
+# entrypoint.sh and leave uploads inaccessible at /storage/....
+RUN ["php", "artisan", "storage:link"]
 RUN ["php", "artisan", "config:clear"]
 EXPOSE 8080
 CMD ["/entrypoint.sh"]
