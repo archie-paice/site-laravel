@@ -73,6 +73,8 @@ class TrainingTicketController extends Controller
                     $fail('The notes field cannot be empty.');
                 }
             }],
+            // Staff-only notes. Never shown to the student, never synced to VATUSA.
+            'instructor_notes' => ['nullable', 'string', 'max:5000'],
             'certification_level_id' => 'nullable|integer|exists:certification_levels,id',
         ]);
 
@@ -93,6 +95,7 @@ class TrainingTicketController extends Controller
             'movements' => $validated['movements'],
             'score' => $validated['score'],
             'notes' => $validated['notes'],
+            'instructor_notes' => $validated['instructor_notes'] ?? null,
             'location' => $validated['location'],
             'issued_certification_level_id' => $issueCertification ? $validated['certification_level_id'] : null,
         ]);
@@ -122,11 +125,18 @@ class TrainingTicketController extends Controller
     {
         $trainingTicket = TrainingTicket::findOrFail($id);
 
-        if (Auth::id() !== $trainingTicket->user_id && ! Auth::user()->hasRole('training')) {
+        $isStudent = Auth::id() === $trainingTicket->user_id;
+
+        if (! $isStudent && ! Auth::user()->hasRole('training')) {
             abort(403);
         }
 
-        return view('training-tickets.show', compact('trainingTicket'));
+        // Training staff get the staff view (admin layout + instructor notes) only
+        // when viewing someone else's ticket. On their own ticket they see the same
+        // student view as everyone else, so instructor notes about them stay hidden.
+        $staffView = ! $isStudent && Auth::user()->hasRole('training');
+
+        return view('training-tickets.show', compact('trainingTicket', 'staffView'));
     }
 
     /**
@@ -158,6 +168,7 @@ class TrainingTicketController extends Controller
             'movements' => 'required|integer',
             'score' => 'required|integer|between:1,5',
             'notes' => 'required|min:20|max:2048',
+            'instructor_notes' => ['nullable', 'string', 'max:5000'],
         ]);
 
         $ticket = TrainingTicket::findOrFail($id);
@@ -173,6 +184,7 @@ class TrainingTicketController extends Controller
             'movements' => $validated['movements'],
             'score' => $validated['score'],
             'notes' => $validated['notes'],
+            'instructor_notes' => $validated['instructor_notes'] ?? null,
             'location' => $validated['location'],
         ]);
 

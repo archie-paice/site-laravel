@@ -99,6 +99,7 @@ erDiagram
         int movements
         int score "1-5"
         mediumText notes
+        mediumText instructor_notes "nullable, staff-only"
         int location "0-2"
         boolean vatusa_synced
         string vatusa_id "nullable"
@@ -134,6 +135,10 @@ erDiagram
   sync job sends as the record duration.
 - `vatusa_synced` (bool) and `vatusa_id` (string, nullable) track sync state.
   `vatusa_id` was added later by `2026_06_11_000001_add_vatusa_id_to_training_tickets_table`.
+- `instructor_notes` (mediumText, nullable) is a staff-only note added by
+  `2026_08_29_000100_add_instructor_notes_to_training_tickets_table`. It is shown
+  on the ticket only to users with the `training` role and is **never** sent to
+  VATUSA — `SyncTrainingTickets` only forwards the student-facing `notes` column.
 - Uses Laravel Scout `Searchable` (student/instructor name + id, position, date)
   and Spatie `LogsActivity`.
 
@@ -166,7 +171,8 @@ erDiagram
 
 1. Validates `student`, `position` (regex above), `location` (0–2),
    `sessionStart`/`sessionEnd` (`sessionEnd` must be after `sessionStart`),
-   `movements`, `score` (1–5), `notes`.
+   `movements`, `score` (1–5), `notes`, and optional `instructor_notes`
+   (staff-only, `max:5000`).
 2. Rejects the ticket if the instructor picks themselves as the student.
 3. Creates the `TrainingTicket` with `instructor_id = Auth::user()->id`.
 4. Emails the student (bcc the instructor) via `TrainingTicketCreated`.
