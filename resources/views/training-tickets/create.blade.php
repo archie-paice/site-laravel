@@ -123,7 +123,6 @@
                 name="instructor_notes"
                 id="instructor_notes"
                 class="textarea w-full min-h-32"
-                maxlength="5000"
             >{{ old('instructor_notes') }}</textarea>
 
             <br>

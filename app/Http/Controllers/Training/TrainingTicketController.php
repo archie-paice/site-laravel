@@ -68,13 +68,13 @@ class TrainingTicketController extends Controller
             'score' => 'required|integer|between:1,5',
             // Notes come from the Quill editor as HTML, so an "empty" editor still
             // submits markup like "<p><br></p>". Reject anything with no real text.
-            'notes' => ['required', 'string', 'max:5000', function ($attribute, $value, $fail) {
+            'notes' => ['required', 'string', function ($attribute, $value, $fail) {
                 if (trim(strip_tags($value)) === '') {
                     $fail('The notes field cannot be empty.');
                 }
             }],
             // Staff-only notes. Never shown to the student, never synced to VATUSA.
-            'instructor_notes' => ['nullable', 'string', 'max:5000'],
+            'instructor_notes' => ['nullable', 'string'],
             'certification_level_id' => 'nullable|integer|exists:certification_levels,id',
         ]);
 
@@ -167,8 +167,8 @@ class TrainingTicketController extends Controller
             'sessionEnd' => 'required|date|after:sessionStart',
             'movements' => 'required|integer',
             'score' => 'required|integer|between:1,5',
-            'notes' => 'required|min:20|max:2048',
-            'instructor_notes' => ['nullable', 'string', 'max:5000'],
+            'notes' => 'required|min:20',
+            'instructor_notes' => ['nullable', 'string'],
         ]);
 
         $ticket = TrainingTicket::findOrFail($id);
