@@ -45,8 +45,8 @@
                         
                         @haspermission('manage users')
                             <td class='border-r-1 border-base-300'>{{ $user->email }}</td>
-                            <td class='border-r-1 border-base-300'>{{ $user->joined_at->format('Y-m-d') }}</td>
-                            <td class='border-r-1 border-base-300'>{{ $user->updated_at->format('Y-m-d') }}</td>
+                            <td class='border-r-1 border-base-300'>{{ $user->joined_at?->format('Y-m-d') ?? '—' }}</td>
+                            <td class='border-r-1 border-base-300'>{{ $user->updated_at?->format('Y-m-d') ?? '—' }}</td>
                             <td>
                                 <ul class='text-accent menu menu-horizontal h-10 items-center gap-x-5 justify-center'>
                                     <li>
