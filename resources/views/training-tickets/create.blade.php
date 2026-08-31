@@ -115,15 +115,11 @@
             <br>
 
             <label for="instructor_notes" class="label">Instructor Notes (Optional)</label>
-            <p class="text-sm opacity-70 mb-1">Visible only to training staff. The student never sees this.</p>
+            <p class="text-sm opacity-70 mb-1">Visible only to training staff. The student never sees this. Markdown shortcuts are supported.</p>
             @error('instructor_notes')
                 <p class="text-error">{{ $message }}</p>
             @enderror
-            <textarea
-                name="instructor_notes"
-                id="instructor_notes"
-                class="textarea w-full min-h-32"
-            >{{ old('instructor_notes') }}</textarea>
+            <x-markdown-editor name="instructor_notes" :content="old('instructor_notes')" />
 
             <br>
 

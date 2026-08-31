@@ -13,6 +13,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Stevebauman\Purify\Facades\Purify;
 
 class TrainingTicketController extends Controller
 {
@@ -94,8 +95,10 @@ class TrainingTicketController extends Controller
             'session_end' => $validated['sessionEnd'],
             'movements' => $validated['movements'],
             'score' => $validated['score'],
-            'notes' => $validated['notes'],
-            'instructor_notes' => $validated['instructor_notes'] ?? null,
+            'notes' => Purify::clean($validated['notes']),
+            'instructor_notes' => filled($validated['instructor_notes'] ?? null)
+                ? Purify::clean($validated['instructor_notes'])
+                : null,
             'location' => $validated['location'],
             'issued_certification_level_id' => $issueCertification ? $validated['certification_level_id'] : null,
         ]);
@@ -183,8 +186,10 @@ class TrainingTicketController extends Controller
             'session_end' => $validated['sessionEnd'],
             'movements' => $validated['movements'],
             'score' => $validated['score'],
-            'notes' => $validated['notes'],
-            'instructor_notes' => $validated['instructor_notes'] ?? null,
+            'notes' => Purify::clean($validated['notes']),
+            'instructor_notes' => filled($validated['instructor_notes'] ?? null)
+                ? Purify::clean($validated['instructor_notes'])
+                : null,
             'location' => $validated['location'],
         ]);
 
