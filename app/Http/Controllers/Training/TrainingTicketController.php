@@ -13,6 +13,7 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Stevebauman\Purify\Facades\Purify;
 
 class TrainingTicketController extends Controller
 {
@@ -68,11 +69,13 @@ class TrainingTicketController extends Controller
             'score' => 'required|integer|between:1,5',
             // Notes come from the Quill editor as HTML, so an "empty" editor still
             // submits markup like "<p><br></p>". Reject anything with no real text.
-            'notes' => ['required', 'string', 'max:5000', function ($attribute, $value, $fail) {
+            'notes' => ['required', 'string', function ($attribute, $value, $fail) {
                 if (trim(strip_tags($value)) === '') {
                     $fail('The notes field cannot be empty.');
                 }
             }],
+            // Staff-only notes. Never shown to the student, never synced to VATUSA.
+            'instructor_notes' => ['nullable', 'string'],
             'certification_level_id' => 'nullable|integer|exists:certification_levels,id',
         ]);
 
@@ -92,7 +95,10 @@ class TrainingTicketController extends Controller
             'session_end' => $validated['sessionEnd'],
             'movements' => $validated['movements'],
             'score' => $validated['score'],
-            'notes' => $validated['notes'],
+            'notes' => Purify::clean($validated['notes']),
+            'instructor_notes' => filled($validated['instructor_notes'] ?? null)
+                ? Purify::clean($validated['instructor_notes'])
+                : null,
             'location' => $validated['location'],
             'issued_certification_level_id' => $issueCertification ? $validated['certification_level_id'] : null,
         ]);
@@ -122,11 +128,18 @@ class TrainingTicketController extends Controller
     {
         $trainingTicket = TrainingTicket::findOrFail($id);
 
-        if (Auth::id() !== $trainingTicket->user_id && ! Auth::user()->hasRole('training')) {
+        $isStudent = Auth::id() === $trainingTicket->user_id;
+
+        if (! $isStudent && ! Auth::user()->hasRole('training')) {
             abort(403);
         }
 
-        return view('training-tickets.show', compact('trainingTicket'));
+        // Training staff get the staff view (admin layout + instructor notes) only
+        // when viewing someone else's ticket. On their own ticket they see the same
+        // student view as everyone else, so instructor notes about them stay hidden.
+        $staffView = ! $isStudent && Auth::user()->hasRole('training');
+
+        return view('training-tickets.show', compact('trainingTicket', 'staffView'));
     }
 
     /**
@@ -157,7 +170,8 @@ class TrainingTicketController extends Controller
             'sessionEnd' => 'required|date|after:sessionStart',
             'movements' => 'required|integer',
             'score' => 'required|integer|between:1,5',
-            'notes' => 'required|min:20|max:2048',
+            'notes' => 'required|min:20',
+            'instructor_notes' => ['nullable', 'string'],
         ]);
 
         $ticket = TrainingTicket::findOrFail($id);
@@ -172,7 +186,10 @@ class TrainingTicketController extends Controller
             'session_end' => $validated['sessionEnd'],
             'movements' => $validated['movements'],
             'score' => $validated['score'],
-            'notes' => $validated['notes'],
+            'notes' => Purify::clean($validated['notes']),
+            'instructor_notes' => filled($validated['instructor_notes'] ?? null)
+                ? Purify::clean($validated['instructor_notes'])
+                : null,
             'location' => $validated['location'],
         ]);
 
