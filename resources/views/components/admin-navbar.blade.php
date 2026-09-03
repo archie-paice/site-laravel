@@ -1,12 +1,3 @@
-@php
-    use \App\Models\VisitorRequest;
-    use \App\Enums\VisitRequestStatus;
-    use \App\Models\Loa;
-    use \App\Enums\LoaStatus;
-    use \App\Models\StaffingRequest;
-    $pendingVisitorRequests = VisitorRequest::where('status', VisitRequestStatus::PENDING)->count();
-@endphp
-
 <div class="navbar bg-info text-white z-10">
     <div class="flex-1 ml-5">
         <a href='{{ route('admin.index') }}' class='text-xl'>Admin Actions</a>
@@ -71,8 +62,8 @@
                     @if(auth()->user()?->hasPermissionTo('staffing-requests:read'))
                         <li>
                             <a href={{ route('admin.staffing-requests.index') }}>Staffing Requests
-                                @if(StaffingRequest::where('closed', false)->count() > 0)
-                                    <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
+                                @if($openStaffingRequests > 0)
+                                    <span class='badge badge-primary'>{{ $openStaffingRequests }}</span>
                                 @endif
                             </a>
                         </li>
@@ -99,8 +90,8 @@
                     </li>
                     <li>
                         <a href={{ route('loa.manage') }}>LOA Requests
-                            @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
-                                <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
+                            @if($pendingLoas > 0)
+                                <span class='badge badge-primary'>{{ $pendingLoas }}</span>
                             @endif
                         </a>
                     </li>
@@ -254,8 +245,8 @@
                             @if(auth()->user()?->can('staffing-requests:read'))
                                 <li>
                                     <a href={{ route('admin.staffing-requests.index') }} class="rounded-none px-3 py-3.5 text-lg">Staffing Requests
-                                        @if(StaffingRequest::where('closed', false)->count() > 0)
-                                            <span class='badge badge-primary'>{{ StaffingRequest::where('closed', false)->count() }}</span>
+                                        @if($openStaffingRequests > 0)
+                                            <span class='badge badge-primary'>{{ $openStaffingRequests }}</span>
                                         @endif
                                     </a>
                                 </li>
@@ -285,8 +276,8 @@
                             </li>
                             <li>
                                 <a href={{ route('loa.manage') }} class="rounded-none px-3 py-3.5 text-lg">LOA Requests
-                                    @if(Loa::where('status', LoaStatus::PENDING)->count() > 0)
-                                        <span class='badge badge-primary'>{{ Loa::where('status', LoaStatus::PENDING)->count() }}</span>
+                                    @if($pendingLoas > 0)
+                                        <span class='badge badge-primary'>{{ $pendingLoas }}</span>
                                     @endif
                                 </a>
                             </li>
