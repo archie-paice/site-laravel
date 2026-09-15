@@ -175,7 +175,7 @@
                                     {{ $n->published_at }}
                                 </p>
 
-                                <div class="py-4">
+                                <div class="py-4 rich-text">
                                     {!! Purify::clean($n->content) !!}
                                 </div>
 

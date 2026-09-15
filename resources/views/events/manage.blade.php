@@ -122,7 +122,7 @@
                         <p>No fields</p>
                     @endif
                     <br />
-                    <div>{!! \Stevebauman\Purify\Facades\Purify::clean($event->description) !!}</div>
+                    <div class="rich-text">{!! \Stevebauman\Purify\Facades\Purify::clean($event->description) !!}</div>
                 </div>
             </div>
         </div>

@@ -56,6 +56,38 @@ test('formatted instructor notes are sanitized and rendered for training staff',
         ->assertDontSee('alert("xss")');
 });
 
+test('indented Quill content keeps its indentation after submission', function () {
+    Http::fake();
+    Mail::fake();
+
+    $instructor = User::factory()->create();
+    $instructor->assignRole(['staff', 'training']);
+    $student = User::factory()->create();
+
+    // Quill encodes indent levels as ql-indent-N classes on <p>/<li>, not inline
+    // styles. If HTMLPurifier's class allow-list ever regresses, this collapses
+    // back to a flat, unindented list/paragraph on submit.
+    $notes = '<ul><li>Top level</li><li class="ql-indent-1">Nested one</li></ul>'
+        .'<p class="ql-indent-2">Indented paragraph</p>';
+
+    $this->actingAs($instructor)
+        ->post(route('training-tickets.store'), [
+            'student' => $student->id,
+            'position' => 'MCO_APP',
+            'location' => 1,
+            'sessionStart' => now()->format('Y-m-d H:i:s'),
+            'sessionEnd' => now()->addHour()->format('Y-m-d H:i:s'),
+            'movements' => 10,
+            'score' => 5,
+            'notes' => $notes,
+        ])
+        ->assertRedirect();
+
+    $ticket = TrainingTicket::where('user_id', $student->id)->firstOrFail();
+
+    expect($ticket->notes)->toBe($notes);
+});
+
 test('instructor notes are hidden from the student but shown to training staff', function () {
     $staff = User::factory()->create();
     $staff->assignRole('training');

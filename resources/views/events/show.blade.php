@@ -52,7 +52,7 @@
 
                 @if($event->description)
                     <div class="divider my-1"></div>
-                    <div class="text-sm leading-relaxed">{!! \Stevebauman\Purify\Facades\Purify::clean($event->description) !!}</div>
+                    <div class="text-sm leading-relaxed rich-text">{!! \Stevebauman\Purify\Facades\Purify::clean($event->description) !!}</div>
                 @endif
             </div>
         </div>

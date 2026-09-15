@@ -176,6 +176,38 @@
         // Enable markdown shortcuts
         new QuillMarkdown(quill);
 
+        // Pasted text is frequently numbered in its source (a PDF, a Word doc, a
+        // regulation reference like "1. At facilities without...") even when it
+        // isn't meant to be an ordered list here. quilljs-markdown's own "1. "
+        // shortcut picks that up on paste and converts it to a numbered list.
+        // Force every list back to bullets after any paste, whether it came in
+        // as real <ol> markup or was reformatted by the markdown shortcut engine.
+        quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
+            delta.ops.forEach((op) => {
+                if (op.attributes && op.attributes.list === 'ordered') {
+                    op.attributes.list = 'bullet';
+                }
+            });
+            return delta;
+        });
+
+        quill.on('text-change', (delta, oldDelta, source) => {
+            if (source !== 'user') {
+                return;
+            }
+
+            let offset = 0;
+            quill.getContents().ops.forEach((op) => {
+                const text = typeof op.insert === 'string' ? op.insert : '';
+
+                if (text.endsWith('\n') && op.attributes && op.attributes.list === 'ordered') {
+                    quill.formatLine(offset + text.length - 1, 0, 'list', 'bullet');
+                }
+
+                offset += text.length || 1;
+            });
+        });
+
         // Keep a hidden textarea in sync so Laravel receives HTML
         const notesField = document.querySelector('textarea[name="notes"]');
         if (notesField) {
