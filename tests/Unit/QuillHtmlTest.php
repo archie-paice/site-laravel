@@ -64,3 +64,47 @@ test('non-ascii characters survive', function () {
     expect(QuillHtml::normalizeLists($html))
         ->toBe('<ul><li>Café — naïve “quotes”</li></ul>');
 });
+
+test('indent levels that skip numbers are collapsed to consecutive steps', function () {
+    // Quill counts indent keypresses, not depth — pasted content often lands on
+    // only the even levels, which doubles every visual step.
+    $html = '<ol>'
+        .'<li data-list="bullet">Top</li>'
+        .'<li data-list="bullet" class="ql-indent-2">Second level</li>'
+        .'<li data-list="bullet" class="ql-indent-4">Third level</li>'
+        .'</ol>';
+
+    expect(QuillHtml::normalizeLists($html))->toBe(
+        '<ul>'
+        .'<li>Top</li>'
+        .'<li class="ql-indent-1">Second level</li>'
+        .'<li class="ql-indent-2">Third level</li>'
+        .'</ul>'
+    );
+});
+
+test('already-consecutive indent levels are left alone', function () {
+    $html = '<ol>'
+        .'<li data-list="bullet">Top</li>'
+        .'<li data-list="bullet" class="ql-indent-1">Second</li>'
+        .'<li data-list="bullet" class="ql-indent-2">Third</li>'
+        .'</ol>';
+
+    expect(QuillHtml::normalizeLists($html))->toBe(
+        '<ul>'
+        .'<li>Top</li>'
+        .'<li class="ql-indent-1">Second</li>'
+        .'<li class="ql-indent-2">Third</li>'
+        .'</ul>'
+    );
+});
+
+test('indent levels on paragraphs are collapsed too, sharing one scale with lists', function () {
+    $html = '<p class="ql-indent-2">Indented paragraph</p>'
+        .'<ol><li data-list="bullet" class="ql-indent-4">Deeper item</li></ol>';
+
+    expect(QuillHtml::normalizeLists($html))->toBe(
+        '<p class="ql-indent-1">Indented paragraph</p>'
+        .'<ul><li class="ql-indent-2">Deeper item</li></ul>'
+    );
+});

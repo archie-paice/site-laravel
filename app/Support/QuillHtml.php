@@ -4,6 +4,8 @@ namespace App\Support;
 
 use DOMDocument;
 use DOMElement;
+use DOMNode;
+use DOMXPath;
 
 class QuillHtml
 {
@@ -50,12 +52,79 @@ class QuillHtml
             self::splitByListType($dom, $list);
         }
 
+        self::compactIndentLevels($dom);
+
         $result = '';
         foreach (iterator_to_array($root->childNodes) as $child) {
             $result .= $dom->saveHTML($child);
         }
 
         return $result;
+    }
+
+    /**
+     * Renumber ql-indent-N levels so they run 1, 2, 3 with no holes.
+     *
+     * Quill's level numbers count indent keypresses, not nesting depth, and
+     * pasted content routinely lands on only the even levels (0, 2, 4...).
+     * Rendered literally that doubles every visual step, which reads as a huge
+     * gap. Collapsing the levels that are actually used down to consecutive
+     * numbers makes one level of nesting render as one step, whatever Quill
+     * happened to number it.
+     */
+    private static function compactIndentLevels(DOMDocument $dom): void
+    {
+        $xpath = new DOMXPath($dom);
+        $indented = $xpath->query('//*[contains(@class, "ql-indent-")]');
+
+        $levels = [];
+        foreach ($indented as $node) {
+            if ($level = self::indentLevel($node)) {
+                $levels[$level] = true;
+            }
+        }
+
+        if ($levels === []) {
+            return;
+        }
+
+        $levels = array_keys($levels);
+        sort($levels);
+        $map = array_combine($levels, range(1, count($levels)));
+
+        // Already consecutive — leave the markup untouched.
+        if ($map === array_combine($levels, $levels)) {
+            return;
+        }
+
+        foreach ($indented as $node) {
+            $level = self::indentLevel($node);
+
+            if (! $level) {
+                continue;
+            }
+
+            $classes = preg_split('/\s+/', trim($node->getAttribute('class')));
+            $classes = array_map(
+                fn (string $class) => $class === 'ql-indent-'.$level
+                    ? 'ql-indent-'.$map[$level]
+                    : $class,
+                $classes
+            );
+
+            $node->setAttribute('class', implode(' ', $classes));
+        }
+    }
+
+    private static function indentLevel(DOMNode $node): ?int
+    {
+        if (! $node instanceof DOMElement) {
+            return null;
+        }
+
+        return preg_match('/\bql-indent-(\d+)\b/', $node->getAttribute('class'), $matches)
+            ? (int) $matches[1]
+            : null;
     }
 
     /**
