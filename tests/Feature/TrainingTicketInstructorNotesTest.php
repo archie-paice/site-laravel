@@ -88,6 +88,36 @@ test('indented Quill content keeps its indentation after submission', function (
     expect($ticket->notes)->toBe($notes);
 });
 
+test('a bulleted list survives submission as a bulleted list', function () {
+    Http::fake();
+    Mail::fake();
+
+    $instructor = User::factory()->create();
+    $instructor->assignRole(['staff', 'training']);
+    $student = User::factory()->create();
+
+    // Quill emits every list as <ol> and carries the real type in data-list, so
+    // without normalisation a bulleted list is stored as a numbered one.
+    $this->actingAs($instructor)
+        ->post(route('training-tickets.store'), [
+            'student' => $student->id,
+            'position' => 'MCO_APP',
+            'location' => 1,
+            'sessionStart' => now()->format('Y-m-d H:i:s'),
+            'sessionEnd' => now()->addHour()->format('Y-m-d H:i:s'),
+            'movements' => 10,
+            'score' => 5,
+            'notes' => '<ol><li data-list="bullet">Sequencing</li><li data-list="bullet">Phraseology</li></ol>',
+            'instructor_notes' => '<ol><li data-list="bullet">Private point</li></ol>',
+        ])
+        ->assertRedirect();
+
+    $ticket = TrainingTicket::where('user_id', $student->id)->firstOrFail();
+
+    expect($ticket->notes)->toBe('<ul><li>Sequencing</li><li>Phraseology</li></ul>');
+    expect($ticket->instructor_notes)->toBe('<ul><li>Private point</li></ul>');
+});
+
 test('instructor notes are hidden from the student but shown to training staff', function () {
     $staff = User::factory()->create();
     $staff->assignRole('training');

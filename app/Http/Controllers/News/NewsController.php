@@ -4,6 +4,7 @@ namespace App\Http\Controllers\News;
 
 use App\Http\Controllers\Controller;
 use App\Models\News;
+use App\Support\QuillHtml;
 use Illuminate\Http\Request;
 use Stevebauman\Purify\Facades\Purify;
 
@@ -32,7 +33,7 @@ class NewsController extends Controller
 
         $news = new News([
             'title' => $validated['title'],
-            'content' => Purify::clean($validated['content']),
+            'content' => Purify::clean(QuillHtml::normalizeLists($validated['content'])),
             'published_at' => now(),
         ]);
 
@@ -55,7 +56,7 @@ class NewsController extends Controller
         ]);
 
         $news->title = $validated['title'];
-        $news->content = Purify::clean($validated['content']);
+        $news->content = Purify::clean(QuillHtml::normalizeLists($validated['content']));
         $news->save();
 
         return redirect()->route('admin.news.index');

@@ -9,6 +9,7 @@ use App\Models\EventPosition;
 use App\Models\EventPositionPreset;
 use App\Models\FeaturedField;
 use App\Models\StaffingRequest;
+use App\Support\QuillHtml;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -155,7 +156,7 @@ class EventManagementController extends Controller
 
         $event = Event::create([
             'title' => $validated['title'],
-            'description' => Purify::clean($validated['description']),
+            'description' => Purify::clean(QuillHtml::normalizeLists($validated['description'])),
             'start' => $validated['start'],
             'end' => $validated['end'],
             'type' => $validated['type'],
@@ -228,7 +229,7 @@ class EventManagementController extends Controller
         $oldImagePath = $event->bannerStoragePath();
 
         $event->title = $validated['title'];
-        $event->description = Purify::clean($validated['description']);
+        $event->description = Purify::clean(QuillHtml::normalizeLists($validated['description']));
         $event->start = $validated['start'];
         $event->end = $validated['end'];
         $event->type = $validated['type'];
