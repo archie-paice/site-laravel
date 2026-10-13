@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -61,12 +62,12 @@ class UserController extends Controller
     {
         $validated = $request->validate([
             'operatingInitials' => 'string|nullable|size:2', // can only be edited if admin
-            'image' => 'file|image|mimes:jpeg,png,jpg,gif,svg|max:2048|nullable',
+            'image' => 'file|image|mimes:jpeg,png,jpg,gif|max:2048|nullable',
             'biography' => 'string|nullable|max:1000',
         ], [
             'operatingInitials.max' => 'Operating initials must be 2 characters long',
             'image.image' => 'The profile picture must be an image file.',
-            'image.mimes' => 'The profile picture must be a JPEG, PNG, GIF, or SVG file.',
+            'image.mimes' => 'The profile picture must be a JPEG, PNG, or GIF file.',
             'image.max' => 'The profile picture must be smaller than 2MB.',
         ]);
 
@@ -77,10 +78,16 @@ class UserController extends Controller
         $user = User::findOrFail($id);
 
         if ($request->hasFile('image')) {
-            $imageName = 'profile_'.$user->id.'.'.$request->file('image')->getClientOriginalExtension();
-            $path = $request->file('image')->storeAs('profile', $imageName, 'public');
+            $oldImagePath = $user->profileImageStoragePath();
+            $image = $validated['image'];
+            $imageName = 'profile_'.$user->id.'.'.$image->extension();
+            $path = $image->storeAs('profile', $imageName, 'public');
 
-            $user->profile_image_route = 'storage/'.$path;
+            if ($oldImagePath && $oldImagePath !== $path) {
+                Storage::disk('public')->delete($oldImagePath);
+            }
+
+            $user->profile_image_route = $path;
         }
 
         $user->biography = $validated['biography'] ?? null;

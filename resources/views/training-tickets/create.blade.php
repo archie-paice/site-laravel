@@ -105,11 +105,21 @@
 
             <br>
 
-            <label for="notes" class="label">Notes</label>
+            <label for="notes" class="label">Session Notes</label>
+            <p class="text-sm opacity-70 mb-1">Shared with the student &mdash; they see this on their training ticket.</p>
             <textarea name="notes" hidden></textarea>
             <div id="editor" class='bg-base-100 text-base-content min-h-50'>
                 {!! old('notes') !!}
             </div>
+
+            <br>
+
+            <label for="instructor_notes" class="label">Instructor Notes (Optional)</label>
+            <p class="text-sm opacity-70 mb-1">Visible only to training staff. The student never sees this. Markdown shortcuts are supported.</p>
+            @error('instructor_notes')
+                <p class="text-error">{{ $message }}</p>
+            @enderror
+            <x-markdown-editor name="instructor_notes" :content="old('instructor_notes')" />
 
             <br>
 

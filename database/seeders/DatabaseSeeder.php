@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         PermissionSeeder $permissionSeeder,
         UserSeeder $userSeeder,
         StatisticsPrefixesSeeder $statisticsPrefixes,
-        StatsSyncSeeder $statsSyncSeeder,
+        VatsimStatisticsSyncSeeder $vatsimStatisticsSyncSeeder,
     ): void {
         $permissionSeeder->run();
         $userSeeder->run();
@@ -23,7 +23,7 @@ class DatabaseSeeder extends Seeder
 
         if (App::environment() === 'development') {
             SyncRoster::dispatch();
-            $statsSyncSeeder->run();
+            $vatsimStatisticsSyncSeeder->run();
         }
     }
 }

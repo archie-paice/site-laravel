@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Laravel\Scout\Searchable;
 use Spatie\Activitylog\LogOptions;
@@ -23,6 +24,10 @@ class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, HasRoles, LogsActivity, Notifiable, Searchable;
+
+    private const PROFILE_IMAGE_DIRECTORY = 'profile/';
+
+    private const DEFAULT_PROFILE_IMAGE = 'images/default_profile.jpg';
 
     /**
      * The primary key is the VATSIM CID, assigned explicitly rather than auto-incremented.
@@ -140,6 +145,41 @@ class User extends Authenticatable
         return Attribute::make(
             get: fn (mixed $value, array $attributes) => ucfirst($attributes['last_name'].', '.ucfirst($attributes['first_name']))
         );
+    }
+
+    /**
+     * Return the configured public-disk URL for an uploaded profile image.
+     *
+     * Older records stored a URL-like `storage/profile/...` value; accept that
+     * representation while keeping the database value as a disk-relative path
+     * for all new uploads.
+     */
+    protected function profileImageUrl(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $path = $this->profileImageStoragePath();
+
+            return $path
+                ? Storage::disk('public')->url($path)
+                : asset(self::DEFAULT_PROFILE_IMAGE);
+        });
+    }
+
+    /**
+     * Get a validated public-disk path for this user's uploaded profile image.
+     */
+    public function profileImageStoragePath(): ?string
+    {
+        if (blank($this->profile_image_route)) {
+            return null;
+        }
+
+        $path = ltrim($this->profile_image_route, '/');
+        $path = str_starts_with($path, 'storage/')
+            ? substr($path, strlen('storage/'))
+            : $path;
+
+        return str_starts_with($path, self::PROFILE_IMAGE_DIRECTORY) ? $path : null;
     }
 
     protected function firstName(): Attribute

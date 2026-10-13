@@ -88,6 +88,31 @@ test('a training ticket with empty quill notes is rejected', function () {
     $this->assertDatabaseMissing('training_tickets', ['user_id' => $student->id]);
 });
 
+test('a training ticket accepts session and instructor notes longer than the previous limit', function () {
+    Http::fake();
+    Mail::fake();
+
+    $instructor = User::factory()->create();
+    $instructor->assignRole(['staff', 'training']);
+    $student = User::factory()->create();
+    $sessionNotes = str_repeat('Session note ', 500).'Session note';
+    $instructorNotes = str_repeat('Instructor note ', 500).'Instructor note';
+
+    $this->actingAs($instructor)
+        ->post(route('training-tickets.store'), [
+            ...ticketPayload($student),
+            'notes' => $sessionNotes,
+            'instructor_notes' => $instructorNotes,
+        ])
+        ->assertRedirect();
+
+    $this->assertDatabaseHas('training_tickets', [
+        'user_id' => $student->id,
+        'notes' => $sessionNotes,
+        'instructor_notes' => $instructorNotes,
+    ]);
+});
+
 test('the vatusa sync appends the certification issued line to the notes', function () {
     $facility = CertificationFacility::factory()->create(['identifier' => 'ZJX']);
     $level = CertificationLevel::factory()->create(['facility_id' => $facility->id, 'name' => 'Ground', 'abbreviation' => 'GND']);

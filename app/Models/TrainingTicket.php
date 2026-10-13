@@ -23,6 +23,7 @@ class TrainingTicket extends Model
         'movements',
         'score',
         'notes',
+        'instructor_notes',
         'location',
         'vatusa_id',
         'vatusa_synced',
@@ -89,7 +90,7 @@ class TrainingTicket extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['user_id', 'instructor_id', 'duration', 'movements', 'score', 'notes', 'location']);
+            ->logOnly(['user_id', 'instructor_id', 'duration', 'movements', 'score', 'notes', 'instructor_notes', 'location']);
     }
 
     public function toSearchableArray(): array

@@ -19,9 +19,9 @@
         </div>
 
         <div class="card card-dash bg-base-100 w-full max-w-xl shadow-sm">
-            @if ($event->event_image_route)
+            @if ($event->banner_url)
               <figure>
-                <img src="{{ asset($event->event_image_route) }}" alt="{{ $event->title }}" class="w-full object-cover max-h-56 sm:max-h-72" />
+                <img src="{{ $event->banner_url }}" alt="{{ $event->title }}" class="w-full object-cover max-h-56 sm:max-h-72" />
               </figure>
             @endif
             <div class="card-body bg-neutral p-4 sm:p-6">

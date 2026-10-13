@@ -11,6 +11,7 @@ use Http;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class SyncRoster implements ShouldBeUnique, ShouldQueue
@@ -163,6 +164,7 @@ class SyncRoster implements ShouldBeUnique, ShouldQueue
             }
 
             $this->syncRosteredRole();
+            Cache::forget('vatsim-statistics:rostered-cids');
 
             Log::info('Roster sync completed successfully.');
         } catch (\Exception $e) {
