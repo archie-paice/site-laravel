@@ -111,7 +111,9 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $this->authorizeSensitivePage($user, 'training-assignments:read');
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-assignments:read')) {
+            abort(403);
+        }
 
         if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training assignments are only available for rostered users.');
@@ -148,7 +150,9 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $this->authorizeSensitivePage($user, 'training-tickets:read');
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('training-tickets:read')) {
+            abort(403);
+        }
 
         if (! $user->rostered) {
             return redirect()->back()->with('error', 'Training tickets are only available for rostered users.');
@@ -203,7 +207,9 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
 
-        $this->authorizeSensitivePage($user, 'solo-certs:read');
+        if (Auth::id() !== $user->id && ! Auth::user()->hasPermissionTo('solo-certs:read')) {
+            abort(403);
+        }
 
         if (! $user->rostered) {
             return redirect()->back()->with('error', 'Solo certifications are only available for rostered users.');
@@ -215,12 +221,5 @@ class UserController extends Controller
             'user' => $user,
             'soloCerts' => $soloCerts,
         ]);
-    }
-
-    private function authorizeSensitivePage(User $user, string $permission): void
-    {
-        if (Auth::id() !== $user->id && ! Auth::user()->can($permission)) {
-            abort(403);
-        }
     }
 }

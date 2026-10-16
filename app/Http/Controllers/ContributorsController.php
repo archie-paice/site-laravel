@@ -65,21 +65,14 @@ class ContributorsController extends Controller
 
     public function index()
     {
-        // Cache only successful responses. A transient GitHub failure returns an
-        // empty collection for this request but is not cached, so the next
-        // request retries rather than serving an empty list for a full hour.
-        $apiContributors = Cache::get('github_contributors');
-        if ($apiContributors === null) {
+        $apiContributors = Cache::remember('github_contributors', 3600, function () {
             $response = Http::withHeaders(['Accept' => 'application/vnd.github+json'])
                 ->get('https://api.github.com/repos/zjx-artcc/site-laravel/contributors', ['per_page' => 100]);
 
-            if ($response->ok()) {
-                $apiContributors = collect($response->json())->reject(fn ($c) => ($c['type'] ?? '') === 'Bot');
-                Cache::put('github_contributors', $apiContributors, 3600);
-            } else {
-                $apiContributors = collect();
-            }
-        }
+            return $response->ok()
+                ? collect($response->json())->reject(fn ($c) => ($c['type'] ?? '') === 'Bot')
+                : collect();
+        });
 
         $manualLogins = ManualContributor::pluck('github_username');
         $mainLogins = ManualContributor::where('section', 'main')->pluck('github_username');

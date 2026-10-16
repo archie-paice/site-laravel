@@ -1,9 +1,12 @@
 <?php
 
+use App\Enums\LoaStatus;
 use App\Jobs\RemoveUserFromRoster;
 use App\Mail\ControllerRemovedFromRoster;
 use App\Mail\RosterRemovalFailed;
 use App\Models\ControllerMonthlyStat;
+use App\Models\Loa;
+use App\Models\TrainingAssignment;
 use App\Models\TrainingTicket;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
@@ -37,7 +40,7 @@ test('quarterly rows include training hours split into student and instructor ti
     $controller = User::factory()->create(['rostered' => true, 'rating' => 5, 'facility' => config('app.vatusa_facility')]);
     $instructor = User::factory()->create(['rostered' => true, 'rating' => 8, 'facility' => config('app.vatusa_facility')]);
 
-    // Puts both users into the "logged history" table for Q3 2026.
+    // Gives both users logged stats for Q3 2026 (zero hours, so both are flagged).
     foreach ([$controller, $instructor] as $user) {
         ControllerMonthlyStat::create([
             'user_id' => $user->id, 'year' => 2026, 'month' => 7,
@@ -55,10 +58,10 @@ test('quarterly rows include training hours split into student and instructor ti
     $admin->assignRole('admin', 'staff');
 
     $response = $this->actingAs($admin)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3]))
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 100]))
         ->assertOk();
 
-    $rows = $response->viewData('rows');
+    $rows = $response->viewData('flagged');
 
     $studentRow = $rows->getCollection()->firstWhere('user.id', $controller->id);
     $instructorRow = $rows->getCollection()->firstWhere('user.id', $instructor->id);
@@ -69,7 +72,7 @@ test('quarterly rows include training hours split into student and instructor ti
         ->and($instructorRow->training_student)->toBe(0.0);
 });
 
-test('the flagged table always excludes unrostered controllers regardless of the rostered_only toggle', function () {
+test('the flagged table always excludes unrostered controllers', function () {
     $rosteredLowHours = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
     $unrosteredLowHours = User::factory()->create(['rostered' => false, 'facility' => config('app.vatusa_facility')]);
 
@@ -85,7 +88,7 @@ test('the flagged table always excludes unrostered controllers regardless of the
     $admin->assignRole('admin', 'staff');
 
     $response = $this->actingAs($admin)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
         ->assertOk();
 
     $flaggedIds = $response->viewData('flagged')->getCollection()->pluck('user.id');
@@ -94,36 +97,7 @@ test('the flagged table always excludes unrostered controllers regardless of the
         ->and($flaggedIds)->not->toContain($unrosteredLowHours->id);
 });
 
-test('the rostered_only toggle filters the All Controllers table', function () {
-    $rostered = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
-    $unrostered = User::factory()->create(['rostered' => false, 'facility' => config('app.vatusa_facility')]);
-
-    foreach ([$rostered, $unrostered] as $user) {
-        ControllerMonthlyStat::create([
-            'user_id' => $user->id, 'year' => 2026, 'month' => 7,
-            'delivery_hours' => 5, 'ground_hours' => 0, 'tower_hours' => 0,
-            'approach_hours' => 0, 'center_hours' => 0,
-        ]);
-    }
-
-    $admin = User::factory()->create();
-    $admin->assignRole('admin', 'staff');
-
-    $withUnrostered = $this->actingAs($admin)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3]))
-        ->viewData('rows')->getCollection()->pluck('user.id');
-
-    expect($withUnrostered)->toContain($unrostered->id);
-
-    $rosteredOnly = $this->actingAs($admin)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'rostered_only' => 1]))
-        ->viewData('rows')->getCollection()->pluck('user.id');
-
-    expect($rosteredOnly)->toContain($rostered->id)
-        ->and($rosteredOnly)->not->toContain($unrostered->id);
-});
-
-test('zero training hours render as 0.0h rather than a dash, in both tables', function () {
+test('zero training hours render as 0.0h rather than a dash', function () {
     $noTraining = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
 
     ControllerMonthlyStat::create([
@@ -136,7 +110,7 @@ test('zero training hours render as 0.0h rather than a dash, in both tables', fu
     $admin->assignRole('admin', 'staff');
 
     $html = $this->actingAs($admin)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
         ->assertOk()
         ->getContent();
 
@@ -156,7 +130,7 @@ test('a user with the removal permission sees the multi-select and remove action
     $admin->assignRole('admin', 'staff');
 
     $this->actingAs($admin)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
         ->assertOk()
         ->assertSee('name="user_ids[]"', false)
         ->assertSee('Remove Selected');
@@ -177,7 +151,7 @@ test('a user without the removal permission does not see the multi-select or rem
     $staff->givePermissionTo('manage visiting controllers');
 
     $this->actingAs($staff)
-        ->get(route('statistics.quarterly', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
         ->assertOk()
         ->assertDontSee('name="user_ids[]"', false)
         ->assertDontSee('Remove Selected');
@@ -192,7 +166,7 @@ test('a senior staff member can queue removal of flagged controllers', function 
     $admin->assignRole('admin', 'staff');
 
     $this->actingAs($admin)
-        ->post(route('statistics.quarterly.remove'), [
+        ->post(route('roster-purge.remove'), [
             'user_ids' => [$inactive->id],
             'reason' => 'Inactivity — below quarterly minimum',
         ])
@@ -212,7 +186,7 @@ test('removal requires a reason', function () {
     $admin->assignRole('admin', 'staff');
 
     $this->actingAs($admin)
-        ->post(route('statistics.quarterly.remove'), ['user_ids' => [$inactive->id]])
+        ->post(route('roster-purge.remove'), ['user_ids' => [$inactive->id]])
         ->assertSessionHasErrors('reason');
 
     Queue::assertNothingPushed();
@@ -227,7 +201,7 @@ test('a user without the removal permission is forbidden', function () {
     $staff->assignRole('staff'); // has "view dashboard" but not "remove inactive controllers"
 
     $this->actingAs($staff)
-        ->post(route('statistics.quarterly.remove'), [
+        ->post(route('roster-purge.remove'), [
             'user_ids' => [$inactive->id],
             'reason' => 'Inactivity',
         ])
@@ -377,4 +351,205 @@ test('the removal job sends the apikey as a query parameter and the rest as a fo
             && $request['reason'] === 'Inactivity'
             && $request['by'] === $admin->id;
     });
+});
+
+test('a flagged controller with an approved LOA is highlighted and cannot be selected for removal', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $onLoa = User::factory()->create(['rostered' => true, 'rating' => 5, 'facility' => config('app.vatusa_facility')]);
+
+    ControllerMonthlyStat::create([
+        'user_id' => $onLoa->id, 'year' => 2026, 'month' => 7,
+        'delivery_hours' => 0, 'ground_hours' => 0, 'tower_hours' => 0,
+        'approach_hours' => 0, 'center_hours' => 0,
+    ]);
+    Loa::create([
+        'user_id' => $onLoa->id,
+        'start_date' => '2026-07-01',
+        'end_date' => '2026-12-31',
+        'reason' => 'Travel',
+        'status' => LoaStatus::APPROVED,
+    ]);
+
+    $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3]))
+        ->assertOk()
+        ->assertSee('On LOA')
+        ->assertDontSee('name="user_ids[]" value="'.$onLoa->id.'"', false);
+});
+
+test('removal skips controllers with an approved LOA', function () {
+    Queue::fake();
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $onLoa = User::factory()->create(['rostered' => true]);
+    $other = User::factory()->create(['rostered' => true]);
+    Loa::create([
+        'user_id' => $onLoa->id,
+        'start_date' => '2026-07-01',
+        'end_date' => '2026-12-31',
+        'reason' => 'Travel',
+        'status' => LoaStatus::APPROVED,
+    ]);
+
+    $this->actingAs($admin)
+        ->post(route('roster-purge.remove'), ['user_ids' => [$onLoa->id, $other->id], 'reason' => 'Inactive'])
+        ->assertRedirect();
+
+    Queue::assertPushed(RemoveUserFromRoster::class, 1);
+    Queue::assertPushed(RemoveUserFromRoster::class, fn ($job) => $job->userId === $other->id);
+});
+
+test('the show_loa toggle hides controllers with an approved LOA from the flagged table', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $onLoa = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $regular = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    foreach ([$onLoa, $regular] as $user) {
+        ControllerMonthlyStat::create([
+            'user_id' => $user->id, 'year' => 2026, 'month' => 7,
+            'delivery_hours' => 1, 'ground_hours' => 0, 'tower_hours' => 0,
+            'approach_hours' => 0, 'center_hours' => 0,
+        ]);
+    }
+    Loa::create([
+        'user_id' => $onLoa->id, 'start_date' => '2026-07-01', 'end_date' => '2026-12-31',
+        'reason' => 'Travel', 'status' => LoaStatus::APPROVED,
+    ]);
+
+    $query = ['year' => 2026, 'quarter' => 3];
+
+    $shown = $this->actingAs($admin)->get(route('roster-purge.index', $query))
+        ->viewData('flagged')->getCollection()->pluck('user.id');
+    $hidden = $this->actingAs($admin)->get(route('roster-purge.index', $query + ['show_loa' => 0]))
+        ->viewData('flagged')->getCollection()->pluck('user.id');
+
+    expect($shown)->toContain($onLoa->id)->toContain($regular->id)
+        ->and($hidden)->not->toContain($onLoa->id)
+        ->and($hidden)->toContain($regular->id);
+});
+
+test('the max_training filter only flags controllers with fewer training hours than the limit', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $trained = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $untrained = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $instructor = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    foreach ([$trained, $untrained] as $user) {
+        ControllerMonthlyStat::create([
+            'user_id' => $user->id, 'year' => 2026, 'month' => 7,
+            'delivery_hours' => 1, 'ground_hours' => 0, 'tower_hours' => 0,
+            'approach_hours' => 0, 'center_hours' => 0,
+        ]);
+    }
+    makeTicket($trained->id, $instructor->id, '2026-07-05 10:00:00', '2026-07-05 13:00:00'); // 3h
+
+    $query = ['year' => 2026, 'quarter' => 3];
+
+    $all = $this->actingAs($admin)->get(route('roster-purge.index', $query))
+        ->viewData('flagged')->getCollection()->pluck('user.id');
+    $limited = $this->actingAs($admin)->get(route('roster-purge.index', $query + ['max_training' => 2]))
+        ->viewData('flagged')->getCollection()->pluck('user.id');
+
+    expect($all)->toContain($trained->id)->toContain($untrained->id)
+        ->and($limited)->toContain($untrained->id)
+        ->and($limited)->not->toContain($trained->id);
+});
+
+test('rostered controllers with no logged stats at all are flagged with 0 hours', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $neverLogged = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    $flagged = $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3]))
+        ->assertOk()
+        ->viewData('flagged')->getCollection();
+
+    expect($flagged->pluck('user.id'))->toContain($neverLogged->id)
+        ->and($flagged->firstWhere('user.id', $neverLogged->id)->total)->toBe(0);
+});
+
+test('a staff member cannot remove themselves from the roster', function () {
+    Queue::fake();
+    $admin = User::factory()->create(['rostered' => true]);
+    $admin->assignRole('admin', 'staff');
+    $other = User::factory()->create(['rostered' => true]);
+
+    $this->actingAs($admin)
+        ->post(route('roster-purge.remove'), ['user_ids' => [$admin->id, $other->id], 'reason' => 'Inactive'])
+        ->assertRedirect()
+        ->assertSessionHas('error');
+
+    Queue::assertNothingPushed();
+});
+
+test('hours spent instructing count towards the flag threshold', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $instructor = User::factory()->create(['rostered' => true, 'rating' => 8, 'facility' => config('app.vatusa_facility')]);
+    $student = User::factory()->create(['rostered' => true, 'rating' => 3, 'facility' => config('app.vatusa_facility')]);
+
+    // 4h instructing, 0h logged: above a 3h threshold once instructing counts.
+    makeTicket($student->id, $instructor->id, '2026-07-05 10:00:00', '2026-07-05 14:00:00');
+
+    $flagged = $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 3]))
+        ->viewData('flagged')->getCollection();
+
+    $instructorRow = $flagged->firstWhere('user.id', $instructor->id);
+
+    expect($flagged->pluck('user.id'))->not->toContain($instructor->id)
+        ->and($flagged->pluck('user.id'))->toContain($student->id);
+
+    $withHigherThreshold = $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'threshold' => 5]))
+        ->viewData('flagged')->getCollection()->firstWhere('user.id', $instructor->id);
+
+    expect($instructorRow)->toBeNull()
+        ->and($withHigherThreshold->counted)->toBe(4.0)
+        ->and($withHigherThreshold->total)->toBe(0);
+});
+
+test('observers with an active training assignment are never flagged', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $inTraining = User::factory()->create(['rostered' => true, 'rating' => 1, 'facility' => config('app.vatusa_facility')]);
+    $notInTraining = User::factory()->create(['rostered' => true, 'rating' => 1, 'facility' => config('app.vatusa_facility')]);
+
+    TrainingAssignment::withoutSyncingToSearch(fn () => TrainingAssignment::create([
+        'user_id' => $inTraining->id,
+        'active' => true,
+        'training_type' => 1,
+        'status' => 1,
+    ]));
+
+    $flagged = $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3]))
+        ->viewData('flagged')->getCollection()->pluck('user.id');
+
+    expect($flagged)->not->toContain($inTraining->id)
+        ->and($flagged)->toContain($notInTraining->id);
+});
+
+test('searching for a controller shows them even when they are not below the threshold', function () {
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+    $active = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    ControllerMonthlyStat::create([
+        'user_id' => $active->id, 'year' => 2026, 'month' => 7,
+        'delivery_hours' => 20, 'ground_hours' => 0, 'tower_hours' => 0,
+        'approach_hours' => 0, 'center_hours' => 0,
+    ]);
+
+    $flagged = $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3, 'cid' => $active->id]))
+        ->assertOk()
+        ->assertSee('Controller Lookup')
+        ->viewData('flagged')->getCollection();
+
+    expect($flagged->pluck('user.id')->all())->toBe([$active->id]);
 });

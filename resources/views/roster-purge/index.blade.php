@@ -71,12 +71,11 @@
 
     <div class="space-y-6">
         <div>
-            <h2 class="text-2xl sm:text-3xl font-bold">Roster Purge Assistant</h2>
-            <p class="text-base-content/60 mt-1">{{ $periodLabel }} &mdash; controllers below the threshold are flagged below.</p>
+            <p class="text-base-content/60">{{ $periodLabel }} &mdash; controllers below the threshold are flagged below. Hours spent instructing count towards a controller's total; observers in training are excluded.</p>
         </div>
 
         {{-- Filter --}}
-        <form method="GET" action="{{ route('statistics.quarterly') }}" x-data="controllerPicker" @submit.prevent="handleSubmit($event)">
+        <form method="GET" action="{{ route('roster-purge.index') }}" x-data="controllerPicker" @submit.prevent="handleSubmit($event)">
             <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:items-end">
                 <div class="flex flex-col gap-1 w-full sm:w-auto">
                     <label class="text-sm">Quarter</label>
@@ -134,29 +133,47 @@
                         </div>
                     </div>
                 </div>
+                <div class="flex flex-col gap-1 w-full sm:w-52">
+                    <label class="text-sm" title="Hours come from training tickets (session start to end, student + instructor) in the selected quarter. Only controllers with fewer training hours than this are flagged. Leave blank for no limit.">Max training (ticket hours)</label>
+                    <input type="number" name="max_training" step="0.1" min="0" value="{{ $maxTraining }}" placeholder="No limit" class="input w-full">
+                </div>
                 <div class="flex items-center gap-2 w-full sm:w-auto">
-                    <label class="label cursor-pointer gap-2" title="Limits the All Controllers table below to currently rostered controllers. The Flagged Controllers table always excludes unrostered controllers.">
-                        <input type="checkbox" name="rostered_only" value="1" class="checkbox" @checked($rosteredOnly)>
-                        <span class="text-sm">Rostered only (All Controllers table)</span>
+                    <input type="hidden" name="show_loa" value="0">
+                    <label class="label cursor-pointer gap-2">
+                        <input type="checkbox" name="show_loa" value="1" class="checkbox" @checked($showLoa)>
+                        <span class="text-sm">Show LOA</span>
                     </label>
                 </div>
                 <button type="submit" class="btn btn-primary w-full sm:w-auto">Search</button>
-                <a href="{{ route('statistics.quarterly.export', request()->query()) }}" class="btn btn-outline w-full sm:w-auto">Export Flagged CSV</a>
+                <a href="{{ route('roster-purge.export', request()->query()) }}" class="btn btn-outline w-full sm:w-auto">Export Flagged CSV</a>
             </div>
         </form>
 
         {{-- Flagged controllers --}}
-        <x-card-component title="Flagged Controllers ({{ $flagged->total() }})">
+        <x-card-component title="{{ $cid ? 'Controller Lookup' : 'Flagged Controllers' }} ({{ $flagged->total() }})">
             @if($flagged->total() === 0)
-                <p class="text-base mt-3">No controllers are below {{ number_format($threshold, 1) }}h for {{ $periodLabel }}.</p>
+                <p class="text-base mt-3">{{ $cid ? 'No rostered controller matches that search.' : 'No controllers are below '.number_format($threshold, 1).'h for '.$periodLabel.'.' }}</p>
             @else
                 @haspermission('remove inactive controllers')
-                    <form method="POST" action="{{ route('statistics.quarterly.remove') }}"
+                    <form method="POST" action="{{ route('roster-purge.remove') }}"
                           x-data="{ selected: [], reason: '' }"
                           @submit="if (selected.length === 0) { $event.preventDefault(); return; }
                                    if (!reason.trim()) { $event.preventDefault(); alert('A removal reason is required.'); return; }
                                    if (!confirm('Remove ' + selected.length + ' controller(s) from the roster? This cannot be undone.')) { $event.preventDefault(); }">
                         @csrf
+                @endhaspermission
+                @haspermission('remove inactive controllers')
+                        <div class="flex flex-col sm:flex-row sm:items-end gap-3 mt-3 mb-1">
+                            <div class="flex flex-col gap-1 w-full sm:max-w-md">
+                                <label class="text-sm">Removal reason (applied to all selected)</label>
+                                <input type="text" name="reason" x-model="reason" maxlength="255" placeholder="e.g. Inactivity — below quarterly hours minimum" class="input w-full">
+                            </div>
+                            <button type="submit" class="btn btn-error w-full sm:w-auto"
+                                    :disabled="selected.length === 0">
+                                Remove Selected (<span x-text="selected.length"></span>)
+                            </button>
+                        </div>
+                        <p class="text-xs text-base-content/60 mt-2">Removes the selected controllers from the VATUSA roster. Controllers on an approved LOA are highlighted and cannot be selected. Only controllers on the current page can be selected at once.</p>
                 @endhaspermission
                 <div class="overflow-x-auto mt-3">
                     <table class="table table-zebra table-sm sm:table-md w-full border border-base-300">
@@ -165,29 +182,40 @@
                                 @haspermission('remove inactive controllers')
                                     <th class="w-8">
                                         <input type="checkbox" class="checkbox checkbox-sm"
-                                               @click="selected = $event.target.checked ? [{{ $flagged->getCollection()->map(fn($r) => $r->user->id)->implode(',') }}] : []"
-                                               :checked="selected.length === {{ $flagged->count() }} && selected.length > 0">
+                                               @click="selected = $event.target.checked ? [{{ $flagged->getCollection()->reject(fn($r) => $r->on_loa)->map(fn($r) => $r->user->id)->implode(',') }}] : []"
+                                               :checked="selected.length === {{ $flagged->getCollection()->reject(fn($r) => $r->on_loa)->count() }} && selected.length > 0">
                                     </th>
                                 @endhaspermission
                                 <th>Controller</th>
                                 <th class="hidden sm:table-cell">Status</th>
                                 <th class="text-right whitespace-nowrap">Training</th>
-                                <th class="text-right whitespace-nowrap">{{ $periodLabel }} Hours</th>
+                                <th class="text-right whitespace-nowrap" title="Logged hours plus training hours spent as an instructor">{{ $periodLabel }} Hours</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($flagged as $row)
-                                <tr>
+                                <tr @class(['bg-warning/20 font-bold' => $row->on_loa])>
                                     @haspermission('remove inactive controllers')
                                         <td>
-                                            <input type="checkbox" name="user_ids[]" value="{{ $row->user->id }}"
-                                                   class="checkbox checkbox-sm" x-model.number="selected">
+                                            @if($row->on_loa)
+                                                <input type="checkbox" class="checkbox checkbox-sm" disabled title="On approved LOA — exempt from removal">
+                                            @else
+                                                <input type="checkbox" name="user_ids[]" value="{{ $row->user->id }}"
+                                                       class="checkbox checkbox-sm" x-model.number="selected">
+                                            @endif
                                         </td>
                                     @endhaspermission
                                     <td>
                                         <a href="{{ route('users.show', ['user' => $row->user->id]) }}"
-                                           class="font-medium hover:underline">{{ $row->user->name }}</a>
+                                           class="{{ $row->on_loa ? 'font-bold' : 'font-medium' }} hover:underline">{{ $row->user->name }}</a>
                                         <span class="text-xs text-base-content/60 ml-1">({{ $row->user->rating->mapToString() }})</span>
+                                        @if($row->on_loa)
+                                            @if(auth()->user()?->can('manage loas'))
+                                                <a href="{{ route('loa.show', $row->loa_id) }}" class="badge badge-warning badge-sm ml-1 hover:underline" title="View LOA">On LOA</a>
+                                            @else
+                                                <span class="badge badge-warning badge-sm ml-1">On LOA</span>
+                                            @endif
+                                        @endif
                                     </td>
                                     @php($status = $statusOf($row->user))
                                     <td class="hidden sm:table-cell">
@@ -201,81 +229,20 @@
                                         <span class="font-medium">{{ number_format($row->training_total, 1) }}h</span>
                                         <span class="text-xs text-base-content/60 ml-1">(S {{ number_format($row->training_student, 1) }} / I {{ number_format($row->training_instructor, 1) }})</span>
                                     </td>
-                                    <td class="text-right font-bold text-error">{{ number_format($row->total, 1) }}h</td>
+                                    <td class="text-right whitespace-nowrap">
+                                        <span class="font-bold text-error">{{ number_format($row->counted, 1) }}h</span>
+                                        <span class="text-xs text-base-content/60 ml-1">({{ number_format($row->total, 1) }} logged + {{ number_format($row->training_instructor, 1) }} instructing)</span>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
                 @haspermission('remove inactive controllers')
-                        <div class="flex flex-col sm:flex-row sm:items-end gap-3 mt-4">
-                            <div class="flex flex-col gap-1 w-full sm:max-w-md">
-                                <label class="text-sm">Removal reason (applied to all selected)</label>
-                                <input type="text" name="reason" x-model="reason" maxlength="255" placeholder="e.g. Inactivity — below quarterly hours minimum" class="input w-full">
-                            </div>
-                            <button type="submit" class="btn btn-error w-full sm:w-auto"
-                                    :disabled="selected.length === 0">
-                                Remove Selected (<span x-text="selected.length"></span>)
-                            </button>
-                        </div>
-                        <p class="text-xs text-base-content/60 mt-2">Removes the selected controllers from the VATUSA roster. Only controllers on the current page can be selected at once.</p>
                     </form>
                 @endhaspermission
                 <div class="mt-3">{{ $flagged->links() }}</div>
             @endif
-        </x-card-component>
-
-        {{-- Full breakdown --}}
-        <x-card-component title="All Controllers with Logged History ({{ $rows->total() }}) — {{ $periodLabel }}">
-            <p class="text-sm text-base-content/60 -mt-1 mb-2">
-                Everyone who has ever logged StatsSim hours, not just the current roster. 0.0h means no activity in {{ $periodLabel }} specifically &mdash; check Status for their current roster standing. Click a controller's name to see their most recent hours.
-            </p>
-            <div class="overflow-x-auto mt-3">
-                <table class="table table-zebra table-sm sm:table-md w-full border border-base-300">
-                    <thead>
-                        <tr>
-                            <th>Controller</th>
-                            <th class="hidden sm:table-cell">Status</th>
-                            <th class="text-right hidden sm:table-cell whitespace-nowrap">Delivery</th>
-                            <th class="text-right hidden sm:table-cell whitespace-nowrap">Ground</th>
-                            <th class="text-right hidden sm:table-cell whitespace-nowrap">Tower</th>
-                            <th class="text-right hidden sm:table-cell whitespace-nowrap">TRACON</th>
-                            <th class="text-right hidden sm:table-cell whitespace-nowrap">Center</th>
-                            <th class="text-right hidden lg:table-cell">Training (Student)</th>
-                            <th class="text-right hidden lg:table-cell">Training (Instructor)</th>
-                            <th class="text-right whitespace-nowrap">Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($rows as $row)
-                            <tr>
-                                <td>
-                                    <a href="{{ route('users.show', ['user' => $row->user->id]) }}"
-                                       class="font-medium hover:underline">{{ $row->user->name }}</a>
-                                    <span class="text-xs text-base-content/60 ml-1">({{ $row->user->rating->mapToString() }})</span>
-                                </td>
-                                @php($status = $statusOf($row->user))
-                                <td class="hidden sm:table-cell">
-                                    @if($status['badge'])
-                                        <span class="badge {{ $status['badge'] }}">{{ $status['label'] }}</span>
-                                    @else
-                                        <span class="text-sm">{{ $status['label'] }}</span>
-                                    @endif
-                                </td>
-                                <td class="text-right hidden sm:table-cell">{{ $row->delivery > 0 ? number_format($row->delivery, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden sm:table-cell">{{ $row->ground > 0 ? number_format($row->ground, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden sm:table-cell">{{ $row->tower > 0 ? number_format($row->tower, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden sm:table-cell">{{ $row->approach > 0 ? number_format($row->approach, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden sm:table-cell">{{ $row->center > 0 ? number_format($row->center, 1).'h' : '—' }}</td>
-                                <td class="text-right hidden lg:table-cell">{{ number_format($row->training_student, 1) }}h</td>
-                                <td class="text-right hidden lg:table-cell">{{ number_format($row->training_instructor, 1) }}h</td>
-                                <td class="text-right font-bold {{ $row->total < $threshold ? 'text-error' : '' }}">{{ number_format($row->total, 1) }}h</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-            <div class="mt-3">{{ $rows->links() }}</div>
         </x-card-component>
     </div>
 
