@@ -209,9 +209,10 @@ online controllers belong to ZJX. The initial set is seeded by
 view `resources/views/roster-purge/index.blade.php`) helps staff find and remove
 inactive controllers for a calendar quarter:
 
-- **Flagged list** — every rostered user whose logged hours in the selected
-  quarter (`controller_monthly_stats`) are below the "Flag below" threshold
-  (default 3h). Rostered users with no stat rows count as 0h.
+- **Flagged list** — every rostered user whose VATSIM Core hours in the selected
+  quarter (`controller_monthly_stats`, populated by `SyncVatsimSessions` from the
+  VATSIM Core API) plus hours spent instructing are below the "Flag below" threshold
+  (default 3h). Rostered users with no VATSIM Core stats count as 0h.
 - **Max training (ticket hours)** — optional extra filter; only flags users with
   fewer training-ticket hours (student + instructor, `session_start` to
   `session_end`) in the quarter than the limit.

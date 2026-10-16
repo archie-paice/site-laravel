@@ -71,7 +71,7 @@
 
     <div class="space-y-6">
         <div>
-            <p class="text-base-content/60">{{ $periodLabel }} &mdash; controllers below the threshold are flagged below. Hours spent instructing count towards a controller's total; observers in training are excluded.</p>
+            <p class="text-base-content/60">{{ $periodLabel }} &mdash; controllers below the threshold are flagged below, using hours from VATSIM Core statistics. Hours spent instructing count towards a controller's total; observers in training are excluded.</p>
         </div>
 
         {{-- Filter --}}
@@ -189,7 +189,7 @@
                                 <th>Controller</th>
                                 <th class="hidden sm:table-cell">Status</th>
                                 <th class="text-right whitespace-nowrap">Training</th>
-                                <th class="text-right whitespace-nowrap" title="Logged hours plus training hours spent as an instructor">{{ $periodLabel }} Hours</th>
+                                <th class="text-right whitespace-nowrap" title="VATSIM Core hours plus training hours spent as an instructor">{{ $periodLabel }} Hours</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -231,7 +231,7 @@
                                     </td>
                                     <td class="text-right whitespace-nowrap">
                                         <span class="font-bold text-error">{{ number_format($row->counted, 1) }}h</span>
-                                        <span class="text-xs text-base-content/60 ml-1">({{ number_format($row->total, 1) }} logged + {{ number_format($row->training_instructor, 1) }} instructing)</span>
+                                        <span class="text-xs text-base-content/60 ml-1">({{ number_format($row->total, 1) }} VATSIM + {{ number_format($row->training_instructor, 1) }} instructing)</span>
                                     </td>
                                 </tr>
                             @endforeach
