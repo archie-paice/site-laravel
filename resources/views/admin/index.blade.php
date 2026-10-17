@@ -9,33 +9,33 @@
 @endphp
 
 @section('body')
-    <section class="grid grid-cols-2 md:grid-cols-10 gap-3 items-start">
-        <div class="col-span-full">
-            <h1 class="col-span-full text-2xl text-primary font-bold">Welcome back, {{ auth()->user()->first_name }}!</h1>
-            <p class="">Here's what's going on in the ARTCC today.</p>
-        </div>
 
-        <x-card-component class="col-span-full lg:col-span-2 min-w-0" title="Total Rostered Users">
+    <div class="mb-3">
+        <h1 class="col-span-full text-2xl text-primary font-bold">Welcome back, {{ auth()->user()->first_name }}!</h1>
+        <p class="">Here's what's going on in the ARTCC today.</p>
+    </div>
+    <section class="grid grid-cols-2 xl:grid-cols-10 gap-3 items-start">
+        <x-card-component class="col-span-full xl:col-span-2 min-w-0" title="Total Rostered Users">
             <p class="text-2xl text-primary font-extrabold">{{ $totalRosteredUsers }}</p>
         </x-card-component>
 
-        <x-card-component class="col-span-full lg:col-span-2 min-w-0" title="Online Controllers">
+        <x-card-component class="col-span-full xl:col-span-2 min-w-0" title="Online Controllers">
             <p class="text-2xl text-primary font-extrabold">{{ $onlineControllers }}</p>
         </x-card-component>
 
-        <x-card-component class="col-span-full lg:col-span-2 min-w-0" title="Events This Month">
+        <x-card-component class="col-span-full xl:col-span-2 min-w-0" title="Events This Month">
             <p class="text-2xl text-primary font-extrabold">{{ $eventsThisMonth }}</p>
         </x-card-component>
 
-        <x-card-component class="col-span-full lg:col-span-2 min-w-0" title="Training Assignments">
+        <x-card-component class="col-span-full xl:col-span-2 min-w-0" title="Training Assignments">
             <p class="text-2xl text-primary font-extrabold">{{ $trainingAssignments }}</p>
         </x-card-component>
 
-        <x-card-component class="col-span-full lg:col-span-2 min-w-0" title="Training Requests">
+        <x-card-component class="col-span-full xl:col-span-2 min-w-0" title="Training Requests">
             <p class="text-2xl text-primary font-extrabold">{{ $trainingRequests }}</p>
         </x-card-component>
 
-        <div class="col-span-full lg:col-span-6 min-w-0">
+        <div class="col-span-full xl:col-span-6 min-w-0">
             <x-card-component class="min-w-0" title="Active Center Split">
                 <div class="w-full min-w-0 overflow-x-auto">
                     <livewire:sector-map/>
