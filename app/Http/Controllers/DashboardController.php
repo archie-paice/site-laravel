@@ -18,12 +18,11 @@ class DashboardController extends Controller
         $visitingControllers = User::where('rostered', true)->whereNot('facility', 'ZJX')->count();
         $totalRosteredUsers = $homeControllers + $visitingControllers;
         $onlineControllers = OnlineController::count();
-        $eventsThisMonth = Event::whereBetween('start', [now()->startOfMonth(), now()->endOfMonth(),])->count();
+        $eventsThisMonth = Event::whereBetween('start', [now()->startOfMonth(), now()->endOfMonth()])->count();
         $upcomingEvents = Event::whereBetween('start', [now(), now()->addDays(14)])->orderBy('start')->get();
         $trainingAssignments = TrainingAssignment::whereNotNull('instructor_id')->count();
         $trainingRequests = TrainingAssignment::whereNull('instructor_id')->count();
         $news = News::where('published_at', '<=', now())->orderBy('published_at', 'desc')->take(3)->get();
-
 
         return view('admin.index', [
             'homeControllers' => $homeControllers,

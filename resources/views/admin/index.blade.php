@@ -44,97 +44,122 @@
         </div>
 
 
-        <x-card-component title="Upcoming Events" class="col-span-full lg:col-span-2 min-w-0">
-            <div class="flex justify-between">
-                @if(!$upcomingEvents->isEmpty())
-                    <h1 class="font-bold text-base-content">
-                        <a href="{{ route('events.index') }}">View All Events</a>
-                    </h1>
-                @endif
-            </div>
+        <div class="col-span-full xl:col-span-4 min-w-0 grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
+            <x-card-component title="Upcoming Events" class="col-span-full lg:col-span-2 min-w-0">
+                <div class="flex justify-between">
+                    @if(!$upcomingEvents->isEmpty())
+                        <h1 class="font-bold text-base-content">
+                            <a href="{{ route('events.index') }}">View All Events</a>
+                        </h1>
+                    @endif
+                </div>
 
-            @if($upcomingEvents->isEmpty())
-                <h1 class="text-lg">No upcoming events.</h1>
-            @else
-                @foreach($upcomingEvents as $event)
-                    <a href="{{ route('events.show', $event->id) }}" class="flex flex-col my-2">
-                        <div class="bg-base-300 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition">
-                            <div class="flex">
-                                <div
-                                    class="bg-primary text-primary-content w-14 sm:w-16 shrink-0 flex flex-col items-center justify-center py-2"
-                                >
+                @if($upcomingEvents->isEmpty())
+                    <h1 class="text-lg">No upcoming events.</h1>
+                @else
+                    @foreach($upcomingEvents as $event)
+                        <a href="{{ route('events.show', $event->id) }}" class="flex flex-col my-2">
+                            <div class="bg-base-300 rounded-xl shadow-sm overflow-hidden hover:shadow-lg transition">
+                                <div class="flex">
+                                    <div
+                                        class="bg-primary text-primary-content w-14 sm:w-16 shrink-0 flex flex-col items-center justify-center py-2"
+                                    >
                                         <span class="text-xs sm:text-sm font-semibold uppercase">
                                             {{ $event->start->format('M') }}
                                         </span>
 
-                                    <span class="text-2xl sm:text-3xl font-bold leading-none">
+                                        <span class="text-2xl sm:text-3xl font-bold leading-none">
                                             {{ $event->start->format('d') }}
                                         </span>
-                                </div>
+                                    </div>
 
-                                <div class="p-3 flex-1 min-w-0">
-                                    <h3 class="font-bold text-base sm:text-lg truncate">
-                                        {{ $event->title }}
-                                        @if($event->isStartingSoon())
-                                            <span class="badge badge-primary badge-xs ml-1">Starting Soon</span>
-                                        @endif
-                                    </h3>
+                                    <div class="p-3 flex-1 min-w-0">
+                                        <h3 class="font-bold text-base sm:text-lg truncate">
+                                            {{ $event->title }}
+                                            @if($event->isStartingSoon())
+                                                <span class="badge badge-primary badge-xs ml-1">Starting Soon</span>
+                                            @endif
+                                        </h3>
 
-                                    <p class="text-sm text-base-content/70 mt-1">
-                                        {{ $event->getFormattedTimeAttribute() }}
-                                    </p>
+                                        <p class="text-sm text-base-content/70 mt-1">
+                                            {{ $event->getFormattedTimeAttribute() }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </a>
-                @endforeach
-            @endif
-        </x-card-component>
+                        </a>
+                    @endforeach
+                @endif
+            </x-card-component>
 
-        <x-card-component title="Latest Announcements" class="col-span-full lg:col-span-2 min-w-0">
-            @if($news->isEmpty())
-                <h1 class="text-lg">No recent announcements.</h1>
-            @endif
+            <x-card-component title="Latest Announcements" class="min-w-0">
+                @if($news->isEmpty())
+                    <h1 class="text-lg">No recent announcements.</h1>
+                @endif
 
-            <div>
-                @foreach($news as $n)
-                    <div class="flex flex-col my-5">
-                        <div
-                            class="bg-base-300 rounded-md overflow-hidden cursor-pointer hover:shadow-lg transition w-full"
-                            onclick="news_modal_{{ $n->id }}.showModal()"
-                        >
-                            <h3 class="font-medium text-base sm:text-lg text-base-content px-3 py-2">
-                                {{ $n->title }}
-                            </h3>
+                <div>
+                    @foreach($news as $n)
+                        <div class="flex flex-col my-5">
+                            <div
+                                class="bg-base-300 rounded-md overflow-hidden cursor-pointer hover:shadow-lg transition w-full"
+                                onclick="news_modal_{{ $n->id }}.showModal()"
+                            >
+                                <h3 class="font-medium text-base sm:text-lg text-base-content px-3 py-2">
+                                    {{ $n->title }}
+                                </h3>
+                            </div>
                         </div>
+
+                        <dialog id="news_modal_{{ $n->id }}" class="modal">
+                            <div class="modal-box w-11/12 max-w-2xl">
+                                <h3 class="text-xl font-bold">
+                                    {{ $n->title }}
+                                </h3>
+
+                                <p class="text-md font-medium">
+                                    {{ $n->published_at }}
+                                </p>
+
+                                <div class="py-4">
+                                    {!! Purify::clean($n->content) !!}
+                                </div>
+
+                                <div class="modal-action">
+                                    <form method="dialog">
+                                        <button class="btn">
+                                            Close
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </dialog>
+                    @endforeach
+                </div>
+            </x-card-component>
+
+            @haspermission('statistics:write')
+            <x-card-component title="Manual Statistics Sync" class="">
+                <form method="POST" action="{{ route('statistics.sync') }}" class="mt-5 space-y-3">
+                    @csrf
+                    <p class="text-sm font-semibold">Sync VATSIM Core Statistics</p>
+                    <p class="text-sm text-base-content/60">The Core API reads all sessions in this date range and
+                        stores eligible rostered-controller sessions.</p>
+                    <div class="flex flex-wrap gap-3 items-end">
+                        <div class="flex flex-col gap-1">
+                            <label for="statistics-from-date" class="text-xs text-base-content/60">From (UTC)</label>
+                            <input id="statistics-from-date" name="from_date" type="date" class="input input-sm"
+                                   value="{{ old('from_date', $statisticsSyncFromDate) }}" required>
+                        </div>
+                        <div class="flex flex-col gap-1">
+                            <label for="statistics-to-date" class="text-xs text-base-content/60">To (UTC)</label>
+                            <input id="statistics-to-date" name="to_date" type="date" class="input input-sm"
+                                   value="{{ old('to_date', $statisticsSyncToDate) }}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-sm">Sync</button>
                     </div>
-
-                    <dialog id="news_modal_{{ $n->id }}" class="modal">
-                        <div class="modal-box w-11/12 max-w-2xl">
-                            <h3 class="text-xl font-bold">
-                                {{ $n->title }}
-                            </h3>
-
-                            <p class="text-md font-medium">
-                                {{ $n->published_at }}
-                            </p>
-
-                            <div class="py-4">
-                                {!! Purify::clean($n->content) !!}
-                            </div>
-
-                            <div class="modal-action">
-                                <form method="dialog">
-                                    <button class="btn">
-                                        Close
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    </dialog>
-                @endforeach
-            </div>
-        </x-card-component>
-
+                </form>
+            </x-card-component>
+        </div>
+        @endhaspermission
     </section>
 @endsection
