@@ -20,7 +20,7 @@ function oiAdmin(): User
 }
 
 test('guests cannot view the oi matrix', function () {
-    $this->get(route('admin.oi-matrix'))->assertRedirect();
+    $this->get(route('admin.oi-matrix'))->assertForbidden();
 });
 
 test('staff without manage users cannot view the oi matrix', function () {
