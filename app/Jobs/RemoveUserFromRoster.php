@@ -11,6 +11,7 @@ use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Throwable;
 
 class RemoveUserFromRoster implements ShouldQueue
 {
@@ -81,6 +82,10 @@ class RemoveUserFromRoster implements ShouldQueue
             ->log($succeeded ? 'Removed from VATUSA roster' : 'VATUSA roster removal failed');
 
         if (! $succeeded) {
+            // Puts them back on the purge tool's flagged list so it can be retried.
+            $user->roster_removal_queued_at = null;
+            $user->save();
+
             Log::error('Failed to remove user '.$this->userId.' from roster. Response: '.$request->body());
 
             if ($requestedBy) {
@@ -94,10 +99,20 @@ class RemoveUserFromRoster implements ShouldQueue
         // full roster sync runs.
         $user->rostered = false;
         $user->operating_initials = null;
+        $user->roster_removal_queued_at = null;
         $user->save();
 
         Mail::to($user->email)->bcc(['atm@zjxartcc.org', 'datm@zjxartcc.org'])->queue(new ControllerRemovedFromRoster($user, $this->reason));
 
         Log::info('Successfully removed user '.$this->userId.' from roster. Reason: '.$this->reason);
+    }
+
+    /**
+     * Handle a job that threw (e.g. VATUSA unreachable) so the controller isn't
+     * left hidden from the purge tool with no removal pending.
+     */
+    public function failed(?Throwable $exception): void
+    {
+        User::whereKey($this->userId)->update(['roster_removal_queued_at' => null]);
     }
 }

@@ -72,12 +72,17 @@ class RosterPurgeController extends Controller
             return redirect()->back()->with('error', 'You cannot remove yourself from the roster.');
         }
 
-        // Controllers with an approved LOA are never purged, even if selected.
+        // Controllers with an approved LOA are never purged, even if selected, and
+        // anyone with a removal already pending isn't queued a second time.
         $users = User::whereIn('id', $validated['user_ids'])
             ->whereNotIn('id', $this->approvedLoaIds()->keys())
+            ->whereNull('roster_removal_queued_at')
             ->get();
 
         foreach ($users as $user) {
+            // Hides them from the flagged list until the job clears it.
+            $user->forceFill(['roster_removal_queued_at' => Carbon::now()])->save();
+
             RemoveUserFromRoster::dispatch($user->id, $validated['reason'], Auth::id());
             Log::info('Queued roster removal for user '.$user->id.' ('.$user->name.'). Reason: '.$validated['reason'].' by '.Auth::id());
         }
@@ -125,7 +130,9 @@ class RosterPurgeController extends Controller
 
         // Every rostered controller is considered, including those with no logged
         // hours at all (they count as 0h and are the most likely to be flagged).
+        // Controllers with a removal already queued are left out entirely.
         $users = User::where('rostered', true)
+            ->whereNull('roster_removal_queued_at')
             ->orderBy('last_name')
             ->orderBy('first_name')
             ->get(['id', 'first_name', 'last_name', 'rating', 'rostered', 'facility']);

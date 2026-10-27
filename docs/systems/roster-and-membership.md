@@ -225,6 +225,11 @@ inactive controllers for a calendar quarter:
   requester, and queues one `RemoveUserFromRoster` job per user. The job calls
   VATUSA, writes an audit log entry, and emails the controller (or the requester
   on failure). A queue worker must be running.
+- **Pending removals** — queuing a removal sets `users.roster_removal_queued_at`.
+  Those users are left out of the flagged list, the controller search, and the
+  CSV export, and selecting them again queues nothing. The job clears the column
+  when it finishes, and its `failed()` hook clears it if it throws, so a failed
+  removal shows up in the list again and can be retried.
 
 ## Permissions / middleware
 

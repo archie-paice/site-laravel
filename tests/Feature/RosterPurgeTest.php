@@ -177,6 +177,45 @@ test('a senior staff member can queue removal of flagged controllers', function 
         && $job->by === $admin->id);
 });
 
+test('controllers queued for removal no longer appear in the flagged table', function () {
+    Queue::fake();
+
+    $queued = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $other = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+
+    $this->actingAs($admin)
+        ->post(route('roster-purge.remove'), ['user_ids' => [$queued->id], 'reason' => 'Inactive'])
+        ->assertRedirect();
+
+    expect($queued->fresh()->roster_removal_queued_at)->not->toBeNull();
+
+    $flagged = $this->actingAs($admin)
+        ->get(route('roster-purge.index', ['year' => 2026, 'quarter' => 3]))
+        ->viewData('flagged')->getCollection()->pluck('user.id');
+
+    expect($flagged)->not->toContain($queued->id)
+        ->and($flagged)->toContain($other->id);
+});
+
+test('a controller already queued for removal is not queued again', function () {
+    Queue::fake();
+
+    $queued = User::factory()->create(['rostered' => true]);
+    $queued->forceFill(['roster_removal_queued_at' => now()])->save();
+
+    $admin = User::factory()->create();
+    $admin->assignRole('admin', 'staff');
+
+    $this->actingAs($admin)
+        ->post(route('roster-purge.remove'), ['user_ids' => [$queued->id], 'reason' => 'Inactive'])
+        ->assertRedirect();
+
+    Queue::assertNothingPushed();
+});
+
 test('removal requires a reason', function () {
     Queue::fake();
 
@@ -253,6 +292,36 @@ test('the removal job does not email the user when the VATUSA call fails', funct
     expect($user->rostered)->toBeTrue();
 
     Mail::assertNotQueued(ControllerRemovedFromRoster::class);
+});
+
+test('the removal job clears the queued flag whether VATUSA succeeds or fails', function (int $status, bool $rostered) {
+    Http::fake([
+        '*' => Http::response($status === 200 ? ['status' => 'OK'] : ['status' => 'error'], $status),
+    ]);
+    Mail::fake();
+
+    $user = User::factory()->create(['rostered' => true, 'facility' => config('app.vatusa_facility')]);
+    $user->forceFill(['roster_removal_queued_at' => now()])->save();
+    $admin = User::factory()->create();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $admin->id))->handle();
+
+    $user->refresh();
+
+    expect($user->roster_removal_queued_at)->toBeNull()
+        ->and($user->rostered)->toBe($rostered);
+})->with([
+    'success' => [200, false],
+    'failure' => [500, true],
+]);
+
+test('a removal job that throws clears the queued flag', function () {
+    $user = User::factory()->create(['rostered' => true]);
+    $user->forceFill(['roster_removal_queued_at' => now()])->save();
+
+    (new RemoveUserFromRoster($user->id, 'Inactivity', $user->id))->failed(new RuntimeException('VATUSA unreachable'));
+
+    expect($user->fresh()->roster_removal_queued_at)->toBeNull();
 });
 
 test('the removal job emails the requesting staff member when the VATUSA call fails', function () {
