@@ -44,8 +44,8 @@
         </div>
 
 
-        <div class="col-span-full xl:col-span-4 min-w-0 grid grid-cols-1 xl:grid-cols-2 gap-3 items-start">
-            <x-card-component title="Upcoming Events" class="col-span-full lg:col-span-2 min-w-0">
+        <div class="col-span-full xl:col-span-4 min-w-0 grid grid-cols-1 gap-3 items-start">
+            <x-card-component title="Upcoming Events" class="col-span-full min-w-0">
                 <div class="flex justify-between">
                     @if(!$upcomingEvents->isEmpty())
                         <h1 class="font-bold text-base-content">
@@ -138,7 +138,7 @@
             </x-card-component>
 
             @haspermission('statistics:write')
-            <x-card-component title="Manual Statistics Sync" class="">
+            <x-card-component title="Manual Statistics Sync" class="min-w-0">
                 <form method="POST" action="{{ route('statistics.sync') }}" class="mt-5 space-y-3">
                     @csrf
                     <p class="text-sm font-semibold">Sync VATSIM Core Statistics</p>
@@ -159,7 +159,7 @@
                     </div>
                 </form>
             </x-card-component>
+            @endhaspermission
         </div>
-        @endhaspermission
     </section>
 @endsection
