@@ -212,7 +212,7 @@
                                     <li><a class="block py-2 pl-8 pr-4 hover:bg-base-300" href="{{ route('visit.manage') }}">Visitor Requests</a></li>
                                     <li><a class="block py-2 pl-8 pr-4 hover:bg-base-300" href="{{ route('loa.manage') }}">LOA Requests</a></li>
                                     <li><a class="block py-2 pl-8 pr-4 hover:bg-base-300" href="{{ route('logs.index') }}">Audit Log</a></li>
-                                    <li><a class="block py-2 pl-8 pr-4 hover:bg-base-300" href="{{ route('logs.index') }}">Stats Sync</a></li>
+                                    <li><a class="block py-2 pl-8 pr-4 hover:bg-base-300" href="{{ route('roster-purge.index') }}">Purge Assistant</a></li>
                                 </ul>
                             </li>
                         @endif
